@@ -150,8 +150,9 @@ input{padding:11px 16px}#send{width:44px;height:44px}
 html,body{overscroll-behavior:none}
 @supports (height:100dvh){html,body,#app{height:100dvh}}
 .cw{position:relative}
-.av{position:absolute;left:18px;top:3px;font-size:10px;line-height:1.5;color:var(--mu);pointer-events:none}
+.av{position:absolute;left:14px;top:2px;font-size:10px;line-height:1.5;color:var(--mu);pointer-events:none;padding:2px 12px 3px 4px;border-radius:8px;background:linear-gradient(90deg,#1d1d1dd9 70%,#1d1d1d00)}
 .av .t{font-size:9px;letter-spacing:.12em;margin-bottom:1px}
+.av .t em{font-style:normal;letter-spacing:0;color:#6d6d6d;margin-left:6px;font-size:9px}
 .av b{color:var(--tx);font-weight:600;font-variant-numeric:tabular-nums;margin-left:3px}
 .av i{display:inline-block;width:8px;height:3px;border-radius:2px;margin-right:4px;vertical-align:middle}
 .ch2.still .ln{animation:none;stroke-dashoffset:0}
@@ -189,10 +190,10 @@ const SRC=()=>[
  {id:'coffee',n:'壱のコーヒー',k:['コーヒー','壱'],f:0,e:0,b:0,t:'d',lb:'毎日'},
  {id:'stamina',n:'シティスタミナ',k:['スタミナ'],f:0,e:0,b:0,t:'w',lb:'毎週月曜'},
  {id:'million',n:'プロジェクトミリオン',k:['ミリオン'],f:0,e:0,b:0,t:'b',lb:'14日ごと(月曜)',anchor:nextMon()}];
-let S={v:5,log:[],goals:{f:0,e:0},all:false,src:SRC(),rcv:{},open:{f:0,e:0,b:0,w:0,set:false},pull:160};
-try{const r=JSON.parse(localStorage.getItem('nte_fans')||'null');if(r){S.log=r.log||[];S.goals=r.goals||{f:r.goal||0,e:0};S.rcv=r.rcv||{};if(r.open)S.open=Object.assign(S.open,r.open);if(r.pull>0)S.pull=r.pull;if(!r.mig)S._m=1;(r.src||[]).forEach(o=>{const s=S.src.find(x=>x.id===o.id);if(s){s.f=+o.f||0;s.b=+o.b||0;s.e=+o.e||0;if(o.anchor)s.anchor=o.anchor}})}}catch(e){}
+let S={v:5,log:[],goals:{f:0,e:0},all:false,src:SRC(),rcv:{},open:{f:0,e:0,b:0,w:0,set:false},pull:160,fcMode:'auto'};
+try{const r=JSON.parse(localStorage.getItem('nte_fans')||'null');if(r){S.log=r.log||[];S.goals=r.goals||{f:r.goal||0,e:0};S.rcv=r.rcv||{};if(r.open)S.open=Object.assign(S.open,r.open);if(r.pull>0)S.pull=r.pull;if(r.fcMode)S.fcMode=r.fcMode;if(!r.mig)S._m=1;(r.src||[]).forEach(o=>{const s=S.src.find(x=>x.id===o.id);if(s){s.f=+o.f||0;s.b=+o.b||0;s.e=+o.e||0;if(o.anchor)s.anchor=o.anchor}})}}catch(e){}
 if(S._m){const d=S.src.find(x=>x.id==='daily');if(d&&!d.b)d.b=20000}
-const save=()=>{try{localStorage.setItem('nte_fans',JSON.stringify({v:5,mig:1,log:S.log,goals:S.goals,open:S.open,pull:S.pull,rcv:S.rcv,src:S.src.map(s=>({id:s.id,f:s.f,e:s.e,b:s.b,anchor:s.anchor}))}))}catch(e){}};
+const save=()=>{try{localStorage.setItem('nte_fans',JSON.stringify({v:5,mig:1,fcMode:S.fcMode,log:S.log,goals:S.goals,open:S.open,pull:S.pull,rcv:S.rcv,src:S.src.map(s=>({id:s.id,f:s.f,e:s.e,b:s.b,anchor:s.anchor}))}))}catch(e){}};
 const of=c=>S.log.filter(e=>(e.c||'f')===c);
 const nc=n=>n>=1e8?(n/1e8).toFixed(1).replace(/\.0$/,'')+'億':n>=1e5?Math.round(n/1e4)+'万':n>=1e4?(n/1e4).toFixed(1).replace(/\.0$/,'')+'万':nf(n);
 const hasBeetle=()=>!!(S.open.b||of('b').length||S.src.some(x=>x.b>0));
@@ -203,14 +204,25 @@ const bal=c=>(S.open[c]||0)+of(c).reduce((a,e)=>a+e.a,0);
 const sum=(a,p)=>a.filter(p).reduce((x,e)=>x+e.a,0);
 const shown={f:0,e:0,b:0};
 let CH=170,ANIM=true,lastSig='';const barPrev={f:0,e:0};
-const sigNow=()=>JSON.stringify([S.log.length,(S.log[S.log.length-1]||{}).id,S.open,S.goals,S.src.map(x=>[x.f,x.e,x.b,x.anchor])]);
+const sigNow=()=>JSON.stringify([S.fcMode,S.log.length,(S.log[S.log.length-1]||{}).id,S.open,S.goals,S.src.map(x=>[x.f,x.e,x.b,x.anchor])]);
 const isToday=e=>new Date(e.t).toDateString()===new Date().toDateString();
 
 const due=(s,d)=>{if(s.t==='d')return true;if(s.t==='w')return d.getDay()===1;const diff=dnum(d)-dnum(strD(s.anchor));return ((diff%14)+14)%14===0};
 const inc=(c,d)=>S.src.reduce((a,s)=>a+(due(s,d)?(+s[c]||0):0),0);
 const avg=c=>S.src.reduce((a,s)=>a+(+s[c]||0)/(s.t==='d'?1:s.t==='w'?7:14),0);
-function fc(c,n){let b=bal(c);const t=startOf(new Date()),a=[];for(let i=1;i<=n;i++){b+=inc(c,addD(t,i));a.push(b)}return a}
-function eta(c){const g=S.goals[c],b=bal(c);if(!(g>0))return '目標未設定';if(b>=g)return '達成済み';if(avg(c)<=0)return '定期収入が未設定';let x=b;const t=startOf(new Date());for(let i=1;i<=730;i++){x+=inc(c,addD(t,i));if(x>=g){const d=addD(t,i);return (d.getMonth()+1)+'/'+d.getDate()+'頃（'+i+'日後）'}}return '2年以内に到達しません'}
+function fcS(c,n){let b=bal(c);const t=startOf(new Date()),a=[];for(let i=1;i<=n;i++){b+=inc(c,addD(t,i));a.push(b)}return a}
+function obs(c){
+  if(!S.log.length)return null;
+  const now=Date.now(),t0=Math.max(startOf(new Date(S.log[0].t)).getTime(),startOf(addD(new Date(),-29)).getTime()),days=(now-t0)/864e5;
+  if(days<3)return null;
+  return {v:of(c).filter(e=>e.t>=t0).reduce((x,e)=>x+e.a,0)/days,days:Math.round(days)};
+}
+const basis=()=>S.fcMode!=='sched'&&obs('f')?'obs':'sched';
+const avgX=c=>{const o=basis()==='obs'?obs(c):null;return o?o.v:avg(c)};
+const fmtA=v=>v>0?'+'+nf(v):v<0?'−'+nf(-v):'±0';
+function fc(c,n){const o=basis()==='obs'?obs(c):null;if(!o)return fcS(c,n);const b=bal(c),a=[];for(let i=1;i<=n;i++)a.push(Math.max(0,Math.round(b+o.v*i)));return a}
+function eta(c){const g=S.goals[c],b=bal(c);if(!(g>0))return '目標未設定';if(b>=g)return '達成済み';if(basis()==='obs'){const o=obs(c);if(!o||o.v<=0)return '増加傾向なし';const d=Math.ceil((g-b)/o.v);if(d>730)return '2年以内に到達しません';const dt=addD(startOf(new Date()),d);return (dt.getMonth()+1)+'/'+dt.getDate()+'頃（'+d+'日後）'}
+  if(avg(c)<=0)return '定期収入が未設定';let x=b;const t=startOf(new Date());for(let i=1;i<=730;i++){x+=inc(c,addD(t,i));if(x>=g){const d=addD(t,i);return (d.getMonth()+1)+'/'+d.getDate()+'頃（'+i+'日後）'}}return '2年以内に到達しません'}
 function nextDue(s){if(s.t==='d')return '';const t=startOf(new Date());for(let i=0;i<30;i++){const d=addD(t,i);if(due(s,d))return (d.getMonth()+1)+'/'+d.getDate()+'（'+'日月火水木金土'[d.getDay()]+'）'}return ''}
 function chart(){
   const t=startOf(new Date()),F=30;
@@ -244,7 +256,7 @@ function chart(){
   ${C?L(C,'cgb',1.7,false):''}${L(B,'cge',2,false)}${L(A,'cgf',2.4,true)}
   ${C?`<circle cx="${X(P)}" cy="${Y(C,C.V[P])}" r="3" fill="#ffd3f0"/>`:''}<circle cx="${X(P)}" cy="${Y(B,B.V[P])}" r="7" fill="#71e7fb" opacity=".2"/><circle cx="${X(P)}" cy="${Y(B,B.V[P])}" r="3.2" fill="#8ff0ff"/>
   <circle cx="${X(P)}" cy="${Y(A,A.V[P])}" r="7" fill="#fccc54" opacity=".22"/><circle cx="${X(P)}" cy="${Y(A,A.V[P])}" r="3.6" fill="#fccc54" stroke="#000" stroke-opacity=".6"/>
-  ${lab(0,'','start')}${P>3?lab(P,'今日','middle'):''}${lab(N-1,'点線＝予測 '+(addD(start,N-1).getMonth()+1)+'/'+addD(start,N-1).getDate(),'end')}</svg><div class="av"><div class="t">1日平均</div>${[['f','ファンス','linear-gradient(90deg,#a8721a,#fccc54,#fff0a8)'],['e','円石','linear-gradient(90deg,#2a54b0,#4aa0f0,#8ff0ff)'],...(C?[['b','甲虫','linear-gradient(90deg,#8a4f86,#d28ac4,#ffd3f0)']]:[])].map(([c,n,g])=>`<div><i style="background:${g}"></i>${n}<b>+${nf(Math.round(avg(c)))}</b></div>`).join('')}</div></div>
+  ${lab(0,'','start')}${P>3?lab(P,'今日','middle'):''}${lab(N-1,'点線＝予測 '+(addD(start,N-1).getMonth()+1)+'/'+addD(start,N-1).getDate(),'end')}</svg><div class="av"><div class="t">1日平均<em>${basis()==='obs'?'実績'+obs('f').days+'日':'定期収入'}</em></div>${[['f','ファンス','linear-gradient(90deg,#a8721a,#fccc54,#fff0a8)'],['e','円石','linear-gradient(90deg,#2a54b0,#4aa0f0,#8ff0ff)'],...(C?[['b','甲虫','linear-gradient(90deg,#8a4f86,#d28ac4,#ffd3f0)']]:[])].map(([c,n,g])=>`<div><i style="background:${g}"></i>${n}<b>${fmtA(Math.round(avgX(c)))}</b></div>`).join('')}</div></div>
   <div class="lgd"><span><i class="sw" style="background:linear-gradient(90deg,#a8721a,#fccc54,#fff0a8)"></i>ファンス 〜${nc(A.mx)}</span><span><i class="sw" style="background:linear-gradient(90deg,#2a54b0,#4aa0f0,#8ff0ff)"></i>円石 〜${nc(B.mx)}</span>${C?`<span><i class="sw" style="background:linear-gradient(90deg,#8a4f86,#d28ac4,#ffd3f0)"></i>甲虫 〜${nc(C.mx)}</span>`:''}</div>`;
 }
 function card(){
@@ -265,7 +277,7 @@ function fcCard(){
   const head=cols.map(c=>`<span class="fh"><i style="background:${SW[c]}"></i>${NAME[c]}</span>`).join('');
   const row=(h,last)=>`<span class="fl${h===30?' em':''}${last?' lr':''}">${h}日後</span>`+cols.map(c=>`<b class="${h===30?'em':''}${last?' lr':''}">${nf(F[c][h-1])}</b>`).join('');
   const anyG=S.goals.f>0||S.goals.e>0;
-  return `<section class="card"><div class="ch"><span>FORECAST</span><span>定期収入のみ</span></div>
+  return `<section class="card"><div class="ch"><span>FORECAST</span><span>${basis()==='obs'?'実績ベース':'定期収入ベース'}</span></div>
   <div class="fct" style="--n:${cols.length}"><span></span>${head}${row(7)}${row(30,true)}</div>
   ${anyG?`<div class="gl" style="line-height:1.6;justify-content:flex-start;gap:12px"><span>目標到達</span>${S.goals.f>0?`<span>ファンス <b style="color:var(--tx);font-weight:600">${eta('f').replace(/（.*）/,'')}</b></span>`:''}${S.goals.e>0?`<span>円石 <b style="color:var(--tx);font-weight:600">${eta('e').replace(/（.*）/,'')}</b></span>`:''}</div>`:''}</section>`;
 }
@@ -372,6 +384,9 @@ function handle(raw){
     if(inFS()){exitFS();fsPref=false;try{localStorage.setItem('nte_fs','0')}catch(e){}return bot('全画面を解除しました。')}
     enterFS();setTimeout(()=>bot(inFS()?'全画面にしました。':'このビューアでは全画面にできませんでした。リンクをブラウザで直接開くと使えます。',{ms:3600}),350);return}
   if(/全画面.*(オフ|off|解除|やめ|終了)/i.test(t)){fsPref=false;try{localStorage.setItem('nte_fs','0')}catch(e){}exitFS();return bot('全画面を解除しました。')}
+  const fm=t.match(/^予測\s*(実績|定期収入|定期|自動)?$/);
+  if(fm){const w=fm[1];if(w){S.fcMode=w==='実績'?'obs':w==='自動'?'auto':'sched';save();render()}
+    const o=obs('f');return bot(`予測：${basis()==='obs'?`実績ベース（直近${o.days}日の増減から計算）`:'定期収入ベース'}${S.fcMode==='obs'&&!o?'<div class="mu">実績が3日分たまるまでは定期収入で計算します</div>':''}<div class="mu">「予測 実績」「予測 定期」で切替</div>`,{ms:4200})}
   const om=t.match(/^(セット|せっと|初期値?|開始量|スタート|財力値|財力)\s*(?:設定)?\s*(.*)$/);
   if(om){
     const NUM='(ファンス|円石|甲虫コイン|甲虫|財力値)?\\s*(\\d[\\d,]*(?:\\.\\d+)?)\\s*(万|千|k)?(?:\\s*(ファンス|円石|甲虫コイン|甲虫|財力値)(?!\\s*\\d))?',rest=om[2];
