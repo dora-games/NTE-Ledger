@@ -24,7 +24,7 @@ body.hasl #wm img{display:block}
 .ph{width:36px;height:36px;border:1px dashed #555;border-radius:10px;display:grid;place-items:center;font-size:8px;letter-spacing:.08em;color:#6a6a6a}
 .title{font-weight:700;font-size:20px;letter-spacing:.02em}
 #dt{font-size:12px;color:var(--mu);font-variant-numeric:tabular-nums}
-#dash{flex:1;min-height:0;overflow-y:auto;padding:4px 14px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;align-content:start}
+#dash{flex:1;min-height:0;overflow-y:auto;padding:2px 14px 8px;display:grid;grid-template-columns:1fr;gap:9px;align-content:start}
 .card{background:#242424a8;border:1px solid var(--line);border-radius:20px;padding:15px 16px;animation:in .5s both}
 .card:nth-child(2){animation-delay:.08s}
 .full{grid-column:1/-1}
@@ -85,7 +85,7 @@ input:focus{outline:0;border-color:#666}
 #dash{gap:10px;padding:2px 14px 10px}
 .big{font-size:28px;margin:0 0 2px}
 .two{margin-top:2px}
-svg.ch2{max-height:var(--ch,168px);margin:2px 0 4px}
+svg.ch2{margin:2px 0 4px}
 .lgd{margin-bottom:8px;flex-wrap:nowrap;gap:2px 9px;white-space:nowrap}
 .tbl{gap:4px 10px;margin:6px 0 6px}
 .h{padding:5px 0}
@@ -104,7 +104,7 @@ svg.ch2{max-height:var(--ch,168px);margin:2px 0 4px}
 #dash{gap:8px;padding:2px 12px 8px}
 .card{padding:9px 12px;border-radius:16px}
 .big{font-size:23px;margin:0}.bl{font-size:10px}
-svg.ch2{max-height:var(--ch,116px);margin:0 0 2px}
+svg.ch2{margin:0 0 2px}
 .lgd{margin-bottom:5px;font-size:9.5px}
 .tbl{gap:2px 10px;font-size:11.5px;margin:4px 0 4px}
 .h{padding:3px 0;font-size:12px}
@@ -134,10 +134,13 @@ input{padding:11px 16px}#send{width:44px;height:44px}
 .pl{font-weight:400;color:var(--mu);font-size:10.5px}
 .fct{display:grid;grid-template-columns:44px repeat(var(--n),1fr);gap:0;margin:8px 0 6px;font-variant-numeric:tabular-nums}
 .fct>*{padding:7px 0;border-bottom:1px solid #ffffff0f}
-.fct>*:nth-last-child(-n+4){border-bottom:0}
+.fct .lr{border-bottom:0}
+.gls.one{grid-template-columns:1fr}
+.slim{padding:9px 14px}.slim .h{padding:0;border:0;font-size:12.5px}
 .fct .fh{font-size:10px;letter-spacing:.04em;color:var(--mu);text-align:right;padding:2px 0 7px;display:flex;justify-content:flex-end;align-items:center;gap:5px;white-space:nowrap}
 .fct .fh i{display:inline-block;width:14px;height:3px;border-radius:2px}
-.fct .fl{font-size:11px;color:var(--mu);align-self:center}
+.fct .fl{font-size:11px;color:var(--mu);display:flex;align-items:center}
+.fct b{display:flex;align-items:center;justify-content:flex-end}
 .fct b{font-weight:600;font-size:13px;text-align:right;white-space:nowrap;padding-left:8px}
 .fct .fh{padding-left:8px}
 .fct b.avg{color:var(--mu);font-weight:500;font-size:12px}
@@ -191,6 +194,7 @@ const wealth=()=>(S.open.w||0)+of('f').filter(e=>e.a>0).reduce((a,e)=>a+e.a,0);
 const bal=c=>(S.open[c]||0)+of(c).reduce((a,e)=>a+e.a,0);
 const sum=(a,p)=>a.filter(p).reduce((x,e)=>x+e.a,0);
 const shown={f:0,e:0,b:0};
+let CH=170;
 const isToday=e=>new Date(e.t).toDateString()===new Date().toDateString();
 
 const due=(s,d)=>{if(s.t==='d')return true;if(s.t==='w')return d.getDay()===1;const diff=dnum(d)-dnum(strD(s.anchor));return ((diff%14)+14)%14===0};
@@ -211,7 +215,7 @@ function chart(){
     let mx=Math.max(...V,g>0?g:-Infinity),mn=c==='b'?Math.min(...V):Math.min(...V,0);if(mx===mn)mx=mn+1;
     return {V,mx,mn,g};
   };
-  const W=300,H=150,pd=8,top=14,bot=20,X=i=>pd+i*(W-pd*2)/(N-1);
+  const W=300,H=CH,pd=8,top=14,bot=20,X=i=>pd+i*(W-pd*2)/(N-1);
   const A=mk('f'),B=mk('e'),hasB=!!(S.open.b||of('b').length),C=hasB?mk('b'):null;
   const Y=(o,v)=>(H-bot)-(v-o.mn)/(o.mx-o.mn)*(H-bot-top);
   const path=(o,i0,i1)=>{let d='';for(let i=i0;i<=i1;i++)d+=(i===i0?'M':'L')+X(i).toFixed(1)+' '+Y(o,o.V[i]).toFixed(1);return d};
@@ -236,30 +240,31 @@ function chart(){
 }
 function card(){
   const D={};['f','e','b'].forEach(c=>{const td=of(c).filter(isToday);D[c]={net:td.reduce((x,y)=>x+y.a,0),b:bal(c),g:S.goals[c]}});
-  const pc=c=>D[c].g>0?Math.max(0,Math.min(100,Math.round(D[c].b/D[c].g*100))):0;
-  const gl=c=>{const g=D[c].g,rem=Math.max(0,g-D[c].b);return `<div><div class="gl"><span>${CUR[c]}</span>${g>0?(rem>0?`<span>あと <b class="rm">${nf(rem)}</b></span>`:'<b class="rm">達成</b>'):'<span>目標なし</span>'}</div><div class="bar"><i data-w="${pc(c)}"></i></div>${g>0?`<div class="gs">目標 ${nf(g)}・${pc(c)}%</div>`:''}</div>`};
-  return `<section class="card full"><div class="ch"><span>BALANCE</span><span class="dl">今日 ${D.f.net?sg(D.f.net):'±0'} ／ ${D.e.net?sg(D.e.net):'±0'}${hasBeetle()?` ／ ${D.b.net?sg(D.b.net):'±0'}`:''}</span></div>
-  <div class="two"><div><div class="bl">${ico('f')}ファンス</div><div class="big" id="bv_f">${nf(shown.f)}</div></div><div><div class="bl">${ico('e')}円石</div><div class="big" id="bv_e">${nf(shown.e)}</div><div class="gc">ガチャ <b>${pulls(bal('e'))}</b>回分</div></div></div>
+  const pc=c=>Math.max(0,Math.min(100,Math.round(D[c].b/D[c].g*100)));
+  const gl=c=>{const g=D[c].g,rem=Math.max(0,g-D[c].b);return `<div><div class="gl"><span>${CUR[c]}</span>${rem>0?`<span>あと <b class="rm">${nf(rem)}</b></span>`:'<b class="rm">達成</b>'}</div><div class="bar"><i data-w="${pc(c)}"></i></div><div class="gs">目標 ${nf(g)}・${pc(c)}%</div></div>`};
+  const gs=['f','e'].filter(c=>D[c].g>0);
+  return `<section class="card"><div class="ch"><span>BALANCE</span><span class="dl">今日 ${D.f.net?sg(D.f.net):'±0'} ／ ${D.e.net?sg(D.e.net):'±0'}${hasBeetle()?` ／ ${D.b.net?sg(D.b.net):'±0'}`:''}</span></div>
+  <div class="two"><div><div class="bl">${ico('f')}ファンス</div><div class="big" id="bv_f">${nf(shown.f)}</div></div><div><div class="bl">${ico('e')}円石</div><div class="big" id="bv_e">${nf(shown.e)}</div></div></div>
   <div class="wl"><span>財力値</span><b>${nf(wealth())}</b><em title="甲虫コイン">${ico('b','sm')}<b id="bv_b">${nf(shown.b)}</b></em></div>
-  ${chart()}<div class="gls">${gl('f')}${gl('e')}</div></section>`;
+  ${chart()}${gs.length?`<div class="gls${gs.length===1?' one':''}">${gs.map(gl).join('')}</div>`:''}</section>`;
 }
 function fcCard(){
   const hb=hasBeetle(),cols=hb?['f','e','b']:['f','e'];
   const F={f:fc('f',30),e:fc('e',30),b:fc('b',30)};
-  const NAME={f:'ファンス',e:'円石(ガチャ)',b:'甲虫'};
+  const NAME={f:'ファンス',e:'円石',b:'甲虫'};
   const SW={f:'linear-gradient(90deg,#a8721a,#fccc54,#fff0a8)',e:'linear-gradient(90deg,#2a54b0,#4aa0f0,#8ff0ff)',b:'linear-gradient(90deg,#8a4f86,#d28ac4,#ffd3f0)'};
   const head=cols.map(c=>`<span class="fh"><i style="background:${SW[c]}"></i>${NAME[c]}</span>`).join('');
-  const avgRow=`<span class="fl">平均/日</span>`+cols.map(c=>`<b class="avg">+${nf(Math.round(avg(c)))}</b>`).join('');
-  const row=h=>`<span class="fl${h===30?' em':''}">${h}日後</span>`+cols.map(c=>{const v=F[c][h-1];return `<b${h===30?' class="em"':''}>${nf(v)}${c==='e'?`<small>${pulls(v)}回</small>`:''}</b>`}).join('');
+  const row=(h,last)=>`<span class="fl${h===30?' em':''}${last?' lr':''}">${h}日後</span>`+cols.map(c=>`<b class="${h===30?'em':''}${last?' lr':''}">${nf(F[c][h-1])}</b>`).join('');
   const anyG=S.goals.f>0||S.goals.e>0;
-  return `<section class="card"><div class="ch"><span>FORECAST</span><span>定期収入のみで計算</span></div>
-  <div class="fct" style="--n:${cols.length}"><span></span>${head}${avgRow}${row(7)}${row(14)}${row(30)}</div>
+  return `<section class="card"><div class="ch"><span>FORECAST</span><span>定期収入のみ</span></div>
+  <div class="fct" style="--n:${cols.length}"><span></span>${head}${row(7)}${row(30,true)}</div>
   ${anyG?`<div class="gl" style="line-height:1.6;justify-content:flex-start;gap:12px"><span>目標到達</span>${S.goals.f>0?`<span>ファンス <b style="color:var(--tx);font-weight:600">${eta('f').replace(/（.*）/,'')}</b></span>`:''}${S.goals.e>0?`<span>円石 <b style="color:var(--tx);font-weight:600">${eta('e').replace(/（.*）/,'')}</b></span>`:''}</div>`:''}</section>`;
 }
-function histPanel(n0){
-  const n=S.all?40:(n0||4),rows=S.log.slice(-n).reverse();
-  return `<section class="card"><div class="ch"><span>HISTORY</span><span>${S.all?'全件表示中':'直近'+Math.min(n,S.log.length)+'件'}・「履歴」で切替</span></div>`+
-  (rows.length?rows.map(e=>{const d=new Date(e.t);return `<div class="h"><span><small>${d.getMonth()+1}/${d.getDate()} ${p2(d.getHours())}:${p2(d.getMinutes())}</small><u>${CUR[e.c||'f']}</u>${esc(e.n||'')}</span><em class="${e.a>0?'up':'dn'}">${sg(e.a)}</em></div>`}).join(''):'<div class="empty">まだ記録がありません</div>')+`</section>`;
+function histPanel(){
+  const row=e=>{const d=new Date(e.t);return `<div class="h"><span><small>${d.getMonth()+1}/${d.getDate()} ${p2(d.getHours())}:${p2(d.getMinutes())}</small><u>${CUR[e.c||'f']}</u>${esc(e.n||'')}</span><em class="${e.a>0?'up':'dn'}">${sg(e.a)}</em></div>`};
+  if(S.all)return `<section class="card"><div class="ch"><span>HISTORY</span><span>全件表示中・「履歴」で戻る</span></div>`+(S.log.length?S.log.slice(-40).reverse().map(row).join(''):'<div class="empty">まだ記録がありません</div>')+`</section>`;
+  if(!S.log.length)return '';
+  return `<section class="card slim">${row(S.log[S.log.length-1])}</section>`;
 }
 let sheetOpen=false;
 function sheetHTML(){
@@ -281,10 +286,15 @@ $('#sheet').addEventListener('change',e=>{const t=e.target,v=Math.max(0,Math.rou
   else{const s=S.src.find(x=>x.id===t.dataset.s);if(!s)return;if(t.dataset.k==='anchor'){if(t.value)s.anchor=t.value}else s[t.dataset.k]=v}
   save();renderDash()});
 function renderDash(){
-  const D=$('#dash'),st=D.scrollTop;D.style.removeProperty('--ch');
-  let hn=4;D.innerHTML=card()+fcCard()+histPanel(hn);
-  if(!S.all)while(D.scrollHeight>D.clientHeight+1&&hn>1){hn--;D.innerHTML=card()+fcCard()+histPanel(hn)}
-  {const ov=D.scrollHeight-D.clientHeight,sv=D.querySelector('svg.ch2');if(!S.all&&ov>1&&sv)D.style.setProperty('--ch',Math.max(56,Math.floor(sv.getBoundingClientRect().height-ov))+'px')}
+  const D=$('#dash'),st=D.scrollTop,build=()=>{D.innerHTML=card()+fcCard()+histPanel()};
+  build();
+  if(!S.all)for(let i=0;i<3;i++){
+    const sv=D.querySelector('svg.ch2');if(!sv)break;
+    const r=sv.getBoundingClientRect(),dr=D.getBoundingClientRect(),last=D.lastElementChild.getBoundingClientRect();
+    const free=D.clientHeight-(last.bottom-dr.top+D.scrollTop)-(parseFloat(getComputedStyle(D).paddingBottom)||0);
+    if(Math.abs(free)<3)break;
+    CH=Math.max(70,Math.min(460,Math.round((r.height+free)*300/r.width)));build();
+  }
   D.scrollTop=st;
   ['f','e','b'].forEach(c=>{
     const to=bal(c),from=shown[c],el=$('#bv_'+c),t0=performance.now();
