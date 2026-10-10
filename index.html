@@ -98,6 +98,21 @@ svg.ch2{max-height:112px;margin:2px 0 4px}
 .sh-h{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
 .sh-h b{font-size:15px}.sh-h .mu{flex:1}
 #shx{color:var(--mu);font-size:16px;cursor:pointer;padding:0 4px}
+@media (max-height:720px){
+.top{padding:8px 16px 4px}.title{font-size:17px}.lg img,.ph{width:30px;height:30px}
+#dash{gap:8px;padding:2px 12px 8px}
+.card{padding:9px 12px;border-radius:16px}
+.big{font-size:23px;margin:0}.bl{font-size:10px}
+svg.ch2{max-height:76px;margin:0 0 2px}
+.lgd{margin-bottom:5px;font-size:10px}
+.tbl{gap:2px 10px;font-size:11.5px;margin:4px 0 4px}
+.h{padding:3px 0;font-size:12px}
+.gl{font-size:10px}
+.inp{padding:6px 12px 10px}
+input{padding:11px 16px}#send{width:44px;height:44px}
+#log{bottom:calc(64px + env(safe-area-inset-bottom,0px))}
+#sheet{bottom:calc(66px + env(safe-area-inset-bottom,0px))}
+}
 </style>
 </head>
 <body>
@@ -127,11 +142,11 @@ const SRC=()=>[
  {id:'coffee',n:'壱のコーヒー',k:['コーヒー','壱'],f:0,e:0,t:'d',lb:'毎日'},
  {id:'stamina',n:'シティスタミナ',k:['スタミナ'],f:0,e:0,t:'w',lb:'毎週月曜'},
  {id:'million',n:'プロジェクトミリオン',k:['ミリオン'],f:0,e:0,t:'b',lb:'14日ごと(月曜)',anchor:nextMon()}];
-let S={v:5,log:[],goals:{f:0,e:0},all:false,src:SRC(),rcv:{}};
-try{const r=JSON.parse(localStorage.getItem('nte_fans')||'null');if(r){S.log=r.log||[];S.goals=r.goals||{f:r.goal||0,e:0};S.rcv=r.rcv||{};(r.src||[]).forEach(o=>{const s=S.src.find(x=>x.id===o.id);if(s){s.f=+o.f||0;s.e=+o.e||0;if(o.anchor)s.anchor=o.anchor}})}}catch(e){}
-const save=()=>{try{localStorage.setItem('nte_fans',JSON.stringify({v:5,log:S.log,goals:S.goals,rcv:S.rcv,src:S.src.map(s=>({id:s.id,f:s.f,e:s.e,anchor:s.anchor}))}))}catch(e){}};
+let S={v:5,log:[],goals:{f:0,e:0},all:false,src:SRC(),rcv:{},open:{f:0,e:0,set:false}};
+try{const r=JSON.parse(localStorage.getItem('nte_fans')||'null');if(r){S.log=r.log||[];S.goals=r.goals||{f:r.goal||0,e:0};S.rcv=r.rcv||{};if(r.open)S.open=Object.assign(S.open,r.open);(r.src||[]).forEach(o=>{const s=S.src.find(x=>x.id===o.id);if(s){s.f=+o.f||0;s.e=+o.e||0;if(o.anchor)s.anchor=o.anchor}})}}catch(e){}
+const save=()=>{try{localStorage.setItem('nte_fans',JSON.stringify({v:5,log:S.log,goals:S.goals,open:S.open,rcv:S.rcv,src:S.src.map(s=>({id:s.id,f:s.f,e:s.e,anchor:s.anchor}))}))}catch(e){}};
 const of=c=>S.log.filter(e=>(e.c||'f')===c);
-const bal=c=>of(c).reduce((a,e)=>a+e.a,0);
+const bal=c=>(S.open[c]||0)+of(c).reduce((a,e)=>a+e.a,0);
 const sum=(a,p)=>a.filter(p).reduce((x,e)=>x+e.a,0);
 const shown={f:0,e:0};
 const isToday=e=>new Date(e.t).toDateString()===new Date().toDateString();
@@ -147,7 +162,7 @@ function chart(){
   const first=S.log.length?startOf(new Date(S.log[0].t)):t;
   const start=first<addD(t,-13)?addD(t,-13):first,P=dnum(t)-dnum(start),N=P+F+1;
   const mk=c=>{
-    let pre=0;const net={};
+    let pre=S.open[c]||0;const net={};
     of(c).forEach(e=>{const d=startOf(new Date(e.t));if(d<start)pre+=e.a;else{const k=ymd(d);net[k]=(net[k]||0)+e.a}});
     const past=[];let b=pre;for(let i=0;i<=P;i++){b+=net[ymd(addD(start,i))]||0;past.push(b)}
     const V=past.concat(fc(c,F)),g=S.goals[c];
@@ -180,25 +195,24 @@ function card(){
   ${chart()}<div class="gls">${gl('f')}${gl('e')}</div></section>`;
 }
 function fcCard(){
-  const f=fc('f',30),e=fc('e',30),T={};
-  ['f','e'].forEach(c=>{const td=of(c).filter(isToday);T[c]={i:sum(td,x=>x.a>0),o:Math.abs(sum(td,x=>x.a<0))}});
+  const f=fc('f',30),e=fc('e',30);
   const r=h=>`<span>${h}日後</span><b>${nf(f[h-1])}</b><b>${nf(e[h-1])}</b>`;
   const anyG=S.goals.f>0||S.goals.e>0;
-  return `<section class="card"><div class="ch"><span>TODAY / FORECAST</span><span>予測は定期収入のみ</span></div>
+  return `<section class="card"><div class="ch"><span>FORECAST</span><span>定期収入のみで計算</span></div>
   <div class="tbl"><span></span><b class="hd">ファンス</b><b class="hd">円石</b>
-  <span>今日 入手</span><b>${nf(T.f.i)}</b><b>${nf(T.e.i)}</b><span>今日 消費</span><b>${nf(T.f.o)}</b><b>${nf(T.e.o)}</b>
   <span>平均/日</span><b>+${nf(Math.round(avg('f')))}</b><b>+${nf(Math.round(avg('e')))}</b>${r(7)}${r(14)}${r(30)}</div>
-  ${anyG?`<div class="gl" style="display:block;line-height:1.8">${S.goals.f>0?`<div>ファンス目標：<b style="color:var(--tx);font-weight:600">${eta('f')}</b></div>`:''}${S.goals.e>0?`<div>円石目標：<b style="color:var(--tx);font-weight:600">${eta('e')}</b></div>`:''}</div>`:''}</section>`;
+  ${anyG?`<div class="gl" style="display:block;line-height:1.7">${S.goals.f>0?`<div>ファンス目標：<b style="color:var(--tx);font-weight:600">${eta('f')}</b></div>`:''}${S.goals.e>0?`<div>円石目標：<b style="color:var(--tx);font-weight:600">${eta('e')}</b></div>`:''}</div>`:''}</section>`;
 }
-function histPanel(){
-  const n=S.all?40:4,rows=S.log.slice(-n).reverse();
-  return `<section class="card"><div class="ch"><span>HISTORY</span><span>${S.all?'全件表示中':'直近4件'}・「履歴」で切替</span></div>`+
+function histPanel(n0){
+  const n=S.all?40:(n0||4),rows=S.log.slice(-n).reverse();
+  return `<section class="card"><div class="ch"><span>HISTORY</span><span>${S.all?'全件表示中':'直近'+Math.min(n,S.log.length)+'件'}・「履歴」で切替</span></div>`+
   (rows.length?rows.map(e=>{const d=new Date(e.t);return `<div class="h"><span><small>${d.getMonth()+1}/${d.getDate()} ${p2(d.getHours())}:${p2(d.getMinutes())}</small><u>${CUR[e.c||'f']}</u>${esc(e.n||'')}</span><em class="${e.a>0?'up':'dn'}">${sg(e.a)}</em></div>`}).join(''):'<div class="empty">まだ記録がありません</div>')+`</section>`;
 }
 let sheetOpen=false;
 function sheetHTML(){
   const inp=(a,l,v)=>`<label>${l}<input type="number" inputmode="numeric" min="0" ${a} value="${v||''}" placeholder="0"></label>`;
   return `<div class="sh-h"><b>設定</b><span class="mu">量はレベルに合わせて入力</span><span id="shx">✕</span></div>
+  <div class="src"><div class="sn"><b>使い始めの量</b><small>このサイトを使い始めた時点</small></div><div class="sf">${inp('data-o="f"','ファンス',S.open.f)}${inp('data-o="e"','円石',S.open.e)}</div></div>
   <div class="src"><div class="sn"><b>目標</b></div><div class="sf">${inp('data-g="f"','ファンス',S.goals.f)}${inp('data-g="e"','円石',S.goals.e)}</div></div>`+
   S.src.map(s=>{const nx=nextDue(s);return `<div class="src"><div class="sn"><b>${s.n}</b><small>${s.lb}${nx?'・次回 '+nx:''}</small></div><div class="sf">${inp(`data-s="${s.id}" data-k="f"`,'ファンス',s.f)}${inp(`data-s="${s.id}" data-k="e"`,'円石',s.e)}${s.t==='b'?`<label>基準日（受取の月曜）<input type="date" data-s="${s.id}" data-k="anchor" value="${s.anchor}"></label>`:''}</div></div>`}).join('');
 }
@@ -207,12 +221,14 @@ function openSheet(o){sheetOpen=o;if(o)renderSheet();$('#shw').classList.toggle(
 $('#shbd').onclick=()=>openSheet(false);
 $('#sheet').addEventListener('click',e=>{if(e.target.id==='shx')openSheet(false)});
 $('#sheet').addEventListener('change',e=>{const t=e.target,v=Math.max(0,Math.round(+t.value||0));
-  if(t.dataset.g){S.goals[t.dataset.g]=v}
+  if(t.dataset.o){S.open[t.dataset.o]=v;S.open.set=true}
+  else if(t.dataset.g){S.goals[t.dataset.g]=v}
   else{const s=S.src.find(x=>x.id===t.dataset.s);if(!s)return;if(t.dataset.k==='anchor'){if(t.value)s.anchor=t.value}else s[t.dataset.k]=v}
   save();renderDash()});
 function renderDash(){
   const D=$('#dash'),st=D.scrollTop;
-  D.innerHTML=card()+fcCard()+histPanel();
+  let hn=4;D.innerHTML=card()+fcCard()+histPanel(hn);
+  if(!S.all)while(D.scrollHeight>D.clientHeight+1&&hn>1){hn--;D.innerHTML=card()+fcCard()+histPanel(hn)}
   D.scrollTop=st;
   ['f','e'].forEach(c=>{
     const to=bal(c),from=shown[c],el=$('#bv_'+c),t0=performance.now();
@@ -234,7 +250,7 @@ function bot(h,o={}){
   const d=bubble('a','<span class="dots"><i></i><i></i><i></i></span>');
   setTimeout(()=>{d.innerHTML=h;if(!o.keep)fadeT=setTimeout(fadeAll,o.ms||2400)},420);
 }
-const help=()=>`<b>+5000 ボス報酬</b>　入手<br><b>-3000 ガチャ</b>　消費<br><b>円石 +300</b>　円石は「円石」を付ける<br><b>設定</b>　定期収入・目標の入力<br><span class="mu">符号なしは聞き返します</span>`;
+const help=()=>`<b>+5000 ボス報酬</b>　入手<br><b>-3000 ガチャ</b>　消費<br><b>円石 +300</b>　円石は「円石」を付ける<br><b>セット ファンス 50000 円石 300</b>　使い始めの量<br><b>設定</b>　定期収入・目標の入力<br><span class="mu">符号なしは聞き返します</span>`;
 
 const norm=s=>s.replace(/[！-～]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0)).replace(/(^|\s)[−ー‐–](?=\s*\d)/g,'$1-').replace(/＋/g,'+').replace(/　/g,' ').trim();
 const curOf=t=>/円石|えんせき/.test(t)?'e':'f';
@@ -264,10 +280,21 @@ function handle(raw){
       if(/消費|使|減|マイナス|^-/.test(t)){pending=null;return record(p.c,-p.v,p.note)}
     }else if(p.type==='reset'){
       pending=null;
-      if(/^(はい|うん|ok|yes|消す|y)/i.test(t)){S.log=[];S.goals={f:0,e:0};save();shown.f=shown.e=0;render();return bot('リセットしました。')}
+      if(/^(はい|うん|ok|yes|消す|y)/i.test(t)){S.log=[];S.goals={f:0,e:0};S.open={f:0,e:0,set:false};save();shown.f=shown.e=0;render();return bot('リセットしました。')}
       return bot('キャンセルしました。');
     }
     pending=null;
+  }
+  const om=t.match(/^(セット|せっと|初期値?|開始量|スタート)\s*(?:設定)?\s*(.*)$/);
+  if(om){
+    const NUM='(ファンス|円石)?\\s*(\\d[\\d,]*(?:\\.\\d+)?)\\s*(万|千|k)?(?:\\s*(ファンス|円石)(?!\\s*\\d))?',rest=om[2];
+    if(rest&&new RegExp('^('+NUM+'\\s*)+$','i').test(rest)){
+      const re=new RegExp(NUM,'gi'),auto=['f','e'];let m;
+      while((m=re.exec(rest))){if(!m[0])break;const w=m[1]||m[4],c=w?(w==='円石'?'e':'f'):(auto.shift()||'f'),mul=m[3]==='万'?1e4:(m[3]==='千'||/k/i.test(m[3]||''))?1e3:1;S.open[c]=Math.round(parseFloat(m[2].replace(/,/g,''))*mul)}
+      S.open.set=true;save();render();
+      return bot(`使い始めの量をセット：ファンス ${nf(S.open.f)}／円石 ${nf(S.open.e)}`,{ms:3200});
+    }
+    openSheet(true);return bot('「セット ファンス 50000 円石 300」と送るか、設定の「使い始めの量」に入力してください。',{ms:4800});
   }
   if(/^(設定|設定を開く|設定画面|定期|定期収入|settings?)$/i.test(t)){openSheet(true);return bot('設定を開きました。',{ms:1600})}
   if(/^(閉じる|とじる|完了|設定終了|close)$/i.test(t)){openSheet(false);return bot('閉じました。',{ms:1200})}
@@ -281,7 +308,7 @@ function handle(raw){
       }
       const dm=rest.match(/^(?:基準日|次回|開始)?\s*(\d{1,2})\/(\d{1,2})$/);
       if(dm&&s.t==='b'){s.anchor=new Date().getFullYear()+'-'+p2(+dm[1])+'-'+p2(+dm[2]);save();render();return bot(`${s.n}の基準日を ${+dm[1]}/${+dm[2]} にしました。以後14日ごとです。`,{ms:3200})}
-      const NUM='(ファンス|円石)?\\s*(\\d[\\d,]*(?:\\.\\d+)?)\\s*(万|千|k)?\\s*(ファンス|円石)?';
+      const NUM='(ファンス|円石)?\\s*(\\d[\\d,]*(?:\\.\\d+)?)\\s*(万|千|k)?(?:\\s*(ファンス|円石)(?!\\s*\\d))?';
       if(rest&&new RegExp('^('+NUM+'\\s*)+$','i').test(rest)){
         const re=new RegExp(NUM,'gi');let m;
         while((m=re.exec(rest))){if(!m[0])break;const c=(m[1]||m[4])==='円石'?'e':'f',mul=m[3]==='万'?1e4:(m[3]==='千'||/k/i.test(m[3]||''))?1e3:1;s[c]=Math.round(parseFloat(m[2].replace(/,/g,''))*mul)}
@@ -293,7 +320,7 @@ function handle(raw){
   if(/ロゴ.*(削除|消|リセット)/.test(t)){clearLogo();return bot('ロゴを削除しました。')}
   const c=curOf(t),u=strip(t);
   if(/^(残高|所持|確認|いくら)/.test(t)||/^(残高|所持)/.test(u.trim()))return bot('残高は上に表示しています。');
-  if(/履歴|ログ|history/i.test(t)){S.all=!S.all;render();return bot(S.all?'履歴を全件表示にしました。':'履歴を直近4件に戻しました。')}
+  if(/履歴|ログ|history/i.test(t)){S.all=!S.all;render();return bot(S.all?'履歴を全件表示にしました。':'履歴を通常表示に戻しました。')}
   if(/集計|まとめ/.test(t)&&!/^\s*[+\-]?\d/.test(u))return bot('集計は各カードに表示しています。');
   if(/取り消|取消|undo|戻す|やり直/i.test(t)){const e=S.log.pop();save();render();return bot(e?`${CUR[e.c||'f']} <b>${sg(e.a)}</b> を取り消しました。`:'取り消せる記録がありません。')}
   if(/^目標/.test(t)){const a=amt(u.replace(/^目標/,''));if(!a)return bot('「目標 100000」「目標 円石 3000」のように入力してください。',{ms:4000});S.goals[c]=a.v;save();render();return bot(`${CUR[c]}の目標を <b>${nf(a.v)}</b> に設定しました。`)}
@@ -312,6 +339,7 @@ function handle(raw){
 $('#send').onclick=()=>{const v=$('#q').value;$('#q').value='';handle(v)};
 $('#q').onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing)$('#send').click()};
 render();
+if(!S.open.set&&!S.log.length)setTimeout(()=>bot('はじめに、今の量を入力してください。<br><b>セット ファンス 50000 円石 300</b>',{keep:true}),500);
 
 /* ---- ロゴ ---- */
 function setLogo(src){$('#lgi').src=src;$('#wmi').src=src;$('#lg').classList.add('has');document.body.classList.add('hasl')}
