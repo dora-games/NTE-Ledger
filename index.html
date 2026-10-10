@@ -113,6 +113,14 @@ input{padding:11px 16px}#send{width:44px;height:44px}
 #log{bottom:calc(64px + env(safe-area-inset-bottom,0px))}
 #sheet{bottom:calc(66px + env(safe-area-inset-bottom,0px))}
 }
+.ci{width:16px;height:16px;object-fit:contain;vertical-align:-3px;margin-right:4px}
+.ci.sm{width:13px;height:13px;margin-right:3px;vertical-align:-2px}
+.bl .ci{width:18px;height:18px;vertical-align:-4px}
+.rm{color:#fff;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+.gs{font-size:10px;color:var(--mu);margin-top:3px}
+.pv{width:46px;height:46px;border:1px dashed #555;border-radius:12px;display:grid;place-items:center;color:#777;font-size:18px;overflow:hidden;margin-top:3px}
+.pv img{width:100%;height:100%;object-fit:contain}
+.ip{cursor:pointer}
 </style>
 </head>
 <body>
@@ -129,6 +137,8 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf=n=>Number(n).toLocaleString('ja-JP');
 const sg=n=>(n>0?'+':n<0?'−':'')+nf(Math.abs(n));
+const ICON={f:null,e:null};
+const ico=(c,k='')=>ICON[c]?`<img class="ci ${k}" src="${ICON[c]}" alt="">`:'';
 const CUR={f:'ファンス',e:'円石'},COL={f:'#ffffff',e:'#b9b9b9'};
 const p2=x=>String(x).padStart(2,'0');
 const ymd=d=>d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());
@@ -184,14 +194,14 @@ function chart(){
   ${L(B,'#a8a8a8',1.6)}${L(A,'#ffffff',2)}
   <circle cx="${X(P)}" cy="${Y(A,A.V[P])}" r="3.5" fill="#fff"/><circle cx="${X(P)}" cy="${Y(B,B.V[P])}" r="3" fill="#a8a8a8"/>
   ${lab(0,'','start')}${P>3?lab(P,'今日','middle'):''}${lab(N-1,'','end')}</svg>
-  <div class="lgd"><span><i style="border-color:#fff"></i>ファンス 〜${nf(A.mx)}</span><span><i style="border-color:#a8a8a8"></i>円石 〜${nf(B.mx)}</span><span><i style="border-color:#777;border-top-style:dashed"></i>予測</span></div>`;
+  <div class="lgd"><span><i style="border-color:#fff"></i>${ico('f','sm')}ファンス 〜${nf(A.mx)}</span><span><i style="border-color:#a8a8a8"></i>${ico('e','sm')}円石 〜${nf(B.mx)}</span><span><i style="border-color:#777;border-top-style:dashed"></i>予測</span></div>`;
 }
 function card(){
   const D={};['f','e'].forEach(c=>{const td=of(c).filter(isToday);D[c]={net:td.reduce((x,y)=>x+y.a,0),b:bal(c),g:S.goals[c]}});
   const pc=c=>D[c].g>0?Math.max(0,Math.min(100,Math.round(D[c].b/D[c].g*100))):0;
-  const gl=c=>`<div><div class="gl"><span>${CUR[c]} ${D[c].g>0?'目標 '+nf(D[c].g):'目標なし'}</span><span>${D[c].g>0?pc(c)+'%':''}</span></div><div class="bar"><i data-w="${pc(c)}"></i></div></div>`;
+  const gl=c=>{const g=D[c].g,rem=Math.max(0,g-D[c].b);return `<div><div class="gl"><span>${ico(c,'sm')}${CUR[c]}</span>${g>0?(rem>0?`<span>あと <b class="rm">${nf(rem)}</b></span>`:'<b class="rm">達成</b>'):'<span>目標なし</span>'}</div><div class="bar"><i data-w="${pc(c)}"></i></div>${g>0?`<div class="gs">目標 ${nf(g)}・${pc(c)}%</div>`:''}</div>`};
   return `<section class="card full"><div class="ch"><span>BALANCE</span><span class="dl">今日 ${D.f.net?sg(D.f.net):'±0'} ／ ${D.e.net?sg(D.e.net):'±0'}</span></div>
-  <div class="two"><div><div class="bl">ファンス</div><div class="big" id="bv_f">${nf(shown.f)}</div></div><div><div class="bl">円石</div><div class="big" id="bv_e">${nf(shown.e)}</div></div></div>
+  <div class="two"><div><div class="bl">${ico('f')}ファンス</div><div class="big" id="bv_f">${nf(shown.f)}</div></div><div><div class="bl">${ico('e')}円石</div><div class="big" id="bv_e">${nf(shown.e)}</div></div></div>
   ${chart()}<div class="gls">${gl('f')}${gl('e')}</div></section>`;
 }
 function fcCard(){
@@ -199,19 +209,20 @@ function fcCard(){
   const r=h=>`<span>${h}日後</span><b>${nf(f[h-1])}</b><b>${nf(e[h-1])}</b>`;
   const anyG=S.goals.f>0||S.goals.e>0;
   return `<section class="card"><div class="ch"><span>FORECAST</span><span>定期収入のみで計算</span></div>
-  <div class="tbl"><span></span><b class="hd">ファンス</b><b class="hd">円石</b>
+  <div class="tbl"><span></span><b class="hd">${ico('f','sm')}ファンス</b><b class="hd">${ico('e','sm')}円石</b>
   <span>平均/日</span><b>+${nf(Math.round(avg('f')))}</b><b>+${nf(Math.round(avg('e')))}</b>${r(7)}${r(14)}${r(30)}</div>
   ${anyG?`<div class="gl" style="display:block;line-height:1.7">${S.goals.f>0?`<div>ファンス目標：<b style="color:var(--tx);font-weight:600">${eta('f')}</b></div>`:''}${S.goals.e>0?`<div>円石目標：<b style="color:var(--tx);font-weight:600">${eta('e')}</b></div>`:''}</div>`:''}</section>`;
 }
 function histPanel(n0){
   const n=S.all?40:(n0||4),rows=S.log.slice(-n).reverse();
   return `<section class="card"><div class="ch"><span>HISTORY</span><span>${S.all?'全件表示中':'直近'+Math.min(n,S.log.length)+'件'}・「履歴」で切替</span></div>`+
-  (rows.length?rows.map(e=>{const d=new Date(e.t);return `<div class="h"><span><small>${d.getMonth()+1}/${d.getDate()} ${p2(d.getHours())}:${p2(d.getMinutes())}</small><u>${CUR[e.c||'f']}</u>${esc(e.n||'')}</span><em class="${e.a>0?'up':'dn'}">${sg(e.a)}</em></div>`}).join(''):'<div class="empty">まだ記録がありません</div>')+`</section>`;
+  (rows.length?rows.map(e=>{const d=new Date(e.t);return `<div class="h"><span><small>${d.getMonth()+1}/${d.getDate()} ${p2(d.getHours())}:${p2(d.getMinutes())}</small><u>${ico(e.c||'f','sm')}${CUR[e.c||'f']}</u>${esc(e.n||'')}</span><em class="${e.a>0?'up':'dn'}">${sg(e.a)}</em></div>`}).join(''):'<div class="empty">まだ記録がありません</div>')+`</section>`;
 }
 let sheetOpen=false;
 function sheetHTML(){
   const inp=(a,l,v)=>`<label>${l}<input type="number" inputmode="numeric" min="0" ${a} value="${v||''}" placeholder="0"></label>`;
-  return `<div class="sh-h"><b>設定</b><span class="mu">量はレベルに合わせて入力</span><span id="shx">✕</span></div>
+  const ic=`<div class="src"><div class="sn"><b>アイコン</b><small>タップで画像を選択</small></div><div class="sf" style="gap:16px">${['f','e'].map(c=>`<label class="ip" style="flex:none;min-width:0;align-items:center">${CUR[c]}<span class="pv">${ICON[c]?`<img src="${ICON[c]}" alt="">`:'＋'}</span><input type="file" accept="image/*" data-i="${c}" hidden></label>`).join('')}</div></div>`;
+  return `<div class="sh-h"><b>設定</b><span class="mu">量はレベルに合わせて入力</span><span id="shx">✕</span></div>${ic}
   <div class="src"><div class="sn"><b>使い始めの量</b><small>このサイトを使い始めた時点</small></div><div class="sf">${inp('data-o="f"','ファンス',S.open.f)}${inp('data-o="e"','円石',S.open.e)}</div></div>
   <div class="src"><div class="sn"><b>目標</b></div><div class="sf">${inp('data-g="f"','ファンス',S.goals.f)}${inp('data-g="e"','円石',S.goals.e)}</div></div>`+
   S.src.map(s=>{const nx=nextDue(s);return `<div class="src"><div class="sn"><b>${s.n}</b><small>${s.lb}${nx?'・次回 '+nx:''}</small></div><div class="sf">${inp(`data-s="${s.id}" data-k="f"`,'ファンス',s.f)}${inp(`data-s="${s.id}" data-k="e"`,'円石',s.e)}${s.t==='b'?`<label>基準日（受取の月曜）<input type="date" data-s="${s.id}" data-k="anchor" value="${s.anchor}"></label>`:''}</div></div>`}).join('');
@@ -221,6 +232,7 @@ function openSheet(o){sheetOpen=o;if(o)renderSheet();$('#shw').classList.toggle(
 $('#shbd').onclick=()=>openSheet(false);
 $('#sheet').addEventListener('click',e=>{if(e.target.id==='shx')openSheet(false)});
 $('#sheet').addEventListener('change',e=>{const t=e.target,v=Math.max(0,Math.round(+t.value||0));
+  if(t.dataset.i){if(t.files[0])pickIcon(t.dataset.i,t.files[0]);t.value='';return}
   if(t.dataset.o){S.open[t.dataset.o]=v;S.open.set=true}
   else if(t.dataset.g){S.goals[t.dataset.g]=v}
   else{const s=S.src.find(x=>x.id===t.dataset.s);if(!s)return;if(t.dataset.k==='anchor'){if(t.value)s.anchor=t.value}else s[t.dataset.k]=v}
@@ -285,6 +297,8 @@ function handle(raw){
     }
     pending=null;
   }
+  if(/^アイコン.*(削除|消|リセット)/.test(t)){['f','e'].forEach(c=>{ICON[c]=null;try{localStorage.removeItem('nte_icon_'+c)}catch(e){}});render();return bot('アイコンを削除しました。')}
+  if(/^アイコン$/.test(t)){openSheet(true);return bot('設定からアイコンを選べます。',{ms:2200})}
   const om=t.match(/^(セット|せっと|初期値?|開始量|スタート)\s*(?:設定)?\s*(.*)$/);
   if(om){
     const NUM='(ファンス|円石)?\\s*(\\d[\\d,]*(?:\\.\\d+)?)\\s*(万|千|k)?(?:\\s*(ファンス|円石)(?!\\s*\\d))?',rest=om[2];
@@ -323,7 +337,7 @@ function handle(raw){
   if(/履歴|ログ|history/i.test(t)){S.all=!S.all;render();return bot(S.all?'履歴を全件表示にしました。':'履歴を通常表示に戻しました。')}
   if(/集計|まとめ/.test(t)&&!/^\s*[+\-]?\d/.test(u))return bot('集計は各カードに表示しています。');
   if(/取り消|取消|undo|戻す|やり直/i.test(t)){const e=S.log.pop();save();render();return bot(e?`${CUR[e.c||'f']} <b>${sg(e.a)}</b> を取り消しました。`:'取り消せる記録がありません。')}
-  if(/^目標/.test(t)){const a=amt(u.replace(/^目標/,''));if(!a)return bot('「目標 100000」「目標 円石 3000」のように入力してください。',{ms:4000});S.goals[c]=a.v;save();render();return bot(`${CUR[c]}の目標を <b>${nf(a.v)}</b> に設定しました。`)}
+  if(/^目標/.test(u.trim())){const a=amt(u.replace(/^\s*目標/,''));if(!a)return bot('「目標 100000」「目標 円石 3000」のように入力してください。',{ms:4000});S.goals[c]=a.v;save();render();return bot(`${CUR[c]}の目標を <b>${nf(a.v)}</b> に設定しました。`)}
   if(/リセット|全消|初期化/.test(t)){pending={type:'reset'};return bot('全ての記録を消します。よろしければ「はい」と送ってください。',{keep:true})}
   if(/ヘルプ|使い方|help|^\?$/i.test(t))return bot(help(),{ms:7000});
   const a=amt(u);
@@ -339,6 +353,9 @@ function handle(raw){
 $('#send').onclick=()=>{const v=$('#q').value;$('#q').value='';handle(v)};
 $('#q').onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing)$('#send').click()};
 render();
+[['f','fons.png'],['e','annulith.png']].forEach(([c,u])=>{let st=null;try{st=localStorage.getItem('nte_icon_'+c)}catch(e){}
+  if(st){ICON[c]=st;render()}else{const t=new Image();t.onload=()=>{ICON[c]=u;render()};t.src=u}});
+function pickIcon(c,f){const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,96/Math.max(im.width,im.height)),cv=document.createElement('canvas');cv.width=Math.max(1,Math.round(im.width*k));cv.height=Math.max(1,Math.round(im.height*k));cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);const u=cv.toDataURL('image/png');try{localStorage.setItem('nte_icon_'+c,u)}catch(e){}ICON[c]=u;render()};im.src=r.result};r.readAsDataURL(f)}
 if(!S.open.set&&!S.log.length)setTimeout(()=>bot('はじめに、今の量を入力してください。<br><b>セット ファンス 50000 円石 300</b>',{keep:true}),500);
 
 /* ---- ロゴ ---- */
