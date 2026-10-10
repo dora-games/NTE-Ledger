@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NTE Ledger</title>
+<style>
+:root{--bg:#1D1D1D;--p:#242424;--p2:#252525;--line:#333;--tx:#f2f2f2;--mu:#858585;--dn:#a3a3a3;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--tx);font:15px/1.6 "Hiragino Sans","Noto Sans JP",system-ui,sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased}
+#wm{position:fixed;inset:0;display:grid;place-items:center;pointer-events:none;z-index:0}
+#wm img{width:min(64vw,380px);height:auto;opacity:.09;filter:grayscale(1)}
+#app{position:relative;z-index:1;height:100%;max-width:720px;margin:auto;display:flex;flex-direction:column}
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding:18px 20px 14px}
+.title{font-weight:700;font-size:20px;letter-spacing:.02em;line-height:1.1}
+.bals{display:flex;gap:22px}
+.bal{text-align:right;min-width:70px}
+.bal span{font-size:10px;letter-spacing:.14em;color:var(--mu);display:block;margin-bottom:1px}
+.bal strong{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.bar{height:2px;border-radius:9px;background:var(--line);overflow:hidden;margin-top:5px}
+.bar i{display:block;height:100%;width:0;background:#fff;border-radius:9px;transition:width .7s cubic-bezier(.2,.8,.2,1)}
+#log{flex:1;min-height:0;overflow-y:auto;padding:8px 18px 10px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth;-webkit-mask-image:linear-gradient(transparent,#000 18px);mask-image:linear-gradient(transparent,#000 18px)}
+.m{max-width:88%;word-break:break-word;animation:in .4s cubic-bezier(.2,.9,.3,1) both}
+@keyframes in{from{opacity:0;transform:translateY(8px)}}
+.m.a{align-self:flex-start;background:var(--p);padding:12px 15px;border-radius:6px 20px 20px 20px}
+.m.u{align-self:flex-end;background:#f2f2f2;color:#1D1D1D;font-weight:600;padding:9px 16px;border-radius:20px 20px 6px 20px}
+.up{color:#fff;font-weight:700}.dn{color:var(--dn);font-weight:700}
+.big{font-size:26px;font-weight:700;margin:1px 0 2px;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.mu{color:var(--mu);font-size:12px}
+.h{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid #ffffff10;font-size:13px}
+.h:last-child{border:0}.h em{font-style:normal;font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+.dots i{display:inline-block;width:5px;height:5px;margin:0 2px;border-radius:50%;background:#aaa;animation:b 1s infinite}
+.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+@keyframes b{50%{transform:translateY(-4px);opacity:.4}}
+.inp{display:flex;gap:10px;padding:8px 16px 14px;align-items:center}
+input{flex:1;min-width:0;background:var(--p2);border:1px solid transparent;color:var(--tx);border-radius:26px;padding:14px 20px;font:inherit;transition:border-color .2s}
+input::placeholder{color:#6d6d6d}
+input:focus{outline:0;border-color:#5a5a5a}
+#send{width:48px;height:48px;border:0;border-radius:50%;cursor:pointer;background:#f2f2f2;color:#1D1D1D;flex:none;display:grid;place-items:center;transition:transform .15s}
+#send:active{transform:scale(.9)}
+#send svg{width:20px;height:20px}
+</style>
+</head>
+<body>
+<div id="wm"><img src="logo.png" alt="" onerror="this.parentNode.remove()"></div>
+<div id="app">
+  <div class="top">
+    <div class="title">NTE Ledger</div>
+    <div class="bals">
+      <div class="bal"><span>ファンス</span><strong id="b_f">0</strong><div class="bar"><i id="g_f"></i></div></div>
+      <div class="bal"><span>円石</span><strong id="b_e">0</strong><div class="bar"><i id="g_e"></i></div></div>
+    </div>
+  </div>
+  <div id="log"></div>
+  <div class="inp"><input id="q" placeholder="例: +5000 ボス報酬 / 円石 -300 ガチャ" enterkeyhint="send" autocomplete="off"><button id="send" aria-label="送信"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nf=n=>Number(n).toLocaleString('ja-JP');
+const CUR={f:'ファンス',e:'円石'};
+let S={v:3,log:[],goals:{f:0,e:0},msgs:[]};
+try{const r=JSON.parse(localStorage.getItem('nte_fans')||'null');if(r){if(r.v!==3)r.msgs=[];S=Object.assign(S,r);S.v=3;if(typeof r.goal==='number'&&!r.goals){S.goals={f:r.goal,e:0}}}}catch(e){}
+const save=()=>{try{S.msgs=S.msgs.slice(-80);localStorage.setItem('nte_fans',JSON.stringify(S))}catch(e){}};
+const bal=c=>S.log.filter(e=>(e.c||'f')===c).reduce((a,e)=>a+e.a,0);
+const sg=n=>(n>0?'+':n<0?'−':'')+nf(Math.abs(n));
+const L=$('#log');
+const shown={f:0,e:0};
+function head(){
+  ['f','e'].forEach(c=>{
+    const to=bal(c),el=$('#b_'+c),from=shown[c],t0=performance.now();
+    (function f(t){const k=Math.min(1,(t-t0)/600),e=1-Math.pow(1-k,3);el.textContent=nf(Math.round(from+(to-from)*e));if(k<1)requestAnimationFrame(f);else shown[c]=to})(t0);
+    const g=S.goals[c];$('#g_'+c).style.width=(g>0?Math.max(0,Math.min(100,to/g*100)):0)+'%';
+  });
+}
+function bubble(r,h,anim){const d=document.createElement('div');d.className='m '+r;if(!anim)d.style.animation='none';d.innerHTML=h;L.appendChild(d);L.scrollTop=L.scrollHeight;return d}
+function user(t){S.msgs.push({r:'u',h:esc(t)});bubble('u',esc(t),true)}
+function bot(h){
+  S.msgs.push({r:'a',h});save();
+  const d=bubble('a','<span class="dots"><i></i><i></i><i></i></span>',true);
+  setTimeout(()=>{d.innerHTML=h;L.scrollTop=L.scrollHeight},450);
+}
+const goalLine=c=>{const g=S.goals[c];return g>0?`<div class="mu">${CUR[c]}目標 ${nf(g)} まであと ${nf(Math.max(0,g-bal(c)))}（${Math.min(100,Math.max(0,Math.round(bal(c)/g*100)))}%）</div>`:''};
+const balCard=()=>['f','e'].map(c=>`<div class="mu">${CUR[c]}</div><div class="big">${nf(bal(c))}</div>${goalLine(c)}`).join('');
+const help=()=>`話しかけるだけで記録します。<div class="h" style="display:block;margin-top:6px"><b>+5000 ボス報酬</b>　入手<br><b>-3000 ガチャ</b>　消費<br><b>円石 +300</b>　円石は「円石」を付ける（なしはファンス）<br><b>1.2万 売却</b>　符号がなければ聞き返します<br><b>残高 / 履歴 / 集計 / 取り消し</b><br><b>目標 100000</b>　円石なら「目標 円石 3000」</div>`;
+
+const norm=s=>s.replace(/[！-～]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0)).replace(/[−ー‐–]/g,'-').replace(/＋/g,'+').replace(/　/g,' ').trim();
+const curOf=t=>/円石|えんせき/.test(t)?'e':'f';
+const strip=t=>t.replace(/円石|えんせき|ファンス|ふぁんす/g,' ');
+function amt(t){
+  const m=t.match(/([+\-])?\s*(\d[\d,]*(?:\.\d+)?)\s*(万|千|k)?/i);if(!m)return null;
+  const mul=m[3]==='万'?1e4:(m[3]==='千'||/k/i.test(m[3]||''))?1e3:1;
+  return {v:Math.round(parseFloat(m[2].replace(/,/g,''))*mul),sign:m[1]||'',rest:(t.slice(0,m.index)+' '+t.slice(m.index+m[0].length)).replace(/\s+/g,' ').trim()};
+}
+function record(c,v,note){
+  const before=bal(c);
+  S.log.push({id:Date.now(),c,a:v,n:note,t:Date.now()});save();head();
+  let h=`${CUR[c]} <span class="${v>0?'up':'dn'}">${sg(v)}</span> を記録しました${note?`<span class="mu">　${esc(note)}</span>`:''}<div class="big">${nf(bal(c))}</div>${goalLine(c)}`;
+  const g=S.goals[c];
+  if(g>0&&before<g&&bal(c)>=g)h+='<div style="margin-top:6px">目標達成です。</div>';
+  if(bal(c)<0)h+='<div class="mu" style="margin-top:6px">残高がマイナスです。入力を確認してください。</div>';
+  bot(h);
+}
+function hist(){
+  if(!S.log.length)return bot('まだ履歴がありません。');
+  bot('<div class="mu" style="margin-bottom:4px">直近の履歴</div>'+S.log.slice(-8).reverse().map(e=>{const d=new Date(e.t);return `<div class="h"><span>${d.getMonth()+1}/${d.getDate()} ${CUR[e.c||'f']} ${esc(e.n||'')}</span><em class="${e.a>0?'up':'dn'}">${sg(e.a)}</em></div>`}).join(''));
+}
+function summary(){
+  const d=new Date().toDateString();
+  const row=(l,a)=>`<div class="h"><span>${l}</span><em class="${a>0?'up':'dn'}">${sg(a)}</em></div>`;
+  let h='';
+  ['f','e'].forEach(c=>{
+    const all=S.log.filter(e=>(e.c||'f')===c),td=all.filter(e=>new Date(e.t).toDateString()===d);
+    const s=(a,p)=>a.filter(p).reduce((x,e)=>x+e.a,0);
+    h+=`<div class="mu" style="margin-top:6px">${CUR[c]}</div>`+row('今日 入手',s(td,e=>e.a>0))+row('今日 消費',s(td,e=>e.a<0))+row('累計 入手',s(all,e=>e.a>0))+row('累計 消費',s(all,e=>e.a<0));
+  });
+  bot(h);
+}
+const INC=/入手|獲得|もらっ|貰|収入|入金|稼|報酬|ドロップ|売却|売っ|増/,EXP=/使[っい]|消費|購入|買|ガチャ|支出|出金|課金|払|減/;
+let pending=null;
+function handle(raw){
+  const t=norm(raw);if(!t)return;user(raw);
+  if(pending){
+    const p=pending;
+    if(p.type==='sign'){
+      if(/入手|獲得|増|プラス|^\+/.test(t)){pending=null;return record(p.c,p.v,p.note)}
+      if(/消費|使|減|マイナス|^-/.test(t)){pending=null;return record(p.c,-p.v,p.note)}
+    }else if(p.type==='reset'){
+      pending=null;
+      if(/^(はい|うん|ok|yes|消す|y)/i.test(t)){S.log=[];S.goals={f:0,e:0};S.msgs=[];save();shown.f=shown.e=0;head();L.innerHTML='';return bot('リセットしました。'+help())}
+      return bot('キャンセルしました。');
+    }
+    pending=null;
+  }
+  const c=curOf(t),u=strip(t);
+  if(/^(残高|いくら|所持|確認|balance)/i.test(u.trim())||/^(残高|所持)/.test(t))return bot(balCard());
+  if(/履歴|ログ|history/i.test(t))return hist();
+  if(/集計|まとめ/.test(t)&&!/^\s*[+\-]?\d/.test(u))return summary();
+  if(/取り消|取消|undo|戻す|やり直/i.test(t)){const e=S.log.pop();save();head();return bot(e?`直前の ${CUR[e.c||'f']} <b>${sg(e.a)}</b>${e.n?'（'+esc(e.n)+'）':''} を取り消しました。<div class="big">${nf(bal(e.c||'f'))}</div>`:'取り消せる記録がありません。')}
+  if(/^目標/.test(t)){const a=amt(u.replace(/^目標/,''));if(!a)return bot('「目標 100000」「目標 円石 3000」のように入力してください。');S.goals[c]=a.v;save();head();return bot(`${CUR[c]}の目標を <b>${nf(a.v)}</b> に設定しました。${goalLine(c)}`)}
+  if(/リセット|全消|初期化/.test(t)){pending={type:'reset'};return bot('全ての記録を消します。よろしければ「はい」と送ってください。')}
+  if(/ヘルプ|使い方|help|^\?$/i.test(t))return bot(help());
+  const a=amt(u);
+  if(a&&a.v>0){
+    const note=a.rest.replace(/^(を|が|で)\s*/,'').slice(0,24);
+    if(a.sign==='+'||(!a.sign&&INC.test(t)&&!EXP.test(t)))return record(c,a.v,note);
+    if(a.sign==='-'||(!a.sign&&EXP.test(t)&&!INC.test(t)))return record(c,-a.v,note);
+    pending={type:'sign',c,v:a.v,note};
+    return bot(`${CUR[c]} <b>${nf(a.v)}</b> は入手ですか？消費ですか？<div class="mu">「入手」か「消費」と送ってください</div>`);
+  }
+  bot('うまく読み取れませんでした。'+help());
+}
+$('#send').onclick=()=>{const v=$('#q').value;$('#q').value='';handle(v)};
+$('#q').onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing)$('#send').click()};
+S.msgs.forEach(m=>bubble(m.r,m.h,false));
+head();
+if(!S.msgs.length)bot('NTE Ledger です。ファンスと円石の出入りを記録します。'+help());
+</script>
+</body>
+</html>
