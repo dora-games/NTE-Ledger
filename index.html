@@ -127,10 +127,23 @@ input{padding:11px 16px}#send{width:44px;height:44px}
 .wl b{color:var(--tx);font-size:15px;letter-spacing:0;font-variant-numeric:tabular-nums}
 .wl em{font-style:normal;margin-left:auto;font-size:11px;letter-spacing:0;font-variant-numeric:tabular-nums}
 .wl em b{color:var(--tx);font-size:14px;margin-left:3px}
-.wl em .ci{width:16px;height:16px;vertical-align:-4px;margin-right:3px}
+.wl em .ci{width:19px;height:19px;vertical-align:-5px;margin-right:2px}
+.wl span,.wl b,.wl em{white-space:nowrap}
 @media (max-height:720px){.wl{margin:1px 0 2px}.wl b{font-size:14px}}
 .gc{font-size:11px;color:var(--mu);margin:-2px 0 0}.gc b{color:var(--tx);font-size:13px;font-variant-numeric:tabular-nums}
 .pl{font-weight:400;color:var(--mu);font-size:10.5px}
+.fct{display:grid;grid-template-columns:44px repeat(var(--n),1fr);gap:0;margin:8px 0 6px;font-variant-numeric:tabular-nums}
+.fct>*{padding:7px 0;border-bottom:1px solid #ffffff0f}
+.fct>*:nth-last-child(-n+4){border-bottom:0}
+.fct .fh{font-size:10px;letter-spacing:.04em;color:var(--mu);text-align:right;padding:2px 0 7px;display:flex;justify-content:flex-end;align-items:center;gap:5px;white-space:nowrap}
+.fct .fh i{display:inline-block;width:14px;height:3px;border-radius:2px}
+.fct .fl{font-size:11px;color:var(--mu);align-self:center}
+.fct b{font-weight:600;font-size:13px;text-align:right;white-space:nowrap;padding-left:8px}
+.fct .fh{padding-left:8px}
+.fct b.avg{color:var(--mu);font-weight:500;font-size:12px}
+.fct .em{font-size:13.5px;font-weight:700}.fct .fl.em{color:var(--tx);font-weight:600;font-size:11px}
+.fct small{color:var(--mu);font-weight:400;font-size:10px;margin-left:4px}
+@media (max-height:720px){.fct>*{padding:3.5px 0}.fct .fh{padding:1px 0 4px}.fct{margin:5px 0 4px}}
 </style>
 </head>
 <body>
@@ -141,7 +154,7 @@ input{padding:11px 16px}#send{width:44px;height:44px}
   <input type="file" accept="image/*" id="shot" hidden>
   <div id="shw"><div id="shbd"></div><div id="sheet"></div></div>
   <div id="log"></div>
-  <div class="inp"><input id="q" placeholder="例: +5000 ボス報酬 / 円石 -300 ガチャ" enterkeyhint="send" autocomplete="off"><button id="send" aria-label="送信"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div>
+  <div class="inp"><input id="q" enterkeyhint="send" autocomplete="off"><button id="send" aria-label="送信"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div>
 </div>
 <script>
 const $=s=>document.querySelector(s);
@@ -161,16 +174,19 @@ const strD=s=>{const a=s.split('-').map(Number);return new Date(a[0],a[1]-1,a[2]
 const startOf=d=>new Date(d.getFullYear(),d.getMonth(),d.getDate());
 const nextMon=()=>{let d=startOf(new Date());while(d.getDay()!==1)d=addD(d,1);return ymd(d)};
 const SRC=()=>[
- {id:'daily',n:'デイリー',k:[],f:20000,e:60,b:0,t:'d',lb:'毎日'},
+ {id:'daily',n:'デイリー',k:[],f:20000,e:60,b:20000,t:'d',lb:'毎日'},
  {id:'coffee',n:'壱のコーヒー',k:['コーヒー','壱'],f:0,e:0,b:0,t:'d',lb:'毎日'},
  {id:'stamina',n:'シティスタミナ',k:['スタミナ'],f:0,e:0,b:0,t:'w',lb:'毎週月曜'},
  {id:'million',n:'プロジェクトミリオン',k:['ミリオン'],f:0,e:0,b:0,t:'b',lb:'14日ごと(月曜)',anchor:nextMon()}];
 let S={v:5,log:[],goals:{f:0,e:0},all:false,src:SRC(),rcv:{},open:{f:0,e:0,b:0,w:0,set:false},pull:160};
-try{const r=JSON.parse(localStorage.getItem('nte_fans')||'null');if(r){S.log=r.log||[];S.goals=r.goals||{f:r.goal||0,e:0};S.rcv=r.rcv||{};if(r.open)S.open=Object.assign(S.open,r.open);if(r.pull>0)S.pull=r.pull;(r.src||[]).forEach(o=>{const s=S.src.find(x=>x.id===o.id);if(s){s.f=+o.f||0;s.b=+o.b||0;s.e=+o.e||0;if(o.anchor)s.anchor=o.anchor}})}}catch(e){}
-const save=()=>{try{localStorage.setItem('nte_fans',JSON.stringify({v:5,log:S.log,goals:S.goals,open:S.open,pull:S.pull,rcv:S.rcv,src:S.src.map(s=>({id:s.id,f:s.f,e:s.e,b:s.b,anchor:s.anchor}))}))}catch(e){}};
+try{const r=JSON.parse(localStorage.getItem('nte_fans')||'null');if(r){S.log=r.log||[];S.goals=r.goals||{f:r.goal||0,e:0};S.rcv=r.rcv||{};if(r.open)S.open=Object.assign(S.open,r.open);if(r.pull>0)S.pull=r.pull;if(!r.mig)S._m=1;(r.src||[]).forEach(o=>{const s=S.src.find(x=>x.id===o.id);if(s){s.f=+o.f||0;s.b=+o.b||0;s.e=+o.e||0;if(o.anchor)s.anchor=o.anchor}})}}catch(e){}
+if(S._m){const d=S.src.find(x=>x.id==='daily');if(d&&!d.b)d.b=20000}
+const save=()=>{try{localStorage.setItem('nte_fans',JSON.stringify({v:5,mig:1,log:S.log,goals:S.goals,open:S.open,pull:S.pull,rcv:S.rcv,src:S.src.map(s=>({id:s.id,f:s.f,e:s.e,b:s.b,anchor:s.anchor}))}))}catch(e){}};
 const of=c=>S.log.filter(e=>(e.c||'f')===c);
 const nc=n=>n>=1e8?(n/1e8).toFixed(1).replace(/\.0$/,'')+'億':n>=1e5?Math.round(n/1e4)+'万':n>=1e4?(n/1e4).toFixed(1).replace(/\.0$/,'')+'万':nf(n);
+const hasBeetle=()=>!!(S.open.b||of('b').length||S.src.some(x=>x.b>0));
 const pulls=n=>Math.floor(Math.max(0,n)/(S.pull||160));
+if(S._m){delete S._m;save()}
 const wealth=()=>(S.open.w||0)+of('f').filter(e=>e.a>0).reduce((a,e)=>a+e.a,0);
 const bal=c=>(S.open[c]||0)+of(c).reduce((a,e)=>a+e.a,0);
 const sum=(a,p)=>a.filter(p).reduce((x,e)=>x+e.a,0);
@@ -219,23 +235,26 @@ function chart(){
   <div class="lgd"><span><i class="sw" style="background:linear-gradient(90deg,#a8721a,#fccc54,#fff0a8)"></i>ファンス 〜${nc(A.mx)}</span><span><i class="sw" style="background:linear-gradient(90deg,#2a54b0,#4aa0f0,#8ff0ff)"></i>円石 〜${nc(B.mx)}</span>${C?`<span><i class="sw" style="background:linear-gradient(90deg,#8a4f86,#d28ac4,#ffd3f0)"></i>甲虫 〜${nc(C.mx)}</span>`:''}</div>`;
 }
 function card(){
-  const D={};['f','e'].forEach(c=>{const td=of(c).filter(isToday);D[c]={net:td.reduce((x,y)=>x+y.a,0),b:bal(c),g:S.goals[c]}});
+  const D={};['f','e','b'].forEach(c=>{const td=of(c).filter(isToday);D[c]={net:td.reduce((x,y)=>x+y.a,0),b:bal(c),g:S.goals[c]}});
   const pc=c=>D[c].g>0?Math.max(0,Math.min(100,Math.round(D[c].b/D[c].g*100))):0;
   const gl=c=>{const g=D[c].g,rem=Math.max(0,g-D[c].b);return `<div><div class="gl"><span>${CUR[c]}</span>${g>0?(rem>0?`<span>あと <b class="rm">${nf(rem)}</b></span>`:'<b class="rm">達成</b>'):'<span>目標なし</span>'}</div><div class="bar"><i data-w="${pc(c)}"></i></div>${g>0?`<div class="gs">目標 ${nf(g)}・${pc(c)}%</div>`:''}</div>`};
-  return `<section class="card full"><div class="ch"><span>BALANCE</span><span class="dl">今日 ${D.f.net?sg(D.f.net):'±0'} ／ ${D.e.net?sg(D.e.net):'±0'}</span></div>
+  return `<section class="card full"><div class="ch"><span>BALANCE</span><span class="dl">今日 ${D.f.net?sg(D.f.net):'±0'} ／ ${D.e.net?sg(D.e.net):'±0'}${hasBeetle()?` ／ ${D.b.net?sg(D.b.net):'±0'}`:''}</span></div>
   <div class="two"><div><div class="bl">${ico('f')}ファンス</div><div class="big" id="bv_f">${nf(shown.f)}</div></div><div><div class="bl">${ico('e')}円石</div><div class="big" id="bv_e">${nf(shown.e)}</div><div class="gc">ガチャ <b>${pulls(bal('e'))}</b>回分</div></div></div>
-  <div class="wl"><span>財力値</span><b>${nf(wealth())}</b><em>${ico('b','sm')}甲虫コイン <b id="bv_b">${nf(shown.b)}</b></em></div>
+  <div class="wl"><span>財力値</span><b>${nf(wealth())}</b><em title="甲虫コイン">${ico('b','sm')}<b id="bv_b">${nf(shown.b)}</b></em></div>
   ${chart()}<div class="gls">${gl('f')}${gl('e')}</div></section>`;
 }
 function fcCard(){
-  const f=fc('f',30),e=fc('e',30),bb=fc('b',30),hb=S.src.some(x=>x.b>0);
-  const bc=v=>hb?`<b>${v}</b>`:'';
-  const r=h=>`<span>${h}日後</span><b>${nf(f[h-1])}</b><b>${nf(e[h-1])}<small class="pl">・${pulls(e[h-1])}回</small></b>${bc(nf(bb[h-1]))}`;
+  const hb=hasBeetle(),cols=hb?['f','e','b']:['f','e'];
+  const F={f:fc('f',30),e:fc('e',30),b:fc('b',30)};
+  const NAME={f:'ファンス',e:'円石(ガチャ)',b:'甲虫'};
+  const SW={f:'linear-gradient(90deg,#a8721a,#fccc54,#fff0a8)',e:'linear-gradient(90deg,#2a54b0,#4aa0f0,#8ff0ff)',b:'linear-gradient(90deg,#8a4f86,#d28ac4,#ffd3f0)'};
+  const head=cols.map(c=>`<span class="fh"><i style="background:${SW[c]}"></i>${NAME[c]}</span>`).join('');
+  const avgRow=`<span class="fl">平均/日</span>`+cols.map(c=>`<b class="avg">+${nf(Math.round(avg(c)))}</b>`).join('');
+  const row=h=>`<span class="fl${h===30?' em':''}">${h}日後</span>`+cols.map(c=>{const v=F[c][h-1];return `<b${h===30?' class="em"':''}>${nf(v)}${c==='e'?`<small>${pulls(v)}回</small>`:''}</b>`}).join('');
   const anyG=S.goals.f>0||S.goals.e>0;
   return `<section class="card"><div class="ch"><span>FORECAST</span><span>定期収入のみで計算</span></div>
-  <div class="tbl" style="${hb?'grid-template-columns:.8fr 1fr 1fr 1fr':''}"><span></span><b class="hd">ファンス</b><b class="hd">円石</b>${hb?'<b class="hd">甲虫</b>':''}
-  <span>平均/日</span><b>+${nf(Math.round(avg('f')))}</b><b>+${nf(Math.round(avg('e')))}</b>${bc('+'+nf(Math.round(avg('b'))))}${r(7)}${r(14)}${r(30)}</div>
-  ${anyG?`<div class="gl" style="line-height:1.7;justify-content:flex-start;gap:12px"><span>目標到達</span>${S.goals.f>0?`<span>ファンス <b style="color:var(--tx);font-weight:600">${eta('f').replace(/（.*）/,'')}</b></span>`:''}${S.goals.e>0?`<span>円石 <b style="color:var(--tx);font-weight:600">${eta('e').replace(/（.*）/,'')}</b></span>`:''}</div>`:''}</section>`;
+  <div class="fct" style="--n:${cols.length}"><span></span>${head}${avgRow}${row(7)}${row(14)}${row(30)}</div>
+  ${anyG?`<div class="gl" style="line-height:1.6;justify-content:flex-start;gap:12px"><span>目標到達</span>${S.goals.f>0?`<span>ファンス <b style="color:var(--tx);font-weight:600">${eta('f').replace(/（.*）/,'')}</b></span>`:''}${S.goals.e>0?`<span>円石 <b style="color:var(--tx);font-weight:600">${eta('e').replace(/（.*）/,'')}</b></span>`:''}</div>`:''}</section>`;
 }
 function histPanel(n0){
   const n=S.all?40:(n0||4),rows=S.log.slice(-n).reverse();
