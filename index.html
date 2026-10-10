@@ -44,6 +44,13 @@ svg.ch2{width:100%;height:auto;display:block;margin:4px 0 8px;overflow:visible}
 .tbl b{color:var(--tx);font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
 .tbl .hd{text-align:right;font-size:10px;letter-spacing:.1em}
 .gls{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ax{font-size:8px;fill:#777}
+#dash.na .card{animation:none}
+.src{padding:9px 0;border-bottom:1px solid #ffffff0d}.src:last-child{border:0}
+.sn b{font-size:13px}.sn small{color:var(--mu);font-size:11px;margin-left:8px}
+.sf{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.sf label{font-size:10px;color:var(--mu);display:flex;flex-direction:column;gap:2px;flex:1;min-width:88px;letter-spacing:.05em}
+.sf input{width:100%;padding:7px 10px;border-radius:10px;font-size:13px;background:var(--p2);border:1px solid #333;color-scheme:dark;font-variant-numeric:tabular-nums}
 .gl{display:flex;justify-content:space-between;font-size:11px;color:var(--mu)}
 .bar{height:3px;border-radius:9px;background:var(--line);overflow:hidden;margin:4px 0 0}
 .bar i{display:block;height:100%;width:0;background:#fff;border-radius:9px;transition:width .9s cubic-bezier(.2,.8,.2,1)}
@@ -73,6 +80,24 @@ input:focus{outline:0;border-color:#666}
 #send{width:48px;height:48px;border:0;border-radius:50%;cursor:pointer;background:#f2f2f2;color:#1D1D1D;flex:none;display:grid;place-items:center}
 #send:active{transform:scale(.9)}
 #send svg{width:20px;height:20px}
+.card{padding:12px 14px}
+#dash{gap:10px;padding:2px 14px 10px}
+.big{font-size:28px;margin:0 0 2px}
+.two{margin-top:2px}
+svg.ch2{max-height:112px;margin:2px 0 4px}
+.lgd{margin-bottom:8px}
+.tbl{gap:4px 10px;margin:6px 0 6px}
+.h{padding:5px 0}
+.inp{z-index:9}
+#log{z-index:8}
+#shw{position:absolute;inset:0;z-index:7;opacity:0;pointer-events:none;transition:opacity .25s}
+#shw.open{opacity:1;pointer-events:auto}
+#shbd{position:absolute;inset:0;background:#000a;backdrop-filter:blur(3px)}
+#sheet{position:absolute;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom,0px));max-height:calc(100% - 130px);overflow-y:auto;background:#262626;border:1px solid #3a3a3a;border-radius:22px;padding:14px 16px 8px;transform:translateY(26px) scale(.97);transition:transform .38s cubic-bezier(.2,.9,.3,1.1)}
+#shw.open #sheet{transform:none}
+.sh-h{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+.sh-h b{font-size:15px}.sh-h .mu{flex:1}
+#shx{color:var(--mu);font-size:16px;cursor:pointer;padding:0 4px}
 </style>
 </head>
 <body>
@@ -80,6 +105,7 @@ input:focus{outline:0;border-color:#666}
 <div id="app">
   <div class="top"><div class="tl"><label class="lg" id="lg" title="タップでロゴ画像を選択"><input type="file" accept="image/*" id="lf" hidden><img id="lgi" alt=""><span class="ph">LOGO</span></label><div class="title">NTE Ledger</div></div><div id="dt"></div></div>
   <div id="dash"></div>
+  <div id="shw"><div id="shbd"></div><div id="sheet"></div></div>
   <div id="log"></div>
   <div class="inp"><input id="q" placeholder="例: +5000 ボス報酬 / 円石 -300 ガチャ" enterkeyhint="send" autocomplete="off"><button id="send" aria-label="送信"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div>
 </div>
@@ -89,60 +115,113 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 const nf=n=>Number(n).toLocaleString('ja-JP');
 const sg=n=>(n>0?'+':n<0?'−':'')+nf(Math.abs(n));
 const CUR={f:'ファンス',e:'円石'},COL={f:'#ffffff',e:'#b9b9b9'};
-let S={v:4,log:[],goals:{f:0,e:0},all:false};
-try{const r=JSON.parse(localStorage.getItem('nte_fans')||'null');if(r){S.log=r.log||[];S.goals=r.goals||{f:r.goal||0,e:0}}}catch(e){}
-const save=()=>{try{localStorage.setItem('nte_fans',JSON.stringify({v:4,log:S.log,goals:S.goals}))}catch(e){}};
+const p2=x=>String(x).padStart(2,'0');
+const ymd=d=>d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());
+const addD=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const dnum=d=>Math.round(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5);
+const strD=s=>{const a=s.split('-').map(Number);return new Date(a[0],a[1]-1,a[2])};
+const startOf=d=>new Date(d.getFullYear(),d.getMonth(),d.getDate());
+const nextMon=()=>{let d=startOf(new Date());while(d.getDay()!==1)d=addD(d,1);return ymd(d)};
+const SRC=()=>[
+ {id:'daily',n:'デイリー',k:[],f:20000,e:60,t:'d',lb:'毎日'},
+ {id:'coffee',n:'壱のコーヒー',k:['コーヒー','壱'],f:0,e:0,t:'d',lb:'毎日'},
+ {id:'stamina',n:'シティスタミナ',k:['スタミナ'],f:0,e:0,t:'w',lb:'毎週月曜'},
+ {id:'million',n:'プロジェクトミリオン',k:['ミリオン'],f:0,e:0,t:'b',lb:'14日ごと(月曜)',anchor:nextMon()}];
+let S={v:5,log:[],goals:{f:0,e:0},all:false,src:SRC(),rcv:{}};
+try{const r=JSON.parse(localStorage.getItem('nte_fans')||'null');if(r){S.log=r.log||[];S.goals=r.goals||{f:r.goal||0,e:0};S.rcv=r.rcv||{};(r.src||[]).forEach(o=>{const s=S.src.find(x=>x.id===o.id);if(s){s.f=+o.f||0;s.e=+o.e||0;if(o.anchor)s.anchor=o.anchor}})}}catch(e){}
+const save=()=>{try{localStorage.setItem('nte_fans',JSON.stringify({v:5,log:S.log,goals:S.goals,rcv:S.rcv,src:S.src.map(s=>({id:s.id,f:s.f,e:s.e,anchor:s.anchor}))}))}catch(e){}};
 const of=c=>S.log.filter(e=>(e.c||'f')===c);
 const bal=c=>of(c).reduce((a,e)=>a+e.a,0);
 const sum=(a,p)=>a.filter(p).reduce((x,e)=>x+e.a,0);
 const shown={f:0,e:0};
 const isToday=e=>new Date(e.t).toDateString()===new Date().toDateString();
 
+const due=(s,d)=>{if(s.t==='d')return true;if(s.t==='w')return d.getDay()===1;const diff=dnum(d)-dnum(strD(s.anchor));return ((diff%14)+14)%14===0};
+const inc=(c,d)=>S.src.reduce((a,s)=>a+(due(s,d)?(+s[c]||0):0),0);
+const avg=c=>S.src.reduce((a,s)=>a+(+s[c]||0)/(s.t==='d'?1:s.t==='w'?7:14),0);
+function fc(c,n){let b=bal(c);const t=startOf(new Date()),a=[];for(let i=1;i<=n;i++){b+=inc(c,addD(t,i));a.push(b)}return a}
+function eta(c){const g=S.goals[c],b=bal(c);if(!(g>0))return '目標未設定';if(b>=g)return '達成済み';if(avg(c)<=0)return '定期収入が未設定';let x=b;const t=startOf(new Date());for(let i=1;i<=730;i++){x+=inc(c,addD(t,i));if(x>=g){const d=addD(t,i);return (d.getMonth()+1)+'/'+d.getDate()+'頃（'+i+'日後）'}}return '2年以内に到達しません'}
+function nextDue(s){if(s.t==='d')return '';const t=startOf(new Date());for(let i=0;i<30;i++){const d=addD(t,i);if(due(s,d))return (d.getMonth()+1)+'/'+d.getDate()+'（'+'日月火水木金土'[d.getDay()]+'）'}return ''}
 function chart(){
-  let f=0,e=0;const F=[0],E=[0];
-  S.log.forEach(x=>{if((x.c||'f')==='f')f+=x.a;else e+=x.a;F.push(f);E.push(e)});
-  const n=Math.min(41,F.length),pf=F.slice(-n),pe=E.slice(-n);
-  if(n<2)return '<div class="nochart">記録するとグラフが表示されます</div>';
-  const W=300,H=96,pd=6,X=i=>pd+i*(W-pd*2)/(n-1);
-  const mk=(p,c)=>{const g=S.goals[c];let mx=Math.max(...p,g>0?g:-Infinity),mn=Math.min(...p,0);if(mx===mn)mx=mn+1;const Y=v=>H-pd-(v-mn)/(mx-mn)*(H-pd*2);return {Y,mx,g,d:p.map((v,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1)).join(''),ly:Y(p[p.length-1])}};
-  const A=mk(pf,'f'),B=mk(pe,'e'),lx=X(n-1);
-  return `<svg class="ch2" viewBox="0 0 ${W} ${H}"><defs><linearGradient id="gf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".25"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
-  ${A.g>0?`<line x1="0" x2="${W}" y1="${A.Y(A.g)}" y2="${A.Y(A.g)}" stroke="#fff" stroke-opacity=".3" stroke-dasharray="3 4"/>`:''}
-  ${B.g>0?`<line x1="0" x2="${W}" y1="${B.Y(B.g)}" y2="${B.Y(B.g)}" stroke="#aaa" stroke-opacity=".3" stroke-dasharray="1 4"/>`:''}
-  <path d="${A.d}L${lx} ${H}L${X(0)} ${H}Z" fill="url(#gf)"/>
-  <path class="ln" pathLength="1" d="${A.d}" stroke="#fff"/>
-  <path class="ln" pathLength="1" d="${B.d}" stroke="#a8a8a8" style="stroke-dasharray:.04 .02;animation:none;stroke-dashoffset:0;stroke-width:1.8"/>
-  <circle cx="${lx}" cy="${A.ly}" r="3.5" fill="#fff"/><circle cx="${lx}" cy="${A.ly}" r="7" fill="#fff" opacity=".16"/>
-  <circle cx="${lx}" cy="${B.ly}" r="3" fill="#a8a8a8"/></svg>
-  <div class="lgd"><span><i style="border-color:#fff"></i>ファンス 最大 ${nf(A.mx)}</span><span><i style="border-color:#a8a8a8;border-top-style:dashed"></i>円石 最大 ${nf(B.mx)}</span></div>`;
+  const t=startOf(new Date()),F=30;
+  const first=S.log.length?startOf(new Date(S.log[0].t)):t;
+  const start=first<addD(t,-13)?addD(t,-13):first,P=dnum(t)-dnum(start),N=P+F+1;
+  const mk=c=>{
+    let pre=0;const net={};
+    of(c).forEach(e=>{const d=startOf(new Date(e.t));if(d<start)pre+=e.a;else{const k=ymd(d);net[k]=(net[k]||0)+e.a}});
+    const past=[];let b=pre;for(let i=0;i<=P;i++){b+=net[ymd(addD(start,i))]||0;past.push(b)}
+    const V=past.concat(fc(c,F)),g=S.goals[c];
+    let mx=Math.max(...V,g>0?g:-Infinity),mn=Math.min(...V,0);if(mx===mn)mx=mn+1;
+    return {V,mx,mn,g};
+  };
+  const W=300,H=122,pd=8,top=14,bot=20,X=i=>pd+i*(W-pd*2)/(N-1);
+  const A=mk('f'),B=mk('e');
+  const Y=(o,v)=>(H-bot)-(v-o.mn)/(o.mx-o.mn)*(H-bot-top);
+  const path=(o,i0,i1)=>{let d='';for(let i=i0;i<=i1;i++)d+=(i===i0?'M':'L')+X(i).toFixed(1)+' '+Y(o,o.V[i]).toFixed(1);return d};
+  const L=(o,col,w)=>`<path class="ln" pathLength="1" d="${path(o,0,P)}" stroke="${col}" style="stroke-width:${w}"/><path d="${path(o,P,N-1)}" fill="none" stroke="${col}" stroke-width="${w}" stroke-dasharray="3 4" stroke-linecap="round" opacity=".75"/>`;
+  const lab=(i,txt,an)=>{const d=addD(start,i);return `<text class="ax" x="${X(i)}" y="${H-5}" text-anchor="${an}">${txt||(d.getMonth()+1)+'/'+d.getDate()}</text>`};
+  const gl=(o,col)=>o.g>0?`<line x1="0" x2="${W}" y1="${Y(o,o.g)}" y2="${Y(o,o.g)}" stroke="${col}" stroke-opacity=".25" stroke-dasharray="1 4"/>`:'';
+  const area=`${path(A,0,N-1)}L${X(N-1)} ${H-bot}L${X(0)} ${H-bot}Z`;
+  return `<svg class="ch2" viewBox="0 0 ${W} ${H}"><defs><linearGradient id="gf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".2"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
+  <line x1="${X(P)}" x2="${X(P)}" y1="${top-4}" y2="${H-bot}" stroke="#555" stroke-dasharray="2 3"/>
+  ${gl(A,'#fff')}${gl(B,'#aaa')}
+  <path d="${area}" fill="url(#gf)"/>
+  ${L(B,'#a8a8a8',1.6)}${L(A,'#ffffff',2)}
+  <circle cx="${X(P)}" cy="${Y(A,A.V[P])}" r="3.5" fill="#fff"/><circle cx="${X(P)}" cy="${Y(B,B.V[P])}" r="3" fill="#a8a8a8"/>
+  ${lab(0,'','start')}${P>3?lab(P,'今日','middle'):''}${lab(N-1,'','end')}</svg>
+  <div class="lgd"><span><i style="border-color:#fff"></i>ファンス 〜${nf(A.mx)}</span><span><i style="border-color:#a8a8a8"></i>円石 〜${nf(B.mx)}</span><span><i style="border-color:#777;border-top-style:dashed"></i>予測</span></div>`;
 }
 function card(){
-  const D={};['f','e'].forEach(c=>{const a=of(c),td=a.filter(isToday);D[c]={b:bal(c),net:td.reduce((x,y)=>x+y.a,0),ti:sum(td,x=>x.a>0),to:-sum(td,x=>x.a<0),ai:sum(a,x=>x.a>0),ao:-sum(a,x=>x.a<0),g:S.goals[c]}});
+  const D={};['f','e'].forEach(c=>{const td=of(c).filter(isToday);D[c]={net:td.reduce((x,y)=>x+y.a,0),b:bal(c),g:S.goals[c]}});
   const pc=c=>D[c].g>0?Math.max(0,Math.min(100,Math.round(D[c].b/D[c].g*100))):0;
   const gl=c=>`<div><div class="gl"><span>${CUR[c]} ${D[c].g>0?'目標 '+nf(D[c].g):'目標なし'}</span><span>${D[c].g>0?pc(c)+'%':''}</span></div><div class="bar"><i data-w="${pc(c)}"></i></div></div>`;
-  const row=(l,k)=>`<span>${l}</span><b>${nf(D.f[k])}</b><b>${nf(D.e[k])}</b>`;
   return `<section class="card full"><div class="ch"><span>BALANCE</span><span class="dl">今日 ${D.f.net?sg(D.f.net):'±0'} ／ ${D.e.net?sg(D.e.net):'±0'}</span></div>
   <div class="two"><div><div class="bl">ファンス</div><div class="big" id="bv_f">${nf(shown.f)}</div></div><div><div class="bl">円石</div><div class="big" id="bv_e">${nf(shown.e)}</div></div></div>
-  ${chart()}
-  <div class="tbl"><span></span><b class="hd">ファンス</b><b class="hd">円石</b>${row('今日 入手','ti')}${row('今日 消費','to')}${row('累計 入手','ai')}${row('累計 消費','ao')}</div>
-  <div class="gls">${gl('f')}${gl('e')}</div></section>`;
+  ${chart()}<div class="gls">${gl('f')}${gl('e')}</div></section>`;
+}
+function fcCard(){
+  const f=fc('f',30),e=fc('e',30),T={};
+  ['f','e'].forEach(c=>{const td=of(c).filter(isToday);T[c]={i:sum(td,x=>x.a>0),o:Math.abs(sum(td,x=>x.a<0))}});
+  const r=h=>`<span>${h}日後</span><b>${nf(f[h-1])}</b><b>${nf(e[h-1])}</b>`;
+  const anyG=S.goals.f>0||S.goals.e>0;
+  return `<section class="card"><div class="ch"><span>TODAY / FORECAST</span><span>予測は定期収入のみ</span></div>
+  <div class="tbl"><span></span><b class="hd">ファンス</b><b class="hd">円石</b>
+  <span>今日 入手</span><b>${nf(T.f.i)}</b><b>${nf(T.e.i)}</b><span>今日 消費</span><b>${nf(T.f.o)}</b><b>${nf(T.e.o)}</b>
+  <span>平均/日</span><b>+${nf(Math.round(avg('f')))}</b><b>+${nf(Math.round(avg('e')))}</b>${r(7)}${r(14)}${r(30)}</div>
+  ${anyG?`<div class="gl" style="display:block;line-height:1.8">${S.goals.f>0?`<div>ファンス目標：<b style="color:var(--tx);font-weight:600">${eta('f')}</b></div>`:''}${S.goals.e>0?`<div>円石目標：<b style="color:var(--tx);font-weight:600">${eta('e')}</b></div>`:''}</div>`:''}</section>`;
 }
 function histPanel(){
-  const n=S.all?40:8,rows=S.log.slice(-n).reverse();
-  const p=x=>String(x).padStart(2,'0');
-  return `<section class="card full"><div class="ch"><span>HISTORY</span><span>${S.all?'全件表示中':'直近8件'}・「履歴」で切替</span></div>`+
-  (rows.length?rows.map(e=>{const d=new Date(e.t);return `<div class="h"><span><small>${d.getMonth()+1}/${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}</small><u>${CUR[e.c||'f']}</u>${esc(e.n||'')}</span><em class="${e.a>0?'up':'dn'}">${sg(e.a)}</em></div>`}).join(''):'<div class="empty">まだ記録がありません</div>')+`</section>`;
+  const n=S.all?40:4,rows=S.log.slice(-n).reverse();
+  return `<section class="card"><div class="ch"><span>HISTORY</span><span>${S.all?'全件表示中':'直近4件'}・「履歴」で切替</span></div>`+
+  (rows.length?rows.map(e=>{const d=new Date(e.t);return `<div class="h"><span><small>${d.getMonth()+1}/${d.getDate()} ${p2(d.getHours())}:${p2(d.getMinutes())}</small><u>${CUR[e.c||'f']}</u>${esc(e.n||'')}</span><em class="${e.a>0?'up':'dn'}">${sg(e.a)}</em></div>`}).join(''):'<div class="empty">まだ記録がありません</div>')+`</section>`;
 }
-function render(){
+let sheetOpen=false;
+function sheetHTML(){
+  const inp=(a,l,v)=>`<label>${l}<input type="number" inputmode="numeric" min="0" ${a} value="${v||''}" placeholder="0"></label>`;
+  return `<div class="sh-h"><b>設定</b><span class="mu">量はレベルに合わせて入力</span><span id="shx">✕</span></div>
+  <div class="src"><div class="sn"><b>目標</b></div><div class="sf">${inp('data-g="f"','ファンス',S.goals.f)}${inp('data-g="e"','円石',S.goals.e)}</div></div>`+
+  S.src.map(s=>{const nx=nextDue(s);return `<div class="src"><div class="sn"><b>${s.n}</b><small>${s.lb}${nx?'・次回 '+nx:''}</small></div><div class="sf">${inp(`data-s="${s.id}" data-k="f"`,'ファンス',s.f)}${inp(`data-s="${s.id}" data-k="e"`,'円石',s.e)}${s.t==='b'?`<label>基準日（受取の月曜）<input type="date" data-s="${s.id}" data-k="anchor" value="${s.anchor}"></label>`:''}</div></div>`}).join('');
+}
+function renderSheet(){const sh=$('#sheet'),st=sh.scrollTop;sh.innerHTML=sheetHTML();sh.scrollTop=st}
+function openSheet(o){sheetOpen=o;if(o)renderSheet();$('#shw').classList.toggle('open',o)}
+$('#shbd').onclick=()=>openSheet(false);
+$('#sheet').addEventListener('click',e=>{if(e.target.id==='shx')openSheet(false)});
+$('#sheet').addEventListener('change',e=>{const t=e.target,v=Math.max(0,Math.round(+t.value||0));
+  if(t.dataset.g){S.goals[t.dataset.g]=v}
+  else{const s=S.src.find(x=>x.id===t.dataset.s);if(!s)return;if(t.dataset.k==='anchor'){if(t.value)s.anchor=t.value}else s[t.dataset.k]=v}
+  save();renderDash()});
+function renderDash(){
   const D=$('#dash'),st=D.scrollTop;
-  D.innerHTML=card()+histPanel()+'<div class="hint full">+5000 ボス報酬 ／ -3000 ガチャ ／ 円石 +300 ／ 1.2万 売却<br>取り消し ／ 目標 100000 ／ 目標 円石 3000 ／ 履歴 ／ リセット</div>';
+  D.innerHTML=card()+fcCard()+histPanel();
   D.scrollTop=st;
   ['f','e'].forEach(c=>{
     const to=bal(c),from=shown[c],el=$('#bv_'+c),t0=performance.now();
     (function f(t){const k=Math.min(1,(t-t0)/700),e=1-Math.pow(1-k,3);el.textContent=nf(Math.round(from+(to-from)*e));if(k<1)requestAnimationFrame(f);else shown[c]=to})(t0);
   });
+  if(!D.classList.contains('na'))setTimeout(()=>D.classList.add('na'),900);
   requestAnimationFrame(()=>requestAnimationFrame(()=>D.querySelectorAll('.bar i').forEach(i=>i.style.width=i.dataset.w+'%')));
 }
+function render(){renderDash();if(sheetOpen)renderSheet()}
 const clock=()=>{const d=new Date(),p=x=>String(x).padStart(2,'0');$('#dt').textContent=`${d.getMonth()+1}/${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}`};
 clock();setInterval(clock,20000);
 
@@ -155,9 +234,9 @@ function bot(h,o={}){
   const d=bubble('a','<span class="dots"><i></i><i></i><i></i></span>');
   setTimeout(()=>{d.innerHTML=h;if(!o.keep)fadeT=setTimeout(fadeAll,o.ms||2400)},420);
 }
-const help=()=>`<b>+5000 ボス報酬</b>　入手<br><b>-3000 ガチャ</b>　消費<br><b>円石 +300</b>　円石は「円石」を付ける<br><span class="mu">符号なしは聞き返します</span>`;
+const help=()=>`<b>+5000 ボス報酬</b>　入手<br><b>-3000 ガチャ</b>　消費<br><b>円石 +300</b>　円石は「円石」を付ける<br><b>設定</b>　定期収入・目標の入力<br><span class="mu">符号なしは聞き返します</span>`;
 
-const norm=s=>s.replace(/[！-～]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0)).replace(/[−ー‐–]/g,'-').replace(/＋/g,'+').replace(/　/g,' ').trim();
+const norm=s=>s.replace(/[！-～]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0)).replace(/(^|\s)[−ー‐–](?=\s*\d)/g,'$1-').replace(/＋/g,'+').replace(/　/g,' ').trim();
 const curOf=t=>/円石|えんせき/.test(t)?'e':'f';
 const strip=t=>t.replace(/円石|えんせき|ファンス|ふぁんす/g,' ');
 function amt(t){
@@ -190,10 +269,31 @@ function handle(raw){
     }
     pending=null;
   }
+  if(/^(設定|設定を開く|設定画面|定期|定期収入|settings?)$/i.test(t)){openSheet(true);return bot('設定を開きました。',{ms:1600})}
+  if(/^(閉じる|とじる|完了|設定終了|close)$/i.test(t)){openSheet(false);return bot('閉じました。',{ms:1200})}
+  if(!/^[+\-]/.test(t)){
+    for(const s of S.src){const key=[s.n,...s.k].map(norm).find(k=>t.startsWith(k));if(!key)continue;
+      const rest=t.slice(key.length).replace(/^\s*(設定|は)?\s*/,'');
+      if(/^(受取|受け取|もらっ|受領|獲得)/.test(rest)){
+        if(!(s.f>0||s.e>0))return bot(`${s.n}の金額が未設定です。「${s.n} 5000」のように先に設定してください。`,{ms:4200});
+        ['f','e'].forEach(c=>{if(s[c]>0)S.log.push({id:Date.now()+(c==='e'?1:0),c,a:s[c],n:s.n,t:Date.now()})});
+        save();render();return bot(`${s.n} を受取：ファンス <span class="up">+${nf(s.f)}</span>／円石 <span class="up">+${nf(s.e)}</span>`);
+      }
+      const dm=rest.match(/^(?:基準日|次回|開始)?\s*(\d{1,2})\/(\d{1,2})$/);
+      if(dm&&s.t==='b'){s.anchor=new Date().getFullYear()+'-'+p2(+dm[1])+'-'+p2(+dm[2]);save();render();return bot(`${s.n}の基準日を ${+dm[1]}/${+dm[2]} にしました。以後14日ごとです。`,{ms:3200})}
+      const NUM='(ファンス|円石)?\\s*(\\d[\\d,]*(?:\\.\\d+)?)\\s*(万|千|k)?\\s*(ファンス|円石)?';
+      if(rest&&new RegExp('^('+NUM+'\\s*)+$','i').test(rest)){
+        const re=new RegExp(NUM,'gi');let m;
+        while((m=re.exec(rest))){if(!m[0])break;const c=(m[1]||m[4])==='円石'?'e':'f',mul=m[3]==='万'?1e4:(m[3]==='千'||/k/i.test(m[3]||''))?1e3:1;s[c]=Math.round(parseFloat(m[2].replace(/,/g,''))*mul)}
+        save();render();return bot(`${s.n} を設定：ファンス ${nf(s.f)}／円石 ${nf(s.e)}`,{ms:3200});
+      }
+      break;
+    }
+  }
   if(/ロゴ.*(削除|消|リセット)/.test(t)){clearLogo();return bot('ロゴを削除しました。')}
   const c=curOf(t),u=strip(t);
   if(/^(残高|所持|確認|いくら)/.test(t)||/^(残高|所持)/.test(u.trim()))return bot('残高は上に表示しています。');
-  if(/履歴|ログ|history/i.test(t)){S.all=!S.all;render();return bot(S.all?'履歴を全件表示にしました。':'履歴を直近8件に戻しました。')}
+  if(/履歴|ログ|history/i.test(t)){S.all=!S.all;render();return bot(S.all?'履歴を全件表示にしました。':'履歴を直近4件に戻しました。')}
   if(/集計|まとめ/.test(t)&&!/^\s*[+\-]?\d/.test(u))return bot('集計は各カードに表示しています。');
   if(/取り消|取消|undo|戻す|やり直/i.test(t)){const e=S.log.pop();save();render();return bot(e?`${CUR[e.c||'f']} <b>${sg(e.a)}</b> を取り消しました。`:'取り消せる記録がありません。')}
   if(/^目標/.test(t)){const a=amt(u.replace(/^目標/,''));if(!a)return bot('「目標 100000」「目標 円石 3000」のように入力してください。',{ms:4000});S.goals[c]=a.v;save();render();return bot(`${CUR[c]}の目標を <b>${nf(a.v)}</b> に設定しました。`)}
