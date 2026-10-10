@@ -154,6 +154,7 @@ html,body{overscroll-behavior:none}
 .av .t{font-size:9px;letter-spacing:.12em;margin-bottom:1px}
 .av b{color:var(--tx);font-weight:600;font-variant-numeric:tabular-nums;margin-left:3px}
 .av i{display:inline-block;width:8px;height:3px;border-radius:2px;margin-right:4px;vertical-align:middle}
+.ch2.still .ln{animation:none;stroke-dashoffset:0}
 </style>
 </head>
 <body>
@@ -201,7 +202,8 @@ const wealth=()=>(S.open.w||0)+of('f').filter(e=>e.a>0).reduce((a,e)=>a+e.a,0);
 const bal=c=>(S.open[c]||0)+of(c).reduce((a,e)=>a+e.a,0);
 const sum=(a,p)=>a.filter(p).reduce((x,e)=>x+e.a,0);
 const shown={f:0,e:0,b:0};
-let CH=170;
+let CH=170,ANIM=true,lastSig='';const barPrev={f:0,e:0};
+const sigNow=()=>JSON.stringify([S.log.length,(S.log[S.log.length-1]||{}).id,S.open,S.goals,S.src.map(x=>[x.f,x.e,x.b,x.anchor])]);
 const isToday=e=>new Date(e.t).toDateString()===new Date().toDateString();
 
 const due=(s,d)=>{if(s.t==='d')return true;if(s.t==='w')return d.getDay()===1;const diff=dnum(d)-dnum(strD(s.anchor));return ((diff%14)+14)%14===0};
@@ -230,7 +232,7 @@ function chart(){
   const lab=(i,txt,an)=>{const d=addD(start,i);return `<text class="ax" x="${X(i)}" y="${H-5}" text-anchor="${an}">${txt||(d.getMonth()+1)+'/'+d.getDate()}</text>`};
   const gl=(o,col)=>o.g>0?`<line x1="0" x2="${W}" y1="${Y(o,o.g)}" y2="${Y(o,o.g)}" stroke="${col}" stroke-opacity=".35" stroke-dasharray="1 4"/>`:'';
   const area=(o)=>`${path(o,0,N-1)}L${X(N-1)} ${H-bot}L${X(0)} ${H-bot}Z`;
-  return `<div class="cw"><svg class="ch2" viewBox="0 0 ${W} ${H}"><defs>
+  return `<div class="cw"><svg class="ch2${ANIM?'':' still'}" viewBox="0 0 ${W} ${H}"><defs>
   <linearGradient id="cgf" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${W}" y2="0"><stop offset="0" stop-color="#a8721a"/><stop offset=".5" stop-color="#fccc54"/><stop offset="1" stop-color="#fff0a8"/></linearGradient>
   <linearGradient id="cge" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${W}" y2="0"><stop offset="0" stop-color="#2a54b0"/><stop offset=".55" stop-color="#4aa0f0"/><stop offset="1" stop-color="#8ff0ff"/></linearGradient>
   <linearGradient id="cgb" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${W}" y2="0"><stop offset="0" stop-color="#8a4f86"/><stop offset=".55" stop-color="#d28ac4"/><stop offset="1" stop-color="#ffd3f0"/></linearGradient>
@@ -248,7 +250,7 @@ function chart(){
 function card(){
   const D={};['f','e','b'].forEach(c=>{const td=of(c).filter(isToday);D[c]={net:td.reduce((x,y)=>x+y.a,0),b:bal(c),g:S.goals[c]}});
   const pc=c=>Math.max(0,Math.min(100,Math.round(D[c].b/D[c].g*100)));
-  const gl=c=>{const g=D[c].g,rem=Math.max(0,g-D[c].b);return `<div><div class="gl"><span>${CUR[c]}</span>${rem>0?`<span>あと <b class="rm">${nf(rem)}</b></span>`:'<b class="rm">達成</b>'}</div><div class="bar"><i data-w="${pc(c)}"></i></div><div class="gs">目標 ${nf(g)}・${pc(c)}%</div></div>`};
+  const gl=c=>{const g=D[c].g,rem=Math.max(0,g-D[c].b);return `<div><div class="gl"><span>${CUR[c]}</span>${rem>0?`<span>あと <b class="rm">${nf(rem)}</b></span>`:'<b class="rm">達成</b>'}</div><div class="bar"><i data-c="${c}" style="width:${barPrev[c]}%" data-w="${pc(c)}"></i></div><div class="gs">目標 ${nf(g)}・${pc(c)}%</div></div>`};
   const gs=['f','e'].filter(c=>D[c].g>0);
   return `<section class="card"><div class="ch"><span>BALANCE</span><span class="dl">今日 ${D.f.net?sg(D.f.net):'±0'} ／ ${D.e.net?sg(D.e.net):'±0'}${hasBeetle()?` ／ ${D.b.net?sg(D.b.net):'±0'}`:''}</span></div>
   <div class="two"><div><div class="bl">${ico('f')}ファンス</div><div class="big" id="bv_f">${nf(shown.f)}</div></div><div><div class="bl">${ico('e')}円石</div><div class="big" id="bv_e">${nf(shown.e)}</div></div></div>
@@ -294,6 +296,7 @@ $('#sheet').addEventListener('change',e=>{const t=e.target,v=Math.max(0,Math.rou
   save();renderDash()});
 function renderDash(){
   const D=$('#dash'),st=D.scrollTop;let drop=0;
+  {const sg=sigNow();ANIM=sg!==lastSig;lastSig=sg}
   const build=()=>{D.innerHTML=card()+fcCard()+(drop?'':histPanel())};
   D.style.overflowY=S.all?'auto':'hidden';
   build();
@@ -315,7 +318,7 @@ function renderDash(){
     (function f(t){const k=Math.min(1,(t-t0)/700),e=1-Math.pow(1-k,3);el.textContent=nf(Math.round(from+(to-from)*e));if(k<1)requestAnimationFrame(f);else shown[c]=to})(t0);
   });
   if(!D.classList.contains('na'))setTimeout(()=>D.classList.add('na'),900);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>D.querySelectorAll('.bar i').forEach(i=>i.style.width=i.dataset.w+'%')));
+  requestAnimationFrame(()=>requestAnimationFrame(()=>D.querySelectorAll('.bar i').forEach(i=>{i.style.width=i.dataset.w+'%';barPrev[i.dataset.c]=+i.dataset.w})));
 }
 function render(){renderDash();if(sheetOpen)renderSheet()}
 const clock=()=>{const d=new Date(),p=x=>String(x).padStart(2,'0');$('#dt').textContent=`${d.getMonth()+1}/${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}`};
@@ -517,7 +520,7 @@ const inFS=()=>document.fullscreenElement||document.webkitFullscreenElement;
 function enterFS(){const e=document.documentElement,f=e.requestFullscreen||e.webkitRequestFullscreen;if(!f||inFS())return;try{const r=f.call(e);if(r&&r.catch)r.catch(()=>{})}catch(x){}}
 function exitFS(){const d=document;try{(d.exitFullscreen||d.webkitExitFullscreen||(()=>{})).call(d)}catch(x){}}
 document.addEventListener('click',e=>{if(!e.isTrusted||(e.target.closest&&e.target.closest('#send,#shw')))return;if(fsPref&&!fsTried&&!inFS()){fsTried=true;enterFS()}});
-let rzT;const refit=()=>{clearTimeout(rzT);rzT=setTimeout(renderDash,160)};addEventListener('resize',refit);addEventListener('orientationchange',refit);if(window.visualViewport)visualViewport.addEventListener('resize',refit);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(refit);
+let rzT,pendRefit=false;const refit=()=>{if(document.activeElement&&document.activeElement.id==='q'){pendRefit=true;return}clearTimeout(rzT);rzT=setTimeout(renderDash,160)};$('#q').addEventListener('blur',()=>{if(pendRefit){pendRefit=false;refit()}});addEventListener('resize',refit);addEventListener('orientationchange',refit);if(window.visualViewport)visualViewport.addEventListener('resize',refit);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(refit);
 </script>
 </body>
 </html>
