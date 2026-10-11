@@ -425,7 +425,8 @@ function handle(raw){
   if(/^(残高|所持|確認|いくら)/.test(t)||/^(残高|所持)/.test(u.trim()))return bot('残高は上に表示しています。');
   if(/履歴|ログ|history/i.test(t)){S.all=!S.all;render();return bot(S.all?'履歴を全件表示にしました。':'履歴を通常表示に戻しました。')}
   if(/集計|まとめ/.test(t)&&!/^\s*[+\-]?\d/.test(u))return bot('集計は各カードに表示しています。');
-  if(/取り消|取消|undo|戻す|やり直/i.test(t)){const e=S.log.pop();save();render();return bot(e?`${CUR[e.c||'f']} <b>${sg(e.a)}</b> を取り消しました。`:'取り消せる記録がありません。')}
+  if(/取り消|取消|undo|戻す|やり直/i.test(t)){if(shotUndo&&S.log.length===shotUndo.len){S.log=JSON.parse(shotUndo.log);S.open=JSON.parse(shotUndo.open);shotUndo=null;save();render();return bot('スクショの反映を取り消しました。')}
+    const e=S.log.pop();save();render();return bot(e?`${CUR[e.c||'f']} <b>${sg(e.a)}</b> を取り消しました。`:'取り消せる記録がありません。')}
   if(/^目標/.test(u.trim())&&c==='b')return bot('甲虫コインには目標を設定していません。');
   if(/^目標/.test(u.trim())){const a=amt(u.replace(/^\s*目標/,''));if(!a)return bot('「目標 100000」「目標 円石 3000」のように入力してください。',{ms:4000});S.goals[c]=a.v;save();render();return bot(`${CUR[c]}の目標を <b>${nf(a.v)}</b> に設定しました。`)}
   if(/リセット|全消|初期化/.test(t)){pending={type:'reset'};return bot('全ての記録を消します。よろしければ「はい」と送ってください。',{keep:true})}
@@ -541,23 +542,23 @@ function readShot(file){
 }
 function shotResult(r){
   if(!r.ok||(r.f==null&&r.e==null&&r.b==null&&r.w==null))return bot('ファンスと円石の数字を読み取れませんでした。<div class="mu">バッグ画面の右上、またはにくきゅうランキングの自分の行が写ったスクショを選んでください。</div>',{ms:5500});
-  pending={type:'shot',f:r.f,e:r.e,b:r.b,w:r.w};
-  const first=!S.open.set&&!S.log.length;
-  const hasC=['f','e','b'].some(c=>r[c]!=null),parts=[];
-  if(hasC)parts.push(['f','e','b'].filter(c=>r[c]!=null).map(c=>CUR[c]+' <b>'+nf(r[c])+'</b>').join('／'));
-  if(r.w!=null){const d=r.w-wealth();parts.push('財力値 <b>'+nf(r.w)+'</b>（現在 '+nf(wealth())+'・差 '+(d>0?'+':d<0?'−':'±')+nf(Math.abs(d))+'）')}
-  bot(`検出：${parts.join('／')}<div class="mu">「はい」で反映（${r.w!=null&&!hasC?'財力値のズレを補正':first?'使い始めの量としてセット':'差額をスクショ補正として記録'}）</div>`,{keep:true});
+  applyShot({f:r.f,e:r.e,b:r.b,w:r.w});
 }
+let shotUndo=null;
 function applyShot(p){
-  const hasC=['f','e','b'].some(c=>p[c]!=null),first=hasC&&!S.open.set&&!S.log.length;let ch=false;const parts=[];
+  const hasC=['f','e','b'].some(c=>p[c]!=null),first=hasC&&!S.open.set&&!S.log.length;
+  const snap={log:JSON.stringify(S.log),open:JSON.stringify(S.open)},bf={f:bal('f'),e:bal('e'),b:bal('b'),w:wealth()};let ch=false;
   if(hasC){
     if(first){['f','e','b'].forEach(c=>{if(p[c]!=null)S.open[c]=p[c]});S.open.set=true;ch=true}
     else['f','e','b'].forEach((c,i)=>{if(p[c]==null)return;const d=p[c]-bal(c);if(d){S.log.push({id:Date.now()+i,c,a:d,n:'スクショ補正',t:Date.now()});ch=true}});
-    parts.push(`ファンス ${nf(bal('f'))}／円石 ${nf(bal('e'))}／甲虫コイン ${nf(bal('b'))}`);
   }
-  if(p.w!=null){const d=p.w-wealth();if(d){S.open.w=(S.open.w||0)+d;ch=true}parts.push(`財力値 ${nf(wealth())}`)}
+  if(p.w!=null){const d=p.w-wealth();if(d){S.open.w=(S.open.w||0)+d;ch=true}}
+  const dl=(a,b)=>first||a===b?'':` <span class="mu">${sg(a-b)}</span>`,parts=[];
+  ['f','e','b'].filter(c=>p[c]!=null).forEach(c=>parts.push(`${CUR[c]} <b>${nf(bal(c))}</b>${dl(bal(c),bf[c])}`));
+  if(p.w!=null)parts.push(`財力値 <b>${nf(wealth())}</b>${dl(wealth(),bf.w)}`);
   save();render();
-  bot(ch?`反映しました：${parts.join('／')}${first&&p.w==null?'<div class="mu">財力値は「財力値 1200000」か、ランキング画面のスクショで入力できます</div>':''}`:'すでに一致しています。',{ms:first?4800:2600});
+  if(ch)shotUndo={...snap,len:S.log.length};
+  bot(ch?`反映：${parts.join('／')}<div class="mu">「取り消し」で戻せます${first&&p.w==null?'・財力値は「財力値 1200000」かランキング画面のスクショで入力':''}</div>`:'すでに一致しています。',{ms:first?5000:3800});
 }
 $('#shot').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)readShot(f)};
 document.addEventListener('paste',e=>{const it=[...((e.clipboardData&&e.clipboardData.items)||[])].find(i=>i.type.indexOf('image/')===0);if(it){e.preventDefault();readShot(it.getAsFile())}});
