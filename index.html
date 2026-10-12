@@ -172,12 +172,47 @@ html,body{overscroll-behavior:none}
 .br::after{content:"";position:absolute;left:0;bottom:2px;height:2px;width:var(--p);background:#ffffff3d;border-radius:2px}
 .il{font-size:11.5px;line-height:1.5;padding:2px 0;color:#d7d7d7}
 .il b{color:var(--tx);font-weight:600;font-variant-numeric:tabular-nums}
+#nb{padding:0 14px;display:flex;flex-direction:column;gap:6px}#nb:empty{display:none}
+.nt{display:flex;align-items:center;gap:10px;background:#2b2b2b;border:1px solid #444;border-radius:14px;padding:7px 8px 7px 12px;animation:pop .35s cubic-bezier(.2,.9,.3,1.1) both}
+.nt.nag{border-color:#8a8a8a}
+.nd{width:7px;height:7px;border-radius:50%;background:#fff;flex:none;animation:pls 2.2s infinite}
+@keyframes pls{0%{box-shadow:0 0 0 0 #ffffff77}70%,100%{box-shadow:0 0 0 7px #fff0}}
+.nm{flex:1;min-width:0;font-size:12.5px;line-height:1.35;font-weight:600}
+.nm small{display:block;color:var(--mu);font-size:10.5px;font-weight:400}
+.nx{color:var(--mu);padding:4px 7px;cursor:pointer;font-size:13px}
+.nmore{font-size:10.5px;color:var(--mu);text-align:right;padding-right:6px}
+.tg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tl2{background:#242424a8;border:1px solid var(--line);border-radius:16px;padding:10px 12px;min-width:0}
+.tl2.w2{grid-column:1/-1}
+.tl2h{font-size:11px;color:var(--mu);display:flex;align-items:center;gap:5px}
+.tl2h .ci{width:17px;height:17px;margin:0}
+.tl2v{font-size:21px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.01em;line-height:1.25;margin-top:1px}
+.tl2s{font-size:10.5px;color:var(--mu);line-height:1.5;font-variant-numeric:tabular-nums}
+.tl2 .bar{margin-top:5px}
+.stc{display:flex;align-items:center;gap:11px}
+.stc .sd{width:10px;height:10px;border-radius:50%;flex:none;border:2px solid #777}
+.stc .sd.ok{background:#fff;border-color:#fff;box-shadow:0 0 10px #ffffff66}
+.stc b{font-size:14px}.stc small{display:block;color:var(--mu);font-size:11px;font-weight:400;font-variant-numeric:tabular-nums}
+.nx2{padding:6px 0 4px}
+.nx2h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:12.5px}
+.nx2h span{color:var(--mu);font-size:12px;font-variant-numeric:tabular-nums}.nx2h em{font-style:normal;color:var(--tx);font-weight:700;margin-left:8px}
+.nx2 .bar{margin:5px 0 3px}.nx2 small{color:var(--mu);font-size:10.5px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:6px}
+.cc{border-radius:10px;padding:4px 0 2px;text-align:center;background:#ffffff08}
+.cc.ev{background:#ffffff1c}.cc.td{outline:1.5px solid #fff}
+.cc small{display:block;font-size:9px;color:var(--mu);line-height:1.2}
+.cc b{display:block;font-size:13px;font-variant-numeric:tabular-nums;line-height:1.3}
+.cc span{display:block;font-size:9px;height:11px;line-height:11px;letter-spacing:1px}
+.calg{font-size:10px;color:var(--mu);margin-top:6px}
+.tight .card{padding:7px 12px}.tight .tl2{padding:6px 12px}.tight .tl2v{font-size:19px}.tight .nx2{padding:3px 0 2px}.tight .cc{padding:2px 0 1px}
+.hn{font-size:10.5px;color:#6d6d6d;text-align:center;padding:2px 0}
 </style>
 </head>
 <body>
 <div id="wm"><img id="wmi" alt=""></div>
 <div id="app">
   <div class="top"><div class="tl"><div class="lg"><img id="lgi" alt="NTE"></div><div class="title">NTE Ledger</div></div><div id="dt"></div></div>
+  <div id="nb"></div>
   <div id="dash"></div>
   <input type="file" accept="image/*" id="shot" hidden>
   <div id="shw"><div id="shbd"></div><div id="sheet"></div></div>
@@ -206,10 +241,10 @@ const SRC=()=>[
  {id:'coffee',n:'壱のコーヒー',k:['コーヒー','壱'],f:0,e:0,b:0,t:'d',lb:'毎日'},
  {id:'stamina',n:'シティスタミナ',k:['スタミナ'],f:0,e:0,b:0,t:'w',lb:'毎週月曜'},
  {id:'million',n:'プロジェクトミリオン',k:['ミリオン'],f:0,e:0,b:0,t:'b',lb:'14日ごと(月曜)',anchor:nextMon()}];
-let S={v:5,log:[],goals:{f:0,e:0},all:false,src:SRC(),rcv:{},open:{f:0,e:0,b:0,w:0,set:false},pull:160,fcMode:'auto'};
-try{const r=JSON.parse(localStorage.getItem('nte_fans')||'null');if(r){S.log=r.log||[];S.goals=r.goals||{f:r.goal||0,e:0};S.rcv=r.rcv||{};if(r.open)S.open=Object.assign(S.open,r.open);if(r.pull>0)S.pull=r.pull;if(r.fcMode)S.fcMode=r.fcMode;if(!r.mig)S._m=1;(r.src||[]).forEach(o=>{const s=S.src.find(x=>x.id===o.id);if(s){s.f=+o.f||0;s.b=+o.b||0;s.e=+o.e||0;if(o.anchor)s.anchor=o.anchor}})}}catch(e){}
+let S={v:5,log:[],goals:{f:0,e:0},all:false,src:SRC(),rcv:{},open:{f:0,e:0,b:0,w:0,set:false},pull:160,fcMode:'auto',ntf:{on:true,seen:{},dis:{},inbox:[],upd:0,wsync:0,gt:null,gr:null,edge:[]}};
+try{const r=JSON.parse(localStorage.getItem('nte_fans')||'null');if(r){S.log=r.log||[];S.goals=r.goals||{f:r.goal||0,e:0};S.rcv=r.rcv||{};if(r.open)S.open=Object.assign(S.open,r.open);if(r.pull>0)S.pull=r.pull;if(r.fcMode)S.fcMode=r.fcMode;if(r.ntf)S.ntf=Object.assign(S.ntf,r.ntf);if(!r.mig)S._m=1;(r.src||[]).forEach(o=>{const s=S.src.find(x=>x.id===o.id);if(s){s.f=+o.f||0;s.b=+o.b||0;s.e=+o.e||0;if(o.anchor)s.anchor=o.anchor}})}}catch(e){}
 if(S._m){const d=S.src.find(x=>x.id==='daily');if(d&&!d.b)d.b=20000}
-const save=()=>{try{localStorage.setItem('nte_fans',JSON.stringify({v:5,mig:1,fcMode:S.fcMode,log:S.log,goals:S.goals,open:S.open,pull:S.pull,rcv:S.rcv,src:S.src.map(s=>({id:s.id,f:s.f,e:s.e,b:s.b,anchor:s.anchor}))}))}catch(e){}};
+const save=()=>{try{localStorage.setItem('nte_fans',JSON.stringify({v:5,mig:1,fcMode:S.fcMode,ntf:S.ntf,log:S.log,goals:S.goals,open:S.open,pull:S.pull,rcv:S.rcv,src:S.src.map(s=>({id:s.id,f:s.f,e:s.e,b:s.b,anchor:s.anchor}))}))}catch(e){}};
 const of=c=>S.log.filter(e=>(e.c||'f')===c);
 const nc=n=>n>=1e8?(n/1e8).toFixed(1).replace(/\.0$/,'')+'億':n>=1e5?Math.round(n/1e4)+'万':n>=1e4?(n/1e4).toFixed(1).replace(/\.0$/,'')+'万':nf(n);
 const hasBeetle=()=>!!(S.open.b||of('b').length||S.src.some(x=>x.b>0));
@@ -312,7 +347,7 @@ function sheetHTML(){
   <div class="src"><div class="sn"><b>目標</b></div><div class="sf">${inp('data-g="f"','ファンス',S.goals.f)}${inp('data-g="e"','円石',S.goals.e)}</div></div>`+
   S.src.map(s=>{const nx=nextDue(s);return `<div class="src"><div class="sn"><b>${s.n}</b><small>${s.lb}${nx?'・次回 '+nx:''}</small></div><div class="sf">${inp(`data-s="${s.id}" data-k="f"`,'ファンス',s.f)}${inp(`data-s="${s.id}" data-k="e"`,'円石',s.e)}${inp(`data-s="${s.id}" data-k="b"`,'甲虫コイン',s.b)}${s.t==='b'?`<label>基準日（受取の月曜）<input type="date" data-s="${s.id}" data-k="anchor" value="${s.anchor}"></label>`:''}</div></div>`}).join('');
 }
-function renderSheet(){const sh=$('#sheet'),st=sh.scrollTop;sh.innerHTML=sheetHTML();sh.scrollTop=st}
+function renderSheet(){const sh=$('#sheet'),st=sh.scrollTop;sh.innerHTML=sheetMode==='inbox'?inboxHTML():sheetHTML();sh.scrollTop=st}
 function openSheet(o){sheetOpen=o;if(o)renderSheet();$('#shw').classList.toggle('open',o)}
 $('#shbd').onclick=()=>openSheet(false);
 $('#sheet').addEventListener('click',e=>{if(e.target.id==='shx')openSheet(false)});
@@ -350,7 +385,7 @@ function renderHome(){
 }
 
 /* ===== 分析タブ ===== */
-let VIEW='home',FOCUS='f',AH=130,animA=true,lastSigA='',lastView='home';
+let VIEW='top',FOCUS='f',AH=130,animA=true,lastSigA='',lastView='top';
 const SWG={f:'linear-gradient(90deg,#a8721a,#fccc54,#fff0a8)',e:'linear-gradient(90deg,#2a54b0,#4aa0f0,#8ff0ff)',b:'linear-gradient(90deg,#8a4f86,#d28ac4,#ffd3f0)'};
 const md=t=>{const d=new Date(t);return (d.getMonth()+1)+'/'+d.getDate()};
 function anaData(){
@@ -429,13 +464,105 @@ function renderAnalysis(changed){
   }}
   D.scrollTop=st;
 }
+
+/* ===== ホーム(トップページ) ===== */
+const WD='日月火水木金土';
+const fmtMD=d=>(d.getMonth()+1)+'/'+d.getDate()+'（'+WD[d.getDay()]+'）';
+function nextDueD(s){const t=startOf(new Date());for(let i=0;i<45;i++){const d=addD(t,i);if(due(s,d))return {d,i}}return null}
+function topHTML(lv=0){
+  const td=c=>of(c).filter(isTodayE).reduce((x,e)=>x+e.a,0),upd=updatedToday(),hb=hasBeetle();
+  const lastT=Math.max(S.ntf.upd&&new Date(S.ntf.upd).toDateString()===new Date().toDateString()?S.ntf.upd:0,...S.log.filter(isTodayE).map(e=>e.t),0);
+  const hm=t=>{const d=new Date(t);return p2(d.getHours())+':'+p2(d.getMinutes())};
+  const dl=v=>v?fmtA(v):'±0';
+  const status=`<section class="card"><div class="stc"><i class="sd${upd?' ok':''}"></i><div><b>${upd?'今日は更新済み':'今日はまだ更新がありません'}</b><small>${upd?`最終 ${hm(lastT)}・今日の記録 ${S.log.filter(isTodayE).length}件`:'「スクショ」か記録で更新できます'}</small></div></div></section>`;
+  const gF=S.goals.f>0&&bal('f')<S.goals.f?`<div class="bar"><i style="width:${Math.max(0,Math.min(100,Math.round(bal('f')/S.goals.f*100)))}%"></i></div><div class="tl2s">目標まで あと ${nf(S.goals.f-bal('f'))}</div>`:'';
+  const tile=(cls,head,v,sub,extra)=>`<div class="tl2 ${cls}"><div class="tl2h">${head}</div><div class="tl2v">${nf(v)}</div><div class="tl2s">${sub}</div>${extra||''}</div>`;
+  const tiles=`<div class="tg">`+
+    tile('',`${ico('f')}ファンス`,bal('f'),`今日 ${dl(td('f'))}`,gF)+
+    tile('',`${ico('e')}円石`,bal('e'),`今日 ${dl(td('e'))}・ガチャ ${pulls(bal('e'))}回分`)+
+    (hb?tile('',`${ico('b')}甲虫コイン`,bal('b'),`今日 ${dl(td('b'))}`):'')+
+    tile(hb?'':'w2',`財力値`,wealth(),`今日 ${dl(of('f').filter(e=>isTodayE(e)&&e.a>0).reduce((x,e)=>x+e.a,0))}`)+`</div>`;
+  const nx=S.src.filter(x=>x.t!=='d').map(s=>{const n=nextDueD(s);if(!n)return '';const L=s.t==='w'?7:14,pct=Math.round((L-n.i)/L*100);
+    return `<div class="nx2"><div class="nx2h"><b>${s.n}</b><span>${fmtMD(n.d)}<em>${n.i===0?'今日':n.i===1?'明日':'あと'+n.i+'日'}</em></span></div><div class="bar"><i style="width:${pct}%"></i></div>${lv>=1?'':`<small>${ntfDetail(s)||'金額は「設定」で入力'}</small>`}</div>`}).join('');
+  const t0=startOf(new Date()),evs=S.src.filter(x=>x.t!=='d');
+  const cells=Array.from({length:lv>=2?7:14},(_,i)=>{const d=addD(t0,i),es=evs.filter(s=>due(s,d));
+    return `<div class="cc${es.length?' ev':''}${i===0?' td':''}"><small>${WD[d.getDay()]}</small><b>${d.getDate()}</b><span>${es.map(s=>s.t==='w'?'●':'◆').join('')}</span></div>`}).join('');
+  return status+tiles+
+    `<section class="card"><div class="ch"><span>NEXT UPDATE</span><span>定期収入の更新日</span></div>${nx}</section>`+
+    `<section class="card"><div class="ch"><span>CALENDAR</span><span>今後${lv>=2?7:14}日　● スタミナ　◆ ミリオン</span></div><div class="cal">${cells}</div></section>`+(lv>=1?'':`<div class="hn">「残高」でグラフ・「分析」でレポート・「スクショ」で更新</div>`);
+}
+function renderTop(changed){
+  const D=$('#dash'),st=D.scrollTop;
+  let lv=0;D.innerHTML=topHTML(lv);D.style.overflowY='hidden';
+  D.classList.remove('tight');
+  while(D.scrollHeight>D.clientHeight+1&&lv<3){lv++;if(lv===3)D.classList.add('tight');D.innerHTML=topHTML(Math.min(lv,2))}
+  if(D.scrollHeight>D.clientHeight+1)D.style.overflowY='auto';
+  if(changed){D.classList.remove('na');setTimeout(()=>D.classList.add('na'),900)}else D.classList.add('na');
+  D.scrollTop=st;
+}
+setInterval(()=>{if(VIEW==='top')renderDash()},60000);
 function renderDash(){
   const changed=VIEW!==lastView;lastView=VIEW;
-  $('.title').innerHTML='NTE Ledger'+(VIEW==='analysis'?'<span class="sub">分析</span>':'');
-  if(VIEW==='analysis')renderAnalysis(changed);else renderHome();
+  $('.title').innerHTML='NTE Ledger'+(VIEW==='analysis'?'<span class="sub">分析</span>':VIEW==='home'?'<span class="sub">残高</span>':'');
+  if(VIEW==='analysis')renderAnalysis(changed);else if(VIEW==='top')renderTop(changed);else renderHome();
   if(changed){const D=$('#dash');D.classList.remove('vs');void D.offsetWidth;D.classList.add('vs')}
 }
-function render(){renderDash();if(sheetOpen)renderSheet()}
+
+/* ===== お知らせ ===== */
+let sheetMode='set',nbSig='',nbFirst=true;
+const isTodayE=e=>new Date(e.t).toDateString()===new Date().toDateString();
+const updatedToday=()=>S.log.some(isTodayE)||(S.ntf.upd&&new Date(S.ntf.upd).toDateString()===new Date().toDateString());
+const notifPerm=()=>('Notification' in window)?({granted:'許可',denied:'拒否',default:'未許可'})[Notification.permission]||'未許可':'非対応';
+const ntfDetail=s=>{const p=['f','e','b'].filter(c=>s[c]>0).map(c=>`${c==='b'?'甲虫':CUR[c]} ${nf(s[c])}`);return p.length?'受取予定 '+p.join('／'):''};
+function sysNotify(n){try{if('Notification' in window&&Notification.permission==='granted'&&document.hidden)new Notification(n.msg,{body:n.sub||'',tag:n.key})}catch(e){}}
+function ntfCheck(){
+  const nt=S.ntf;
+  if(!nt.on){drawBanner([]);return}
+  const now=new Date(),T=now.getTime(),today=startOf(now),tom=addD(today,1),h=now.getHours(),act=[],fresh=[];let dirty=false;
+  // 定期収入の更新前日・当日
+  S.src.filter(x=>x.t!=='d').forEach(s=>{
+    if(due(s,tom))act.push({key:`eve:${s.id}:${ymd(tom)}`,ty:'eve',msg:`明日は${s.n}の更新日です`,sub:ntfDetail(s)});
+    if(due(s,today)&&!S.log.some(e=>isTodayE(e)&&e.n===s.n))act.push({key:`day:${s.id}:${ymd(today)}`,ty:'day',msg:`今日は${s.n}の更新日`,sub:`「${s.n} 受取」で記録`});
+  });
+  // 20時以降、その日まだ一度も更新していない(1時間おき)
+  if(h>=20&&!updatedToday())act.push({key:`nag:${ymd(today)}:${h}`,ty:'nag',msg:`今日はまだ更新がありません（${h}時）`,sub:'「スクショ」か記録で更新'});
+  // 財力値の補正(7日以上)
+  if(!nt.wsync){nt.wsync=T;dirty=true}
+  const wd=Math.floor((T-nt.wsync)/864e5);
+  if(wd>=7)act.push({key:`wealth:${ymd(today)}`,ty:'info',msg:`財力値の補正から${wd}日たちました`,sub:'ランキング画面の「スクショ」でズレを直せます'});
+  ['f','e','b'].forEach(c=>{if(bal(c)<0)act.push({key:`neg:${c}:${ymd(today)}`,ty:'info',msg:`${CUR[c]}の残高がマイナスです`,sub:'記録を確認してください'})});
+  // 一度だけ: ガチャ10連・目標達成
+  const pt=Math.floor(pulls(bal('e'))/10);
+  if(nt.gt==null){nt.gt=pt;dirty=true}else{if(pt>nt.gt&&pt>=1)nt.edge.push({key:`gacha:${pt}:${T}`,ty:'info',msg:`円石が${pt*10}回分たまりました`,sub:`ガチャ ${pulls(bal('e'))}回分（円石 ${nf(bal('e'))}）`,ts:T});if(pt!==nt.gt){nt.gt=pt;dirty=true}}
+  const rc={f:S.goals.f>0&&bal('f')>=S.goals.f,e:S.goals.e>0&&bal('e')>=S.goals.e};
+  if(!nt.gr){nt.gr=rc;dirty=true}else['f','e'].forEach(c=>{if(rc[c]&&!nt.gr[c])nt.edge.push({key:`goal:${c}:${T}`,ty:'info',msg:`${CUR[c]}が目標 ${nf(S.goals[c])} に到達しました`,sub:'',ts:T});if(rc[c]!==nt.gr[c]){nt.gr[c]=rc[c];dirty=true}});
+  nt.edge=nt.edge.filter(e=>T-e.ts<864e5);nt.edge.forEach(e=>act.push(e));
+  // 新着を受信箱へ
+  act.forEach(a=>{if(!nt.seen[a.key]){nt.seen[a.key]=T;nt.inbox.unshift({key:a.key,t:T,msg:a.msg,sub:a.sub||'',ty:a.ty});fresh.push(a);dirty=true}});
+  if(nt.inbox.length>40)nt.inbox.length=40;
+  const sk=Object.keys(nt.seen);if(sk.length>150){sk.sort((a,b)=>nt.seen[a]-nt.seen[b]).slice(0,sk.length-120).forEach(k=>{delete nt.seen[k];delete nt.dis[k]})}
+  if(dirty)save();
+  fresh.forEach(sysNotify);
+  const pr={nag:0,eve:1,day:2,info:3};
+  drawBanner(act.filter(a=>!nt.dis[a.key]).sort((a,b)=>pr[a.ty]-pr[b.ty]));
+}
+function drawBanner(list){
+  const sig=list.slice(0,2).map(a=>a.key).join('|')+'#'+list.length;
+  if(sig===nbSig)return;nbSig=sig;
+  const nb=$('#nb'),v=list.slice(0,2);
+  nb.innerHTML=v.map(a=>`<div class="nt ${a.ty}"><i class="nd"></i><div class="nm">${esc(a.msg)}${a.sub?`<small>${esc(a.sub)}</small>`:''}</div><span class="nx" data-k="${esc(a.key)}">✕</span></div>`).join('')+(list.length>2?`<div class="nmore">ほか${list.length-2}件・「お知らせ」で一覧</div>`:'');
+  if(!nbFirst)renderDash();nbFirst=false;
+}
+$('#nb').addEventListener('click',e=>{const k=e.target.dataset&&e.target.dataset.k;if(!k)return;S.ntf.dis[k]=1;save();ntfCheck()});
+function inboxHTML(){
+  const L=S.ntf.inbox.slice(0,20),tm=t=>{const d=new Date(t);return (d.getMonth()+1)+'/'+d.getDate()+' '+p2(d.getHours())+':'+p2(d.getMinutes())};
+  return `<div class="sh-h"><b>お知らせ</b><span class="mu">通知 ${S.ntf.on?'オン':'オフ'}・ブラウザ通知 ${notifPerm()}</span><span id="shx">✕</span></div>`+
+   (L.length?L.map(n=>`<div class="src"><div class="sn"><b style="font-size:12.5px">${esc(n.msg)}</b></div><div class="mu" style="margin-top:2px">${tm(n.t)}${n.sub?'・'+esc(n.sub):''}</div></div>`).join(''):'<div class="empty">お知らせはまだありません</div>')+
+   `<div class="mu" style="padding:8px 0 4px;line-height:1.7">更新前日・更新当日・20時以降の未更新（1時間おき）・ガチャ10連・目標達成・財力値の補正・残高マイナスを通知します。<br>「通知オフ」「通知オン」「通知許可」「お知らせ消去」</div>`;
+}
+setInterval(ntfCheck,30000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)ntfCheck()});
+function render(){renderDash();if(sheetOpen)renderSheet();ntfCheck()}
 const clock=()=>{const d=new Date(),p=x=>String(x).padStart(2,'0');$('#dt').textContent=`${d.getMonth()+1}/${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}`};
 clock();setInterval(clock,20000);
 
@@ -448,7 +575,7 @@ function bot(h,o={}){
   const d=bubble('a','<span class="dots"><i></i><i></i><i></i></span>');
   setTimeout(()=>{d.innerHTML=h;if(!o.keep)fadeT=setTimeout(fadeAll,o.ms||2400)},420);
 }
-const help=()=>`<b>+5000 ボス報酬</b>　入手<br><b>-3000 ガチャ</b>　消費<br><b>円石 +300</b>　円石は「円石」を付ける<br><b>甲虫 +1000</b>　甲虫コインは「甲虫」を付ける<br><b>セット ファンス 50000 円石 300 財力値 1000000</b>　使い始めの量<br><b>分析</b>　分析レポートに切替（「戻る」でホーム）<br><b>スクショ</b>　バッグ画面・にくきゅうランキングから読み取り<br><b>全画面</b>　全画面表示の切替<br><b>設定</b>　定期収入・目標の入力<br><span class="mu">符号なしは聞き返します</span>`;
+const help=()=>`<b>+5000 ボス報酬</b>　入手<br><b>-3000 ガチャ</b>　消費<br><b>円石 +300</b>　円石は「円石」を付ける<br><b>甲虫 +1000</b>　甲虫コインは「甲虫」を付ける<br><b>セット ファンス 50000 円石 300 財力値 1000000</b>　使い始めの量<br><b>お知らせ</b>　通知の一覧（通知オン／オフ）<br><b>ホーム</b>　トップページ　<b>残高</b>　グラフ画面<br><b>分析</b>　分析レポートに切替<br><b>スクショ</b>　バッグ画面・にくきゅうランキングから読み取り<br><b>全画面</b>　全画面表示の切替<br><b>設定</b>　定期収入・目標の入力<br><span class="mu">符号なしは聞き返します</span>`;
 
 const norm=s=>s.replace(/[！-～]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0)).replace(/(^|\s)[−ー‐–](?=\s*\d)/g,'$1-').replace(/＋/g,'+').replace(/　/g,' ').trim();
 const curOf=t=>/円石|えんせき/.test(t)?'e':/甲虫|ビートル/.test(t)?'b':'f';
@@ -487,9 +614,18 @@ function handle(raw){
     if(inFS()){exitFS();fsPref=false;try{localStorage.setItem('nte_fs','0')}catch(e){}return bot('全画面を解除しました。')}
     enterFS();setTimeout(()=>bot(inFS()?'全画面にしました。':'このビューアでは全画面にできませんでした。リンクをブラウザで直接開くと使えます。',{ms:3600}),350);return}
   if(/全画面.*(オフ|off|解除|やめ|終了)/i.test(t)){fsPref=false;try{localStorage.setItem('nte_fs','0')}catch(e){}exitFS();return bot('全画面を解除しました。')}
+  if(/^(お知らせ|お知らせ一覧|通知一覧|通知)$/.test(t)){sheetMode='inbox';openSheet(true);return bot('お知らせを開きました。',{ms:1400})}
+  if(/^通知\s*(オン|on)$/i.test(t)){S.ntf.on=true;save();ntfCheck();return bot('通知をオンにしました。',{ms:1800})}
+  if(/^通知\s*(オフ|off)$/i.test(t)){S.ntf.on=false;save();ntfCheck();return bot('通知をオフにしました。',{ms:1800})}
+  if(/^お知らせ(消去|クリア|削除)$/.test(t)){S.ntf.inbox=[];save();if(sheetOpen)renderSheet();return bot('お知らせの履歴を消しました。',{ms:1800})}
+  if(/^(通知許可|通知を許可|ブラウザ通知)$/.test(t)){
+    if(!('Notification' in window))return bot('このブラウザはシステム通知に対応していません。アプリを開いている間は、画面上のお知らせで通知します。',{ms:5200});
+    try{Notification.requestPermission().then(r=>bot(r==='granted'?'システム通知を許可しました（アプリを開いたまま別の画面にいる間に届きます）。':'許可されませんでした。アプリを開いている間は画面上のお知らせで通知します。',{ms:4800}))}catch(x){bot('許可を求められませんでした。',{ms:3000})}
+    return}
   const am=t.match(/^(分析|分析レポート|レポート)\s*(ファンス|円石|甲虫コイン|甲虫)?$/);
   if(am){VIEW='analysis';if(am[2])FOCUS=/円石/.test(am[2])?'e':/甲虫/.test(am[2])?'b':'f';render();return bot(`分析：${CUR[FOCUS]}<div class="mu">「分析 円石」「分析 甲虫」で対象を切替・「戻る」でホーム</div>`,{ms:3200})}
-  if(/^(戻る|もどる|ホーム|トップ|ダッシュボード)$/.test(t)){VIEW='home';render();return bot('ホームに戻りました。',{ms:1400})}
+  if(/^(戻る|もどる|ホーム|トップ|トップページ|ホーム画面)$/.test(t)){VIEW='top';render();return bot('ホームを表示しました。',{ms:1400})}
+  if(/^(残高|グラフ|ダッシュボード|残高画面)$/.test(t)){VIEW='home';render();return bot('残高画面を表示しました。',{ms:1400})}
   const fm=t.match(/^予測\s*(実績|定期収入|定期|自動)?$/);
   if(fm){const w=fm[1];if(w){S.fcMode=w==='実績'?'obs':w==='自動'?'auto':'sched';save();render()}
     const o=obs('f');return bot(`予測：${basis()==='obs'?`実績ベース（直近${o.days}日の増減から計算）`:'定期収入ベース'}${S.fcMode==='obs'&&!o?'<div class="mu">実績が3日分たまるまでは定期収入で計算します</div>':''}<div class="mu">「予測 実績」「予測 定期」で切替</div>`,{ms:4200})}
@@ -498,16 +634,16 @@ function handle(raw){
     const NUM='(ファンス|円石|甲虫コイン|甲虫|財力値)?\\s*(\\d[\\d,]*(?:\\.\\d+)?)\\s*(万|千|k)?(?:\\s*(ファンス|円石|甲虫コイン|甲虫|財力値)(?!\\s*\\d))?',rest=om[2];
     if(rest&&new RegExp('^('+NUM+'\\s*)+$','i').test(rest)){
       const re=new RegExp(NUM,'gi'),auto=/^財力/.test(om[1])?['w']:['f','e','w','b'];let m;
-      while((m=re.exec(rest))){if(!m[0])break;const w=m[1]||m[4],c=w?(w==='円石'?'e':w==='財力値'?'w':/甲虫/.test(w)?'b':'f'):(auto.shift()||'f'),mul=m[3]==='万'?1e4:(m[3]==='千'||/k/i.test(m[3]||''))?1e3:1;S.open[c]=Math.round(parseFloat(m[2].replace(/,/g,''))*mul)}
-      S.open.set=true;save();render();
+      while((m=re.exec(rest))){if(!m[0])break;const w=m[1]||m[4],c=w?(w==='円石'?'e':w==='財力値'?'w':/甲虫/.test(w)?'b':'f'):(auto.shift()||'f');if(c==='w')S.ntf.wsync=Date.now(),mul=m[3]==='万'?1e4:(m[3]==='千'||/k/i.test(m[3]||''))?1e3:1;S.open[c]=Math.round(parseFloat(m[2].replace(/,/g,''))*mul)}
+      S.open.set=true;S.ntf.upd=Date.now();save();render();
       return bot(`使い始めの量をセット：ファンス ${nf(S.open.f)}／円石 ${nf(S.open.e)}${S.open.b?`／甲虫コイン ${nf(S.open.b)}`:''}／財力値 ${nf(S.open.w||0)}（現在 ${nf(wealth())}）`,{ms:3200});
     }
-    openSheet(true);return bot('「セット ファンス 50000 円石 300 財力値 1000000」と送るか、設定の「使い始めの量」に入力してください。',{ms:4800});
+    sheetMode='set';openSheet(true);return bot('「セット ファンス 50000 円石 300 財力値 1000000」と送るか、設定の「使い始めの量」に入力してください。',{ms:4800});
   }
   if(/^(スクショ|スクリーンショット|画像|読み取り|読取|スキャン)$/.test(t)){$('#shot').click();return bot('バッグ画面かにくきゅうランキングのスクショを選んでください。',{ms:2600})}
   if(/^(検出詳細|検出ログ|スクショ詳細)$/.test(t)){const r=lastDet;return bot(!r?'まだスクショを読み取っていません。':((r.groups||[]).map(g=>`x${g.x}　${g.val==null?'読取不可('+g.raw+')':nf(g.val)}　青${g.blue.toFixed(2)}／金${g.gold.toFixed(2)}／誤差${g.worst.toFixed(2)}`).join('<br>')||'通貨の数字が見つかりませんでした')+(r.w!=null?`<br>財力値 ${nf(r.w)}`:''),{keep:true})}
   if(/^(ガチャ|ガチャ回数|回数)$/.test(t)){const b=bal('e'),n=pulls(b),pc=S.pull||160;return bot(`円石 ${nf(b)} で <b>${n}</b> 回回せます（1回 ${nf(pc)}）<div class="mu">あと ${nf(pc-b%pc)} でもう1回</div>`,{ms:3600})}
-  if(/^(設定|設定を開く|設定画面|定期|定期収入|settings?)$/i.test(t)){openSheet(true);return bot('設定を開きました。',{ms:1600})}
+  if(/^(設定|設定を開く|設定画面|定期|定期収入|settings?)$/i.test(t)){sheetMode='set';openSheet(true);return bot('設定を開きました。',{ms:1600})}
   if(/^(閉じる|とじる|完了|設定終了|close)$/i.test(t)){openSheet(false);return bot('閉じました。',{ms:1200})}
   if(!/^[+\-]/.test(t)){
     for(const s of S.src){const key=[s.n,...s.k].map(norm).find(k=>t.startsWith(k));if(!key)continue;
@@ -657,6 +793,7 @@ function shotResult(r){
 }
 let shotUndo=null,lastDet=null;
 function applyShot(p){
+  S.ntf.upd=Date.now();if(p.w!=null)S.ntf.wsync=Date.now();
   const hasC=['f','e','b'].some(c=>p[c]!=null),first=hasC&&!S.open.set&&!S.log.length;
   const snap={log:JSON.stringify(S.log),open:JSON.stringify(S.open)},bf={f:bal('f'),e:bal('e'),b:bal('b'),w:wealth()};let ch=false;
   if(hasC){
