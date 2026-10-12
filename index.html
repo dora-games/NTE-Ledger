@@ -26,7 +26,7 @@ body.hasl #wm img{display:block}
 #dash{flex:1;min-height:0;overflow-y:auto;padding:2px 14px 8px;display:grid;grid-template-columns:1fr;gap:9px;align-content:start}
 .card{background:#242424a8;border:1px solid var(--line);border-radius:20px;padding:15px 16px;animation:in .62s cubic-bezier(.2,.9,.3,1) both}
 .full{grid-column:1/-1}
-@keyframes in{0%{opacity:0;transform:translateY(16px) scale(.975)}55%{opacity:1;transform:translateY(-2px) scale(1.004)}100%{opacity:1;transform:none}}
+@keyframes in{0%{opacity:0;transform:translate(var(--cx,0px),16px) scale(.975)}55%{opacity:1;transform:translate(0,-2px) scale(1.004)}100%{opacity:1;transform:none}}
 .ch{display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:.12em;color:var(--mu)}
 .dl{letter-spacing:0;font-weight:600;font-variant-numeric:tabular-nums}
 .up{color:#fff;font-weight:700}.dn{color:var(--dn);font-weight:700}
@@ -257,6 +257,26 @@ input{transition:border-color .2s,box-shadow .25s}input:focus{box-shadow:0 0 0 4
 #sheet.enter>*{animation:rowin .46s cubic-bezier(.2,.9,.3,1) both;animation-delay:calc(var(--r,0)*34ms + .12s)}
 @keyframes rowin{from{opacity:0;transform:translateY(10px)}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
+/* ---- 画面切り替え: スキャンライン・ワイプ ---- */
+#ghost{position:absolute;z-index:3;pointer-events:none;overflow:hidden;margin:0!important}
+#wipe{position:absolute;z-index:4;pointer-events:none;overflow:hidden}
+#wipe i{position:absolute;top:0;bottom:0;width:2px;background:#fff;box-shadow:0 0 16px 3px #ffffffb0,0 0 40px 8px #ffffff40}
+#wipe i::before{content:"";position:absolute;top:0;bottom:0;width:110px;right:2px;background:linear-gradient(90deg,#fff0,#ffffff2e)}
+#wipe.l i::before{right:auto;left:2px;background:linear-gradient(270deg,#fff0,#ffffff2e)}
+#wipe.r i{animation:swR .6s cubic-bezier(.65,0,.25,1) both}
+#wipe.l i{animation:swL .6s cubic-bezier(.65,0,.25,1) both}
+#dash.rR{animation:revR .6s cubic-bezier(.65,0,.25,1) both}
+#dash.rL{animation:revL .6s cubic-bezier(.65,0,.25,1) both}
+#ghost.eR{animation:erR .6s cubic-bezier(.65,0,.25,1) both}
+#ghost.eL{animation:erL .6s cubic-bezier(.65,0,.25,1) both}
+@keyframes swR{from{left:0}to{left:calc(100% - 2px)}}
+@keyframes swL{from{left:calc(100% - 2px)}to{left:0}}
+@keyframes revR{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0)}}
+@keyframes revL{from{clip-path:inset(0 0 0 100%)}to{clip-path:inset(0)}}
+@keyframes erR{from{clip-path:inset(0);filter:blur(0);transform:none}to{clip-path:inset(0 0 0 100%);filter:blur(5px);transform:translateX(-16px) scale(.985)}}
+@keyframes erL{from{clip-path:inset(0);filter:blur(0);transform:none}to{clip-path:inset(0 100% 0 0);filter:blur(5px);transform:translateX(16px) scale(.985)}}
+.lg.fl img{animation:lgf .6s ease-out}
+@keyframes lgf{0%{filter:none}28%{filter:brightness(2.4) drop-shadow(0 0 8px #fff)}100%{filter:none}}
 </style>
 </head>
 <body>
@@ -562,6 +582,25 @@ function renderTop(){
   D.scrollTop=st;
 }
 setInterval(()=>{if(VIEW==='top')renderDash()},60000);
+const noMo=()=>window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+let wipeT=0;
+function clearWipe(){clearTimeout(wipeT);['#ghost','#wipe'].forEach(q=>{const e=document.querySelector(q);if(e)e.remove()});const D=$('#dash');D.classList.remove('rR','rL')}
+function startWipe(D,dir){
+  clearWipe();if(noMo())return null;
+  const app=$('#app'),box=`left:${D.offsetLeft}px;top:${D.offsetTop}px;width:${D.offsetWidth}px;height:${D.offsetHeight}px`;
+  const g=D.cloneNode(true);g.id='ghost';g.className=D.className.replace(/\b(rR|rL)\b/g,'')+' '+(dir>0?'eR':'eL');
+  g.style.cssText=D.style.cssText+';position:absolute;'+box;
+  g.removeAttribute('aria-live');app.appendChild(g);
+  const w=document.createElement('div');w.id='wipe';w.className=dir>0?'r':'l';w.style.cssText='position:absolute;'+box;w.innerHTML='<i></i>';app.appendChild(w);
+  const lg=document.querySelector('.lg');if(lg){lg.classList.remove('fl');void lg.offsetWidth;lg.classList.add('fl')}
+  wipeT=setTimeout(clearWipe,760);
+  return dir>0?'rR':'rL';
+}
+function scrambleTo(el,txt){
+  if(noMo()){el.textContent=txt;return}
+  const G='▓▒░#%&/|<>+=*',T0=performance.now(),dur=460;
+  (function f(t){const k=Math.min(1,(t-T0)/dur);let o='';for(let i=0;i<txt.length;i++)o+=k>(i+1)/txt.length*.8+.12?txt[i]:G[(Math.random()*G.length)|0];el.textContent=k>=1?txt:o;if(k<1)requestAnimationFrame(f)})(T0);
+}
 let naT=0,lastSigG=null,firstDone=false,enterAt=0,lastSizeKey='';
 const VORD={top:0,home:1,analysis:2};
 function renderDash(){
@@ -572,14 +611,16 @@ function renderDash(){
   const dir=VORD[VIEW]>=VORD[lastView]?1:-1;
   lastView=VIEW;lastSigG=sg;firstDone=true;lastSizeKey=sizeKey;
   const T=$('.title'),lab={top:'ホーム',home:'残高',analysis:'分析'}[VIEW];
-  if(T.textContent!==lab){T.textContent=lab;T.classList.remove('tt');void T.offsetWidth;T.classList.add('tt')}
+  const revCls=changed&&!first?startWipe(D,dir):null;
+  if(T.textContent!==lab){if(first)T.textContent=lab;else scrambleTo(T,lab)}
   if(mode==='enter'){
     enterAt=performance.now();D.classList.remove('na');clearTimeout(naT);naT=setTimeout(()=>D.classList.add('na'),1700);
     if(VIEW==='home'){shown.f=shown.e=shown.b=0;barPrev.f=barPrev.e=0;lastSig=''}
   }else{clearTimeout(naT);D.classList.add('na')}
   if(VIEW==='analysis')renderAnalysis(mode==='enter');else if(VIEW==='top')renderTop();else renderHome();
   runCU(D,mode);runBars(D,mode);
-  if(changed){D.style.setProperty('--dx',(dir*20)+'px');D.classList.remove('vs');void D.offsetWidth;D.classList.add('vs')}
+  D.style.setProperty('--cx',changed&&!first?(dir*22)+'px':'0px');
+  if(revCls){D.classList.add(revCls)}
 }
 
 /* ===== 汎用アニメーション(数値・バー) ===== */
