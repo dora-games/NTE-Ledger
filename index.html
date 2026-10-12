@@ -24,10 +24,9 @@ body.hasl #wm img{display:block}
 .title{font-weight:700;font-size:20px;letter-spacing:.02em}
 #dt{font-size:12px;color:var(--mu);font-variant-numeric:tabular-nums}
 #dash{flex:1;min-height:0;overflow-y:auto;padding:2px 14px 8px;display:grid;grid-template-columns:1fr;gap:9px;align-content:start}
-.card{background:#242424a8;border:1px solid var(--line);border-radius:20px;padding:15px 16px;animation:in .5s both}
-.card:nth-child(2){animation-delay:.08s}
+.card{background:#242424a8;border:1px solid var(--line);border-radius:20px;padding:15px 16px;animation:in .62s cubic-bezier(.2,.9,.3,1) both}
 .full{grid-column:1/-1}
-@keyframes in{from{opacity:0;transform:translateY(10px)}}
+@keyframes in{0%{opacity:0;transform:translateY(16px) scale(.975)}55%{opacity:1;transform:translateY(-2px) scale(1.004)}100%{opacity:1;transform:none}}
 .ch{display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:.12em;color:var(--mu)}
 .dl{letter-spacing:0;font-weight:600;font-variant-numeric:tabular-nums}
 .up{color:#fff;font-weight:700}.dn{color:var(--dn);font-weight:700}
@@ -156,8 +155,8 @@ html,body{overscroll-behavior:none}
 .av i{display:inline-block;width:8px;height:3px;border-radius:2px;margin-right:4px;vertical-align:middle}
 .ch2.still .ln{animation:none;stroke-dashoffset:0}
 .title .sub{font-weight:500;color:var(--mu);font-size:14px;margin-left:9px;letter-spacing:.04em}
-.vs{animation:vsw .3s cubic-bezier(.2,.8,.2,1)}
-@keyframes vsw{from{opacity:0;transform:translateX(14px)}}
+.vs{animation:vsw .36s cubic-bezier(.2,.8,.2,1)}
+@keyframes vsw{from{opacity:0;transform:translateX(var(--dx,14px))}}
 .bu,.bd{transform-box:fill-box;animation:gw .6s cubic-bezier(.2,.8,.2,1) both}
 .bu{transform-origin:50% 100%}.bd{transform-origin:50% 0}
 @keyframes gw{from{transform:scaleY(0)}}
@@ -214,6 +213,50 @@ html,body{overscroll-behavior:none}
 #sheet::before{content:"";display:block;width:36px;height:4px;border-radius:2px;background:#5a5a5a;margin:-4px auto 10px}
 .dv{font-style:normal;margin-left:9px;white-space:nowrap}.dv .ci{margin-right:3px}
 .hp{font-size:12.5px;line-height:1.75}.hp b{display:inline-block;min-width:4.2em;color:var(--mu);font-weight:500;font-size:11px}
+.title{font-size:15px!important;font-weight:600;color:var(--mu);letter-spacing:.08em}
+.fct{grid-template-columns:44px repeat(var(--n),minmax(0,1fr))!important}
+.fct b.mm{font-size:11px;font-weight:500;color:var(--mu);display:block;min-width:0}
+.fct b.mm span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right}
+.lg3{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:4px;margin-top:6px}
+.lg3 .lgt{display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--mu);white-space:nowrap}
+.lg3 .lgt i{width:12px;height:3px;border-radius:2px;flex:none}
+.lg3 small{display:block;font-size:10.5px;color:var(--tx);font-variant-numeric:tabular-nums;white-space:nowrap}
+.av2{position:absolute;left:2px;top:0;font-size:10px;color:var(--mu);white-space:nowrap}
+.ins{padding-top:8px!important;padding-bottom:8px!important}
+.fct b.two{flex-direction:column;align-items:flex-end;justify-content:center;gap:0;line-height:1.25}
+.fct b.two small{font-size:10px;font-weight:400;color:var(--mu);letter-spacing:.02em}
+/* ---- アニメーション強化 ---- */
+#dash>:nth-child(2){animation-delay:.07s}#dash>:nth-child(3){animation-delay:.14s}#dash>:nth-child(4){animation-delay:.21s}#dash>:nth-child(5){animation-delay:.28s}
+.tl2{animation:in .58s cubic-bezier(.2,.9,.3,1) both;animation-delay:calc(var(--i,0)*70ms + .1s)}
+.tg>:nth-child(1){--i:0}.tg>:nth-child(2){--i:1}.tg>:nth-child(3){--i:2}.tg>:nth-child(4){--i:3}
+.nx2{animation:in .5s cubic-bezier(.2,.9,.3,1) both;animation-delay:.3s}.nx2+.nx2{animation-delay:.38s}
+.cc{animation:in .45s cubic-bezier(.2,.9,.3,1) both;animation-delay:calc(var(--i,0)*24ms + .32s)}
+#dash.na .card,#dash.na .tl2,#dash.na .nx2,#dash.na .cc{animation:none}
+.title{display:inline-block}.title.tt{animation:ttl .4s cubic-bezier(.2,.9,.3,1)}
+@keyframes ttl{from{opacity:0;transform:translateY(-6px)}}
+.cuw{display:inline-block;transform-origin:left center}
+.cuw.bump{animation:bump .65s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes bump{0%{transform:scale(1)}30%{transform:scale(1.08);text-shadow:0 0 16px #ffffffaa}100%{transform:scale(1);text-shadow:0 0 0 #fff0}}
+.ch2:not(.still) .ar{animation:fadein .9s .25s both}
+.ch2:not(.still) .fp{animation:fadein .7s 1s both}
+.ch2:not(.still) .dt{transform-box:fill-box;transform-origin:center;animation:popdot .55s cubic-bezier(.2,1.6,.4,1) 1s both}
+.ch2:not(.still) .tm{transform-box:fill-box;transform-origin:50% 100%;animation:grow2 .7s cubic-bezier(.2,.9,.3,1) both}
+@keyframes fadein{from{opacity:0}}@keyframes popdot{from{transform:scale(0)}}@keyframes grow2{from{transform:scaleY(0)}}
+#wm img{animation:breathe 10s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:.12;transform:scale(1)}50%{opacity:.17;transform:scale(1.04)}}
+.stc .sd.ok{animation:pls 2.4s infinite}
+.m{animation:pop .5s cubic-bezier(.2,1.2,.3,1) both}
+@keyframes pop{from{opacity:0;transform:translateY(14px) scale(.94)}}
+.nt{animation:ntin .5s cubic-bezier(.2,1.1,.3,1) both}
+@keyframes ntin{from{opacity:0;transform:translateY(-12px) scale(.97)}}
+.nt.nout{animation:ntout .22s ease forwards}
+@keyframes ntout{to{opacity:0;transform:translateX(26px)}}
+#send.sent svg{animation:fly .5s cubic-bezier(.3,.8,.3,1)}
+@keyframes fly{0%{transform:translateY(0)}35%{transform:translateY(-16px);opacity:0}36%{transform:translateY(16px);opacity:0}100%{transform:translateY(0);opacity:1}}
+input{transition:border-color .2s,box-shadow .25s}input:focus{box-shadow:0 0 0 4px #ffffff1c}
+#sheet.enter>*{animation:rowin .46s cubic-bezier(.2,.9,.3,1) both;animation-delay:calc(var(--r,0)*34ms + .12s)}
+@keyframes rowin{from{opacity:0;transform:translateY(10px)}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
 </style>
 </head>
 <body>
@@ -299,7 +342,7 @@ function chart(){
   const A=mk('f'),B=mk('e'),hasB=!!(S.open.b||of('b').length),C=hasB?mk('b'):null;
   const Y=(o,v)=>(H-bot)-(v-o.mn)/(o.mx-o.mn)*(H-bot-top);
   const path=(o,i0,i1)=>{let d='';for(let i=i0;i<=i1;i++)d+=(i===i0?'M':'L')+X(i).toFixed(1)+' '+Y(o,o.V[i]).toFixed(1);return d};
-  const L=(o,gid,w,under)=>`${under?`<path d="${path(o,0,P)}" fill="none" stroke="#000" stroke-opacity=".6" stroke-width="${w+2.4}" stroke-linecap="round" stroke-linejoin="round"/>`:''}<path class="ln" pathLength="1" d="${path(o,0,P)}" stroke="url(#${gid})" style="stroke-width:${w}"/><path d="${path(o,P,N-1)}" fill="none" stroke="url(#${gid})" stroke-width="${w}" stroke-dasharray="3 4" stroke-linecap="round" opacity=".8"/>`;
+  const L=(o,gid,w,under)=>`${under?`<path d="${path(o,0,P)}" fill="none" stroke="#000" stroke-opacity=".6" stroke-width="${w+2.4}" stroke-linecap="round" stroke-linejoin="round"/>`:''}<path class="ln" pathLength="1" d="${path(o,0,P)}" stroke="url(#${gid})" style="stroke-width:${w}"/><path class="fp" d="${path(o,P,N-1)}" fill="none" stroke="url(#${gid})" stroke-width="${w}" stroke-dasharray="3 4" stroke-linecap="round" opacity=".8"/>`;
   const lab=(i,txt,an)=>{const d=addD(start,i);return `<text class="ax" x="${X(i)}" y="${H-5}" text-anchor="${an}">${txt||(d.getMonth()+1)+'/'+d.getDate()}</text>`};
   const gl=(o,col)=>o.g>0?`<line x1="0" x2="${W}" y1="${Y(o,o.g)}" y2="${Y(o,o.g)}" stroke="${col}" stroke-opacity=".35" stroke-dasharray="1 4"/>`:'';
   const area=(o)=>`${path(o,0,N-1)}L${X(N-1)} ${H-bot}L${X(0)} ${H-bot}Z`;
@@ -309,12 +352,12 @@ function chart(){
   <linearGradient id="cgb" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${W}" y2="0"><stop offset="0" stop-color="#8a4f86"/><stop offset=".55" stop-color="#d28ac4"/><stop offset="1" stop-color="#ffd3f0"/></linearGradient>
   <linearGradient id="caf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fccc54" stop-opacity=".38"/><stop offset=".55" stop-color="#6b4a10" stop-opacity=".16"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
   <linearGradient id="cae" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4aa0f0" stop-opacity=".3"/><stop offset="1" stop-color="#0c243c" stop-opacity="0"/></linearGradient></defs>
-  <line x1="${X(P)}" x2="${X(P)}" y1="${top-4}" y2="${H-bot}" stroke="#555" stroke-dasharray="2 3"/>
+  <line class="tm" x1="${X(P)}" x2="${X(P)}" y1="${top-4}" y2="${H-bot}" stroke="#555" stroke-dasharray="2 3"/>
   ${gl(A,'#fccc54')}${gl(B,'#71e7fb')}
-  <path d="${area(B)}" fill="url(#cae)"/><path d="${area(A)}" fill="url(#caf)"/>
+  <path class="ar" d="${area(B)}" fill="url(#cae)"/><path class="ar" d="${area(A)}" fill="url(#caf)"/>
   ${C?L(C,'cgb',1.7,false):''}${L(B,'cge',2,false)}${L(A,'cgf',2.4,true)}
-  ${C?`<circle cx="${X(P)}" cy="${Y(C,C.V[P])}" r="3" fill="#ffd3f0"/>`:''}<circle cx="${X(P)}" cy="${Y(B,B.V[P])}" r="7" fill="#71e7fb" opacity=".2"/><circle cx="${X(P)}" cy="${Y(B,B.V[P])}" r="3.2" fill="#8ff0ff"/>
-  <circle cx="${X(P)}" cy="${Y(A,A.V[P])}" r="7" fill="#fccc54" opacity=".22"/><circle cx="${X(P)}" cy="${Y(A,A.V[P])}" r="3.6" fill="#fccc54" stroke="#000" stroke-opacity=".6"/>
+  ${C?`<circle class="dt" cx="${X(P)}" cy="${Y(C,C.V[P])}" r="3" fill="#ffd3f0"/>`:''}<circle class="dt" cx="${X(P)}" cy="${Y(B,B.V[P])}" r="7" fill="#71e7fb" opacity=".2"/><circle class="dt" cx="${X(P)}" cy="${Y(B,B.V[P])}" r="3.2" fill="#8ff0ff"/>
+  <circle class="dt" cx="${X(P)}" cy="${Y(A,A.V[P])}" r="7" fill="#fccc54" opacity=".22"/><circle class="dt" cx="${X(P)}" cy="${Y(A,A.V[P])}" r="3.6" fill="#fccc54" stroke="#000" stroke-opacity=".6"/>
   ${lab(0,'','start')}${P>3?lab(P,'今日','middle'):''}${lab(N-1,'点線＝予測 '+(addD(start,N-1).getMonth()+1)+'/'+addD(start,N-1).getDate(),'end')}</svg><div class="av"><div class="t">1日平均<em>${basis()==='obs'?'実績'+obs('f').days+'日':'定期収入'}</em></div>${[['f','ファンス','linear-gradient(90deg,#a8721a,#fccc54,#fff0a8)'],['e','円石','linear-gradient(90deg,#2a54b0,#4aa0f0,#8ff0ff)'],...(C?[['b','甲虫','linear-gradient(90deg,#8a4f86,#d28ac4,#ffd3f0)']]:[])].map(([c,n,g])=>`<div><i style="background:${g}"></i>${n}<b>${fmtA(Math.round(avgX(c)))}</b></div>`).join('')}</div></div>
   <div class="lgd"><span><i class="sw" style="background:linear-gradient(90deg,#a8721a,#fccc54,#fff0a8)"></i>ファンス 〜${nc(A.mx)}</span><span><i class="sw" style="background:linear-gradient(90deg,#2a54b0,#4aa0f0,#8ff0ff)"></i>円石 〜${nc(B.mx)}</span>${C?`<span><i class="sw" style="background:linear-gradient(90deg,#8a4f86,#d28ac4,#ffd3f0)"></i>甲虫 〜${nc(C.mx)}</span>`:''}</div>`;
 }
@@ -325,7 +368,7 @@ function card(){
   const gs=['f','e'].filter(c=>D[c].g>0);
   return `<section class="card"><div class="ch"><span>BALANCE</span><span class="dl">今日<i class="dv">${ico('f','sm')}${D.f.net?sg(D.f.net):'±0'}</i><i class="dv">${ico('e','sm')}${D.e.net?sg(D.e.net):'±0'}</i>${hasBeetle()?`<i class="dv">${ico('b','sm')}${D.b.net?sg(D.b.net):'±0'}</i>`:''}</span></div>
   <div class="two"><div><div class="bl">${ico('f')}ファンス</div><div class="big" id="bv_f">${nf(shown.f)}</div></div><div><div class="bl">${ico('e')}円石</div><div class="big" id="bv_e">${nf(shown.e)}</div></div></div>
-  <div class="wl"><span>財力値</span><b>${nf(wealth())}</b><em title="甲虫コイン">${ico('b','sm')}<b id="bv_b">${nf(shown.b)}</b></em></div>
+  <div class="wl"><span>財力値</span><b>${cu('b-w',wealth())}</b><em title="甲虫コイン">${ico('b','sm')}<b id="bv_b">${nf(shown.b)}</b></em></div>
   ${chart()}${gs.length?`<div class="gls${gs.length===1?' one':''}">${gs.map(gl).join('')}</div>`:''}</section>`;
 }
 function fcCard(){
@@ -334,7 +377,7 @@ function fcCard(){
   const NAME={f:'ファンス',e:'円石',b:'甲虫'};
   const SW={f:'linear-gradient(90deg,#a8721a,#fccc54,#fff0a8)',e:'linear-gradient(90deg,#2a54b0,#4aa0f0,#8ff0ff)',b:'linear-gradient(90deg,#8a4f86,#d28ac4,#ffd3f0)'};
   const head=cols.map(c=>`<span class="fh"><i style="background:${SW[c]}"></i>${NAME[c]}</span>`).join('');
-  const row=(h,last)=>`<span class="fl${h===30?' em':''}${last?' lr':''}">${h}日後</span>`+cols.map(c=>`<b class="${h===30?'em':''}${last?' lr':''}">${nf(F[c][h-1])}</b>`).join('');
+  const row=(h,last)=>`<span class="fl${h===30?' em':''}${last?' lr':''}">${h}日後</span>`+cols.map(c=>`<b class="${h===30?'em':''}${last?' lr':''}">${cu('fc-'+c+h,F[c][h-1])}</b>`).join('');
   const anyG=S.goals.f>0||S.goals.e>0;
   return `<section class="card"><div class="ch"><span>FORECAST</span><span>${basis()==='obs'?'実績ベース':'定期収入ベース'}</span></div>
   <div class="fct" style="--n:${cols.length}"><span></span>${head}${row(7)}${row(30,true)}</div>
@@ -355,8 +398,8 @@ function sheetHTML(){
   <div class="src"><div class="sn"><b>目標</b></div><div class="sf">${inp('data-g="f"','ファンス',S.goals.f)}${inp('data-g="e"','円石',S.goals.e)}</div></div>`+
   S.src.map(s=>{const nx=nextDue(s);return `<div class="src"><div class="sn"><b>${s.n}</b><small>${s.lb}${nx?'・次回 '+nx:''}</small></div><div class="sf">${inp(`data-s="${s.id}" data-k="f"`,'ファンス',s.f)}${inp(`data-s="${s.id}" data-k="e"`,'円石',s.e)}${inp(`data-s="${s.id}" data-k="b"`,'甲虫コイン',s.b)}${s.t==='b'?`<label>基準日（受取の月曜）<input type="date" data-s="${s.id}" data-k="anchor" value="${s.anchor}"></label>`:''}</div></div>`}).join('');
 }
-function renderSheet(){const sh=$('#sheet'),st=sh.scrollTop;sh.innerHTML=sheetMode==='inbox'?inboxHTML():sheetMode==='hist'?histHTML():sheetHTML();sh.scrollTop=st}
-function openSheet(o){sheetOpen=o;if(o)renderSheet();$('#shw').classList.toggle('open',o)}
+function renderSheet(){const sh=$('#sheet'),st=sh.scrollTop;sh.innerHTML=sheetMode==='inbox'?inboxHTML():sheetMode==='hist'?histHTML():sheetHTML();[...sh.children].forEach((c,i)=>c.style.setProperty('--r',Math.min(i,12)));sh.scrollTop=st}
+function openSheet(o){const was=sheetOpen;sheetOpen=o;if(o)renderSheet();$('#shw').classList.toggle('open',o);if(o&&!was){const sh=$('#sheet');sh.classList.remove('enter');void sh.offsetWidth;sh.classList.add('enter');setTimeout(()=>sh.classList.remove('enter'),1200)}}
 $('#shbd').onclick=()=>openSheet(false);
 $('#sheet').addEventListener('click',e=>{if(e.target.id==='shx')openSheet(false)});
 $('#sheet').addEventListener('change',e=>{const t=e.target,v=Math.max(0,Math.round(+t.value||0));
@@ -388,7 +431,6 @@ function renderHome(){
     const to=bal(c),from=shown[c],el=$('#bv_'+c),t0=performance.now();
     (function f(t){const k=Math.min(1,(t-t0)/700),e=1-Math.pow(1-k,3);el.textContent=nf(Math.round(from+(to-from)*e));if(k<1)requestAnimationFrame(f);else shown[c]=to})(t0);
   });
-  if(!D.classList.contains('na'))setTimeout(()=>D.classList.add('na'),900);
   requestAnimationFrame(()=>requestAnimationFrame(()=>D.querySelectorAll('.bar i').forEach(i=>{i.style.width=i.dataset.w+'%';barPrev[i.dataset.c]=+i.dataset.w})));
 }
 
@@ -408,58 +450,69 @@ function anaData(){
   });
   return {t0,days,st};
 }
+const nmS=c=>c==='b'?'甲虫':CUR[c];
+const anaCols=()=>hasBeetle()?['f','e','b']:['f','e'];
+function topMemo(a,pos){
+  const m={};a.filter(e=>pos?e.a>0:e.a<0).forEach(e=>{const k=(e.n||'その他').trim()||'その他';m[k]=(m[k]||0)+Math.abs(e.a)});
+  const L=Object.entries(m).sort((x,y)=>y[1]-x[1]),tot=L.reduce((x,y)=>x+y[1],0);
+  return tot?`${L[0][0]} ${Math.round(L[0][1]/tot*100)}%`:'—';
+}
+function wkCalc(c,sel){
+  if(!S.log.length)return null;
+  const today=startOf(new Date()),t1=addD(today,-6).getTime(),first=startOf(new Date(S.log[0].t)).getTime();
+  if(first>addD(today,-7).getTime())return null;
+  const nPrev=Math.max(1,Math.min(7,Math.round((t1-first)/864e5))),t0=Math.max(first,t1-7*864e5);
+  let cur=0,prev=0;of(c).forEach(e=>{if(e.t>=t1)cur+=sel(e);else if(e.t>=t0)prev+=sel(e)});
+  const ca=cur/7,pa=prev/nPrev;
+  return {cur,prev,pct:Math.abs(pa)<1e-9?null:(ca-pa)/Math.abs(pa)*100,partial:nPrev<7,nPrev};
+}
+const fmtPct=p=>p==null?'—':Math.abs(p)<0.5?'±0%':(p>0?'▲':'▼')+Math.min(999,Math.round(Math.abs(p)))+'%';
+const wkNet=c=>wkCalc(c,e=>e.a),wkInc=c=>wkCalc(c,e=>e.a>0?e.a:0);
 function anaSummary(D){
-  const cols=hasBeetle()?['f','e','b']:['f','e'];
-  const head=cols.map(c=>`<span class="fh"><i style="background:${SWG[c]}"></i>${c==='b'?'甲虫':CUR[c]}</span>`).join('');
-  const row=(l,fn,last)=>`<span class="fl${last?' lr':''}">${l}</span>`+cols.map(c=>`<b class="${last?'lr':''}">${fn(D.st[c])}</b>`).join('');
+  const cols=anaCols();
+  const head=cols.map(c=>`<span class="fh"><i style="background:${SWG[c]}"></i>${nmS(c)}</span>`).join('');
+  const netRow=(D,cols)=>`<span class="fl">純増減</span>`+cols.map(c=>{const w=wkNet(c);return `<b class="two"><span>${cu('a-net-'+c,Math.round(D.st[c].net),'s')}</span><small>先週比 ${w?fmtPct(w.pct)+(w.partial?'※':''):'—'}</small></b>`}).join('');
+  const row=(l,fn,last,mm)=>`<span class="fl${last?' lr':''}">${l}</span>`+cols.map(c=>mm?`<b class="mm${last?' lr':''}"><span>${esc(fn(D.st[c]))}</span></b>`:`<b class="${last?'lr':''}">${fn(D.st[c],c)}</b>`).join('');
   return `<section class="card"><div class="ch"><span>SUMMARY</span><span>直近${Math.max(1,Math.round(D.days))}日・${D.st.f.n+D.st.e.n+D.st.b.n}件</span></div>
-  <div class="fct" style="--n:${cols.length}"><span></span>${head}${row('純増減',s=>fmtA(Math.round(s.net)))}${row('1日平均',s=>fmtA(Math.round(s.avg)),true)}</div></section>`;
+  <div class="fct" style="--n:${cols.length}"><span></span>${head}${netRow(D,cols)}${row('1日平均',(s,c)=>cu('a-avg-'+c,Math.round(s.avg),'s'))}${row('主な入手',s=>topMemo(s.a,true),false,true)}${row('主な消費',s=>topMemo(s.a,false),true,true)}</div></section>`;
 }
-function anaChart(D,c){
-  const today=startOf(new Date()),N=Math.max(1,Math.min(14,dnum(today)-dnum(D.t0)+1)),start=addD(today,-(N-1));
-  const inc=Array(N).fill(0),out=Array(N).fill(0);
-  of(c).forEach(e=>{const i=dnum(startOf(new Date(e.t)))-dnum(start);if(i>=0&&i<N){if(e.a>0)inc[i]+=e.a;else out[i]-=e.a}});
-  const mi=Math.max(...inc,0),mo=Math.max(...out,0),W=300,H=AH,pd=6,top=14,bot=16,plot=H-top-bot,tot=(mi+mo)||1,u=plot/tot,y0=top+mi*u;
-  const bw=(W-pd*2)/N,gw=Math.min(22,bw*.62),G={f:['#fccc54','#a8721a'],e:['#8ff0ff','#2a54b0'],b:['#ffd3f0','#8a4f86']}[c];
+function anaChart(D){
+  const cols=anaCols(),today=startOf(new Date()),N=Math.max(1,Math.min(14,dnum(today)-dnum(D.t0)+1)),start=addD(today,-(N-1));
+  const IN={},OUT={},mi={},mo={};
+  cols.forEach(c=>{IN[c]=Array(N).fill(0);OUT[c]=Array(N).fill(0);
+    of(c).forEach(e=>{const i=dnum(startOf(new Date(e.t)))-dnum(start);if(i>=0&&i<N){if(e.a>0)IN[c][i]+=e.a;else OUT[c][i]-=e.a}});
+    mi[c]=Math.max(...IN[c],0);mo[c]=Math.max(...OUT[c],0)});
+  const hasOut=cols.some(c=>mo[c]>0),W=300,H=AH,pd=6,top=20,bot=16,plot=H-top-bot,y0=hasOut?top+plot*.64:top+plot,upH=y0-top,dnH=top+plot-y0;
+  const GW=(W-pd*2)/N,k=cols.length,bw=Math.min(8,GW/(k+.8)),gap=Math.min(2,bw*.25),inner=k*bw+(k-1)*gap;
+  const G={f:['#fccc54','#a8721a'],e:['#8ff0ff','#2a54b0'],b:['#ffd3f0','#8a4f86']};
   let bars='';
-  for(let i=0;i<N;i++){const x=pd+i*bw+(bw-gw)/2,hi=inc[i]?Math.max(1.8,inc[i]*u):0,ho=out[i]?Math.max(1.8,out[i]*u):0;
-    if(hi)bars+=`<rect class="bu" x="${x.toFixed(1)}" y="${(y0-hi).toFixed(1)}" width="${gw.toFixed(1)}" height="${hi.toFixed(1)}" rx="2" fill="url(#ab${c})" style="animation-delay:${i*25}ms"/>`;
-    if(ho)bars+=`<rect class="bd" x="${x.toFixed(1)}" y="${y0.toFixed(1)}" width="${gw.toFixed(1)}" height="${ho.toFixed(1)}" rx="2" fill="#8d8d8d" fill-opacity=".75" style="animation-delay:${i*25}ms"/>`}
-  const lab=(i,an)=>`<text class="ax" x="${(pd+(i+.5)*bw).toFixed(1)}" y="${H-4}" text-anchor="${an}">${md(addD(start,i).getTime())}</text>`;
-  return `<svg class="ch2 ach${animA?'':' still'}" viewBox="0 0 ${W} ${H}"><defs><linearGradient id="ab${c}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${G[0]}"/><stop offset="1" stop-color="${G[1]}"/></linearGradient></defs>
-  <line x1="0" x2="${W}" y1="${y0.toFixed(1)}" y2="${y0.toFixed(1)}" stroke="#555"/>${bars}
-  <text class="ax" x="${W-pd}" y="${top-3}" text-anchor="end">入手最大 ${nc(mi)}</text><text class="ax" x="${W-pd}" y="${H-bot-3}" text-anchor="end">消費最大 ${nc(mo)}</text>
-  ${lab(0,'start')}${N>4?lab(Math.floor((N-1)/2),'middle'):''}${lab(N-1,'end')}</svg>`;
+  for(let i=0;i<N;i++)cols.forEach((c,j)=>{
+    const x=pd+i*GW+(GW-inner)/2+j*(bw+gap),dly=`animation-delay:${i*22+j*8}ms`;
+    if(IN[c][i]&&mi[c]){const h=Math.max(1.6,IN[c][i]/mi[c]*upH);bars+=`<rect class="bu" x="${x.toFixed(1)}" y="${(y0-h).toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="1.6" fill="url(#ab${c})" style="${dly}"/>`}
+    if(OUT[c][i]&&mo[c]){const h=Math.max(1.6,OUT[c][i]/mo[c]*dnH);bars+=`<rect class="bd" x="${x.toFixed(1)}" y="${y0.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="1.6" fill="url(#ab${c})" fill-opacity=".5" style="${dly}"/>`}
+  });
+  const lab=(i,an)=>`<text class="ax" x="${(pd+(i+.5)*GW).toFixed(1)}" y="${H-4}" text-anchor="${an}">${md(addD(start,i).getTime())}</text>`;
+  const defs=cols.map(c=>`<linearGradient id="ab${c}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${G[c][0]}"/><stop offset="1" stop-color="${G[c][1]}"/></linearGradient>`).join('');
+  const lg=cols.map(c=>`<div><span class="lgt"><i style="background:${SWG[c]}"></i>${nmS(c)}</span></div>`).join('');
+  return `<div class="cw"><svg class="ch2 ach${animA?'':' still'}" viewBox="0 0 ${W} ${H}"><defs>${defs}</defs><line x1="0" x2="${W}" y1="${y0.toFixed(1)}" y2="${y0.toFixed(1)}" stroke="#555"/>${bars}${lab(0,'start')}${N>4?lab(Math.floor((N-1)/2),'middle'):''}${lab(N-1,'end')}</svg><div class="av2">DAILY　上＝入手　下＝消費　高さは通貨ごとの最大値が基準</div></div><div class="lg3" style="--n:${k}">${lg}</div>`;
 }
-function anaChartCard(D){return `<section class="card"><div class="ch"><span>DAILY ${CUR[FOCUS]}</span><span>上＝入手　下＝消費</span></div>${anaChart(D,FOCUS)}</section>`}
-function anaBreak(D){
-  const side=pos=>{
-    const m={};D.st[FOCUS].a.filter(e=>pos?e.a>0:e.a<0).forEach(e=>{const k=(e.n||'その他').trim()||'その他';m[k]=(m[k]||0)+Math.abs(e.a)});
-    const L=Object.entries(m).sort((a,b)=>b[1]-a[1]),tot=L.reduce((x,y)=>x+y[1],0);
-    let h;
-    if(!tot)h='<div class="br" style="--p:0%"><span>—</span></div>';
-    else{const top=L.slice(0,2),rest=L.slice(2).reduce((x,y)=>x+y[1],0);if(rest)top.push(['その他',rest]);
-      h=top.map(([k,v])=>`<div class="br" style="--p:${Math.round(v/tot*100)}%"><span>${esc(k)} ${Math.round(v/tot*100)}%</span><b>${nf(v)}</b></div>`).join('')}
-    return `<div class="bt"><span>${pos?'入手':'消費'}</span><b>${nf(tot)}</b></div>${h}`;
-  };
-  return `<section class="card"><div class="ch"><span>BREAKDOWN ${CUR[FOCUS]}</span><span>メモ別・合計</span></div><div class="bk"><div>${side(true)}</div><div>${side(false)}</div></div></section>`;
-}
+function anaChartCard(D){return `<section class="card" style="padding-top:8px;padding-bottom:8px">${anaChart(D)}</section>`}
 function anaInsights(D){
-  const c=FOCUS,s=D.st[c],A=Math.round(s.avg),sc=Math.round(avg(c)),L=[],days=Math.max(1,Math.round(D.days));
-  L.push(`1日平均 <b>${fmtA(A)}</b>（入手 ${nf(Math.round(s.inc/D.days))}／消費 ${nf(Math.round(s.out/D.days))}）`);
-  if(D.days>=3&&(sc||A)){const d=A-sc;L.push(`定期収入の見込み ${fmtA(sc)}/日 より <b>${nf(Math.abs(d))}</b> ${d>=0?'多く、見込み外の入手があります':'少なく、消費が入手を上回っています'}`)}
-  if(s.inc>0&&s.out>0)L.push(`入手の <b>${Math.round(s.out/s.inc*100)}%</b> を消費${s.maxO?`・最大「${esc(s.maxO.n||'その他')}」${nf(-s.maxO.a)}`:''}`);
-  else if(s.out>0)L.push('入手の記録がなく、消費のみです');
-  const g=S.goals[c];
-  if(g>0&&bal(c)<g)L.push(`目標まであと <b>${nf(g-bal(c))}</b>・${eta(c).replace(/（.*）/,'')}`);
-  else if(c==='f'){const r=s.inc/D.days;L.push(`財力値 <b>${nf(wealth())}</b>・30日後 <b>${nf(wealth()+Math.round(r*30))}</b>（入手 +${nf(Math.round(r))}/日）`)}
-  else if(c==='e'){L.push(`ガチャ換算 <b>${A>=0?'+':'−'}${Math.abs(Math.round(A/(S.pull||160)*10)/10)}</b> 回分/日`)}
-  return `<section class="card"><div class="ch"><span>INSIGHTS</span><span>${D.days<3?'記録3日未満・参考値':'直近'+days+'日'}</span></div>${L.slice(0,4).map(x=>`<div class="il">・${x}</div>`).join('')}</section>`;
+  const cols=anaCols(),L=[];
+  const rr=cols.filter(c=>D.st[c].inc>0&&D.st[c].out>0).map(c=>`${nmS(c)} <b>${Math.round(D.st[c].out/D.st[c].inc*100)}%</b>`);
+  if(rr.length)L.push(`入手に対する消費　${rr.join('／')}`);
+  if(D.days>=3)L.push(`定期収入の見込みとの差　${cols.map(c=>`${nmS(c)} <b>${fmtA(Math.round(D.st[c].avg)-Math.round(avg(c)))}</b>`).join('／')}`);
+  const gl=['f','e'].filter(c=>S.goals[c]>0&&bal(c)<S.goals[c]).map(c=>`${nmS(c)}目標まで あと <b>${nf(S.goals[c]-bal(c))}</b>・${eta(c).replace(/（.*）/,'')}`);
+  if(gl.length)L.push(gl.join('　'));
+  {const w=wkInc('f');if(w)L.push(`財力値の増加　直近7日 <b>+${nf(Math.round(w.cur))}</b>（先週比 <b>${fmtPct(w.pct)}</b>）`);else L.push('<span style="color:var(--mu)">先週比は、記録が8日分たまると表示されます</span>')}
+  const r=D.st.f.inc/D.days;L.push(`財力値 <b>${nf(wealth())}</b>・30日後 <b>${nf(wealth()+Math.round(r*30))}</b>${D.days<3?'（記録3日未満・参考値）':''}`);
+  if(cols.some(c=>{const w=wkNet(c);return w&&w.partial}))L.push('<span style="color:var(--mu)">※先週は記録のある日数で1日平均を出して比べています</span>');
+  return `<section class="card ins">${L.slice(0,6).map(x=>`<div class="il">・${x}</div>`).join('')}</section>`;
 }
 function renderAnalysis(changed){
   const D=$('#dash'),st=D.scrollTop,data=anaData();
-  const sg=sigNow()+FOCUS;animA=changed||sg!==lastSigA;lastSigA=sg;
-  const build=()=>{D.innerHTML=data?anaSummary(data)+anaChartCard(data)+anaBreak(data)+anaInsights(data):'<section class="card"><div class="empty">記録がまだありません。<br>記録がたまると、ここに分析が出ます。</div></section>'};
+  const sg=sigNow();animA=changed||sg!==lastSigA;lastSigA=sg;
+  const build=()=>{D.innerHTML=data?anaSummary(data)+anaChartCard(data)+anaInsights(data):'<section class="card"><div class="empty">記録がまだありません。<br>記録がたまると、ここに分析が出ます。</div></section>'};
   D.style.overflowY='hidden';build();
   if(data){for(let i=0;i<8;i++){
     const sv=D.querySelector('svg.ach');if(!sv)break;
@@ -482,38 +535,71 @@ function topHTML(lv=0){
   const lastT=Math.max(S.ntf.upd&&new Date(S.ntf.upd).toDateString()===new Date().toDateString()?S.ntf.upd:0,...S.log.filter(isTodayE).map(e=>e.t),0);
   const hm=t=>{const d=new Date(t);return p2(d.getHours())+':'+p2(d.getMinutes())};
   const dl=v=>v?fmtA(v):'±0';
+  const wkL=c=>{const w=lv<2&&wkNet(c);return w?'<br>先週比 '+fmtPct(w.pct)+(w.partial?'※':''):''};
   const status=`<section class="card"><div class="stc"><i class="sd${upd?' ok':''}"></i><div><b>${upd?'今日は更新済み':'今日はまだ更新がありません'}</b><small>${upd?`最終 ${hm(lastT)}・今日の記録 ${S.log.filter(isTodayE).length}件`:'「スクショ」か記録で更新できます'}</small></div></div></section>`;
-  const gF=S.goals.f>0&&bal('f')<S.goals.f?`<div class="bar"><i style="width:${Math.max(0,Math.min(100,Math.round(bal('f')/S.goals.f*100)))}%"></i></div><div class="tl2s">目標まで あと ${nf(S.goals.f-bal('f'))}</div>`:'';
-  const tile=(cls,head,v,sub,extra)=>`<div class="tl2 ${cls}"><div class="tl2h">${head}</div><div class="tl2v">${nf(v)}</div><div class="tl2s">${sub}</div>${extra||''}</div>`;
+  const gF=S.goals.f>0&&bal('f')<S.goals.f?`<div class="bar"><i data-bk="t-goal-f" data-w="${Math.max(0,Math.min(100,Math.round(bal('f')/S.goals.f*100)))}"></i></div><div class="tl2s">目標まで あと ${nf(S.goals.f-bal('f'))}</div>`:'';
+  const tile=(cls,head,v,sub,extra)=>`<div class="tl2 ${cls}"><div class="tl2h">${head}</div><div class="tl2v">${cu('t-'+head.replace(/<[^>]*>/g,''),v)}</div><div class="tl2s">${sub}</div>${extra||''}</div>`;
   const tiles=`<div class="tg">`+
-    tile('',`${ico('f')}ファンス`,bal('f'),`今日 ${dl(td('f'))}`,gF)+
-    tile('',`${ico('e')}円石`,bal('e'),`今日 ${dl(td('e'))}・ガチャ ${pulls(bal('e'))}回分`)+
-    (hb?tile('',`${ico('b')}甲虫コイン`,bal('b'),`今日 ${dl(td('b'))}`):'')+
-    tile(hb?'':'w2',`財力値`,wealth(),`今日 ${dl(of('f').filter(e=>isTodayE(e)&&e.a>0).reduce((x,e)=>x+e.a,0))}`)+`</div>`;
+    tile('',`${ico('f')}ファンス`,bal('f'),`今日 ${dl(td('f'))}${wkL('f')}`,gF)+
+    tile('',`${ico('e')}円石`,bal('e'),`今日 ${dl(td('e'))}・ガチャ ${pulls(bal('e'))}回分${wkL('e')}`)+
+    (hb?tile('',`${ico('b')}甲虫コイン`,bal('b'),`今日 ${dl(td('b'))}${wkL('b')}`):'')+
+    tile(hb?'':'w2',`財力値`,wealth(),`今日 ${dl(of('f').filter(e=>isTodayE(e)&&e.a>0).reduce((x,e)=>x+e.a,0))}${(()=>{const w=lv<2&&wkInc('f');return w?'<br>先週比 '+fmtPct(w.pct)+'（入手）':''})()}`)+`</div>`;
   const nx=S.src.filter(x=>x.t!=='d').map(s=>{const n=nextDueD(s);if(!n)return '';const L=s.t==='w'?7:14,pct=Math.round((L-n.i)/L*100);
-    return `<div class="nx2"><div class="nx2h"><b>${s.n}</b><span>${fmtMD(n.d)}<em>${n.i===0?'今日':n.i===1?'明日':'あと'+n.i+'日'}</em></span></div><div class="bar"><i style="width:${pct}%"></i></div>${lv>=1?'':`<small>${ntfDetail(s)||'金額は「設定」で入力'}</small>`}</div>`}).join('');
+    return `<div class="nx2"><div class="nx2h"><b>${s.n}</b><span>${fmtMD(n.d)}<em>${n.i===0?'今日':n.i===1?'明日':'あと'+n.i+'日'}</em></span></div><div class="bar"><i data-bk="nx-${s.id}" data-w="${pct}"></i></div>${lv>=1?'':`<small>${ntfDetail(s)||'金額は「設定」で入力'}</small>`}</div>`}).join('');
   const t0=startOf(new Date()),evs=S.src.filter(x=>x.t!=='d');
   const cells=Array.from({length:lv>=2?7:14},(_,i)=>{const d=addD(t0,i),es=evs.filter(s=>due(s,d));
-    return `<div class="cc${es.length?' ev':''}${i===0?' td':''}"><small>${WD[d.getDay()]}</small><b>${d.getDate()}</b><span>${es.map(s=>s.t==='w'?'●':'◆').join('')}</span></div>`}).join('');
+    return `<div class="cc${es.length?' ev':''}${i===0?' td':''}" style="--i:${i}"><small>${WD[d.getDay()]}</small><b>${d.getDate()}</b><span>${es.map(s=>s.t==='w'?'●':'◆').join('')}</span></div>`}).join('');
   return status+tiles+
     `<section class="card"><div class="ch"><span>NEXT UPDATE</span><span>定期収入の更新日</span></div>${nx}</section>`+
     `<section class="card"><div class="ch"><span>CALENDAR</span><span>今後${lv>=2?7:14}日　● スタミナ　◆ ミリオン</span></div><div class="cal">${cells}</div></section>`+(lv>=1?'':`<div class="hn">「残高」グラフ・「分析」レポート・「スクショ」読み取り・「ヘルプ」一覧</div>`);
 }
-function renderTop(changed){
+function renderTop(){
   const D=$('#dash'),st=D.scrollTop;
   let lv=0;D.innerHTML=topHTML(lv);D.style.overflowY='hidden';
   D.classList.remove('tight');
   while(D.scrollHeight>D.clientHeight+1&&lv<3){lv++;if(lv===3)D.classList.add('tight');D.innerHTML=topHTML(Math.min(lv,2))}
   if(D.scrollHeight>D.clientHeight+1)D.style.overflowY='auto';
-  if(changed){D.classList.remove('na');setTimeout(()=>D.classList.add('na'),900)}else D.classList.add('na');
   D.scrollTop=st;
 }
 setInterval(()=>{if(VIEW==='top')renderDash()},60000);
+let naT=0,lastSigG=null,firstDone=false,enterAt=0,lastSizeKey='';
+const VORD={top:0,home:1,analysis:2};
 function renderDash(){
-  const changed=VIEW!==lastView;lastView=VIEW;
-  $('.title').innerHTML='NTE Ledger'+(VIEW==='analysis'?'<span class="sub">分析</span>':VIEW==='home'?'<span class="sub">残高</span>':'');
-  if(VIEW==='analysis')renderAnalysis(changed);else if(VIEW==='top')renderTop(changed);else renderHome();
-  if(changed){const D=$('#dash');D.classList.remove('vs');void D.offsetWidth;D.classList.add('vs')}
+  const D=$('#dash'),sg=sigNow()+'|'+S.pull+'|'+S.ntf.upd+'|'+S.ntf.on,changed=VIEW!==lastView,first=!firstDone,dchg=sg!==lastSigG;
+  const mode=(changed||first)?'enter':dchg?'data':'none';
+  const sizeKey=innerWidth+'x'+innerHeight+'|'+nbSig+'|'+VIEW;
+  if(mode==='none'&&sizeKey===lastSizeKey&&performance.now()-enterAt<1700)return;
+  const dir=VORD[VIEW]>=VORD[lastView]?1:-1;
+  lastView=VIEW;lastSigG=sg;firstDone=true;lastSizeKey=sizeKey;
+  const T=$('.title'),lab={top:'ホーム',home:'残高',analysis:'分析'}[VIEW];
+  if(T.textContent!==lab){T.textContent=lab;T.classList.remove('tt');void T.offsetWidth;T.classList.add('tt')}
+  if(mode==='enter'){
+    enterAt=performance.now();D.classList.remove('na');clearTimeout(naT);naT=setTimeout(()=>D.classList.add('na'),1700);
+    if(VIEW==='home'){shown.f=shown.e=shown.b=0;barPrev.f=barPrev.e=0;lastSig=''}
+  }else{clearTimeout(naT);D.classList.add('na')}
+  if(VIEW==='analysis')renderAnalysis(mode==='enter');else if(VIEW==='top')renderTop();else renderHome();
+  runCU(D,mode);runBars(D,mode);
+  if(changed){D.style.setProperty('--dx',(dir*20)+'px');D.classList.remove('vs');void D.offsetWidth;D.classList.add('vs')}
+}
+
+/* ===== 汎用アニメーション(数値・バー) ===== */
+const CUP={},BARP={},CUF={n:v=>nf(v),s:v=>fmtA(v)};
+const noMotion=()=>window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+const cu=(key,v,f='n')=>`<span class="cuw" data-cu="${key}" data-v="${Math.round(v)}" data-f="${f}">${CUF[f](Math.round(v))}</span>`;
+function runCU(D,mode){
+  const items=[];
+  D.querySelectorAll('[data-cu]').forEach(el=>{const k=el.dataset.cu,v=+el.dataset.v,f=el.dataset.f;let from=null;
+    if(mode==='enter')from=0;else if(mode==='data'&&CUP[k]!==undefined&&CUP[k]!==v)from=CUP[k];
+    CUP[k]=v;if(from!==null&&from!==v&&!noMotion())items.push({el,from,v,f,bump:mode==='data'})});
+  if(!items.length)return;
+  const T0=performance.now();
+  items.forEach(it=>{it.el.textContent=CUF[it.f](it.from);if(it.bump){it.el.classList.remove('bump');void it.el.offsetWidth;it.el.classList.add('bump')}});
+  (function step(t){const k=Math.min(1,(t-T0)/850),e=1-Math.pow(1-k,3);items.forEach(it=>{it.el.textContent=CUF[it.f](Math.round(it.from+(it.v-it.from)*e))});if(k<1)requestAnimationFrame(step)})(T0);
+}
+function runBars(D,mode){
+  D.querySelectorAll('i[data-bk]').forEach(i=>{const k=i.dataset.bk,w=+i.dataset.w;
+    const from=mode==='enter'?0:(mode==='data'&&BARP[k]!==undefined?BARP[k]:w);
+    i.style.transition='none';i.style.width=from+'%';void i.offsetWidth;i.style.transition='';i.style.width=w+'%';BARP[k]=w});
 }
 
 /* ===== お知らせ ===== */
@@ -561,7 +647,7 @@ function drawBanner(list){
   nb.innerHTML=v.map(a=>`<div class="nt ${a.ty}"><i class="nd"></i><div class="nm">${esc(a.msg)}${a.sub?`<small>${esc(a.sub)}</small>`:''}</div><span class="nx" data-k="${esc(a.key)}">✕</span></div>`).join('')+(list.length>2?`<div class="nmore">ほか${list.length-2}件・「お知らせ」で一覧</div>`:'');
   if(!nbFirst)renderDash();nbFirst=false;
 }
-$('#nb').addEventListener('click',e=>{const k=e.target.dataset&&e.target.dataset.k;if(!k)return;S.ntf.dis[k]=1;save();ntfCheck()});
+$('#nb').addEventListener('click',e=>{const k=e.target.dataset&&e.target.dataset.k;if(!k)return;const el=e.target.closest('.nt');if(el)el.classList.add('nout');setTimeout(()=>{S.ntf.dis[k]=1;save();ntfCheck()},el?210:0)});
 function histHTML(){
   const L=S.log.slice(-60).reverse(),tm=t=>{const d=new Date(t);return (d.getMonth()+1)+'/'+d.getDate()+' '+p2(d.getHours())+':'+p2(d.getMinutes())};
   return `<div class="sh-h"><b>履歴</b><span class="mu">${L.length?'直近'+L.length+'件':''}</span><span id="shx">✕</span></div>`+
@@ -632,7 +718,7 @@ function handle(raw){
     try{Notification.requestPermission().then(r=>bot(r==='granted'?'システム通知を許可しました（アプリを開いたまま別の画面にいる間に届きます）。':'許可されませんでした。アプリを開いている間は画面上のお知らせで通知します。',{ms:4800}))}catch(x){bot('許可を求められませんでした。',{ms:3000})}
     return}
   const am=t.match(/^(分析|分析レポート|レポート)\s*(ファンス|円石|甲虫コイン|甲虫)?$/);
-  if(am){VIEW='analysis';if(am[2])FOCUS=/円石/.test(am[2])?'e':/甲虫/.test(am[2])?'b':'f';render();return bot(`分析レポートを開きました（${CUR[FOCUS]}）<div class="mu">「分析 円石」「分析 甲虫」で対象を切替／「ホーム」で戻る</div>`,{ms:3200})}
+  if(am){VIEW='analysis';render();return bot('分析レポートを開きました。<div class="mu">「ホーム」で戻ります</div>',{ms:2400})}
   if(/^(戻る|もどる|ホーム|トップ|トップページ|ホーム画面)$/.test(t)){VIEW='top';render();return bot('ホームを開きました。',{ms:1400})}
   if(/^(残高|グラフ|ダッシュボード|残高画面)$/.test(t)){VIEW='home';render();return bot('残高画面を開きました。',{ms:1400})}
   const fm=t.match(/^予測\s*(実績|定期収入|定期|自動)?$/);
@@ -693,9 +779,9 @@ function handle(raw){
   }
   bot('入力を読み取れませんでした。<div class="mu">例：+5000 ボス報酬／円石 -300 ガチャ</div><div class="mu">「ヘルプ」でコマンド一覧を表示します</div>',{ms:5200});
 }
-$('#send').onclick=()=>{const v=$('#q').value;$('#q').value='';handle(v)};
+$('#send').onclick=()=>{const v=$('#q').value;$('#q').value='';const b=$('#send');b.classList.remove('sent');void b.offsetWidth;b.classList.add('sent');setTimeout(()=>b.classList.remove('sent'),520);handle(v)};
 $('#q').onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing)$('#send').click()};
-render();
+ntfCheck();render();
 if(!S.open.set&&!S.log.length)setTimeout(()=>bot('はじめに、使い始めの量を入力してください。<br><b>セット ファンス 50000 円石 300 財力値 1000000</b><div class="mu">または「スクショ」でバッグ画面から自動入力</div>',{keep:true}),500);
 /* ===== スクショ読み取り(画像処理のみ・AIなし) ===== */
 const SH={GW:10,GH:16};
