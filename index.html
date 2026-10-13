@@ -89,9 +89,9 @@ svg.ch2{margin:2px 0 4px}
 .h{padding:5px 0}
 .inp{z-index:9}
 #log{z-index:8}
-#shw{position:absolute;inset:0;z-index:7;opacity:0;pointer-events:none;transition:opacity .25s}
+#shw{position:absolute;inset:0;z-index:7;opacity:0;pointer-events:none;transition:opacity .16s}
 #shw.open{opacity:1;pointer-events:auto}
-#shbd{position:absolute;inset:0;background:#000a;backdrop-filter:blur(3px)}
+#shbd{position:absolute;inset:0;background:#000a;backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
 #sheet{position:absolute;left:12px;right:12px;bottom:calc(var(--sab) + 66px);max-height:calc(100% - var(--sab) - var(--sat) - 120px);overflow-y:auto;background:#262626;border:1px solid #3a3a3a;border-radius:22px;padding:14px 16px 8px;transform:translateY(26px) scale(.97);transition:transform .38s cubic-bezier(.2,.9,.3,1.1)}
 #shw.open #sheet{transform:none}
 .sh-h{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
@@ -226,11 +226,11 @@ html,body{overscroll-behavior:none}
 .fct b.two{flex-direction:column;align-items:flex-end;justify-content:center;gap:0;line-height:1.25}
 .fct b.two small{font-size:10px;font-weight:400;color:var(--mu);letter-spacing:.02em}
 /* ---- アニメーション強化 ---- */
-#dash>:nth-child(2){animation-delay:.07s}#dash>:nth-child(3){animation-delay:.14s}#dash>:nth-child(4){animation-delay:.21s}#dash>:nth-child(5){animation-delay:.28s}
-.tl2{animation:in .58s cubic-bezier(.2,.9,.3,1) both;animation-delay:calc(var(--i,0)*70ms + .1s)}
+.card{animation-delay:var(--fxd,0s)}#dash>:nth-child(2){animation-delay:calc(var(--fxd,0s) + .07s)}#dash>:nth-child(3){animation-delay:calc(var(--fxd,0s) + .14s)}#dash>:nth-child(4){animation-delay:calc(var(--fxd,0s) + .21s)}#dash>:nth-child(5){animation-delay:calc(var(--fxd,0s) + .28s)}
+.tl2{animation:in .58s cubic-bezier(.2,.9,.3,1) both;animation-delay:calc(var(--fxd,0s) + var(--i,0)*70ms + .1s)}
 .tg>:nth-child(1){--i:0}.tg>:nth-child(2){--i:1}.tg>:nth-child(3){--i:2}.tg>:nth-child(4){--i:3}
-.nx2{animation:in .5s cubic-bezier(.2,.9,.3,1) both;animation-delay:.3s}.nx2+.nx2{animation-delay:.38s}
-.cc{animation:in .45s cubic-bezier(.2,.9,.3,1) both;animation-delay:calc(var(--i,0)*24ms + .32s)}
+.nx2{animation:in .5s cubic-bezier(.2,.9,.3,1) both;animation-delay:calc(var(--fxd,0s) + .3s)}.nx2+.nx2{animation-delay:calc(var(--fxd,0s) + .38s)}
+.cc{animation:in .45s cubic-bezier(.2,.9,.3,1) both;animation-delay:calc(var(--fxd,0s) + var(--i,0)*24ms + .32s)}
 #dash.na .card,#dash.na .tl2,#dash.na .nx2,#dash.na .cc{animation:none}
 .title{display:inline-block}.title.tt{animation:ttl .4s cubic-bezier(.2,.9,.3,1)}
 @keyframes ttl{from{opacity:0;transform:translateY(-6px)}}
@@ -257,24 +257,8 @@ input{transition:border-color .2s,box-shadow .25s}input:focus{box-shadow:0 0 0 4
 #sheet.enter>*{animation:rowin .46s cubic-bezier(.2,.9,.3,1) both;animation-delay:calc(var(--r,0)*34ms + .12s)}
 @keyframes rowin{from{opacity:0;transform:translateY(10px)}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
-/* ---- 画面切り替え: スキャンライン・ワイプ ---- */
-#ghost{position:absolute;z-index:3;pointer-events:none;overflow:hidden;margin:0!important}
-#wipe{position:absolute;z-index:4;pointer-events:none;overflow:hidden}
-#wipe i{position:absolute;top:0;bottom:0;width:2px;background:#fff;box-shadow:0 0 16px 3px #ffffffb0,0 0 40px 8px #ffffff40}
-#wipe i::before{content:"";position:absolute;top:0;bottom:0;width:110px;right:2px;background:linear-gradient(90deg,#fff0,#ffffff2e)}
-#wipe.l i::before{right:auto;left:2px;background:linear-gradient(270deg,#fff0,#ffffff2e)}
-#wipe.r i{animation:swR .6s cubic-bezier(.65,0,.25,1) both}
-#wipe.l i{animation:swL .6s cubic-bezier(.65,0,.25,1) both}
-#dash.rR{animation:revR .6s cubic-bezier(.65,0,.25,1) both}
-#dash.rL{animation:revL .6s cubic-bezier(.65,0,.25,1) both}
-#ghost.eR{animation:erR .6s cubic-bezier(.65,0,.25,1) both}
-#ghost.eL{animation:erL .6s cubic-bezier(.65,0,.25,1) both}
-@keyframes swR{from{left:0}to{left:calc(100% - 2px)}}
-@keyframes swL{from{left:calc(100% - 2px)}to{left:0}}
-@keyframes revR{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0)}}
-@keyframes revL{from{clip-path:inset(0 0 0 100%)}to{clip-path:inset(0)}}
-@keyframes erR{from{clip-path:inset(0);filter:blur(0);transform:none}to{clip-path:inset(0 0 0 100%);filter:blur(5px);transform:translateX(-16px) scale(.985)}}
-@keyframes erL{from{clip-path:inset(0);filter:blur(0);transform:none}to{clip-path:inset(0 100% 0 0);filter:blur(5px);transform:translateX(16px) scale(.985)}}
+/* ---- 画面切り替え: NTE風 ---- */
+#ghost{position:absolute;z-index:2;pointer-events:none;overflow:hidden;margin:0!important}
 .lg.fl img{animation:lgf .6s ease-out}
 @keyframes lgf{0%{filter:none}28%{filter:brightness(2.4) drop-shadow(0 0 8px #fff)}100%{filter:none}}
 </style>
@@ -583,18 +567,60 @@ function renderTop(){
 }
 setInterval(()=>{if(VIEW==='top')renderDash()},60000);
 const noMo=()=>window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
-let wipeT=0;
-function clearWipe(){clearTimeout(wipeT);['#ghost','#wipe'].forEach(q=>{const e=document.querySelector(q);if(e)e.remove()});const D=$('#dash');D.classList.remove('rR','rL')}
-function startWipe(D,dir){
-  clearWipe();if(noMo())return null;
-  const app=$('#app'),box=`left:${D.offsetLeft}px;top:${D.offsetTop}px;width:${D.offsetWidth}px;height:${D.offsetHeight}px`;
-  const g=D.cloneNode(true);g.id='ghost';g.className=D.className.replace(/\b(rR|rL)\b/g,'')+' '+(dir>0?'eR':'eL');
-  g.style.cssText=D.style.cssText+';position:absolute;'+box;
-  g.removeAttribute('aria-live');app.appendChild(g);
-  const w=document.createElement('div');w.id='wipe';w.className=dir>0?'r':'l';w.style.cssText='position:absolute;'+box;w.innerHTML='<i></i>';app.appendChild(w);
+let fxRaf=0,fxTm=0,fxEls=[];
+function clearFx(){
+  cancelAnimationFrame(fxRaf);clearTimeout(fxTm);fxEls.forEach(e=>e&&e.remove());fxEls=[];
+  const g=document.getElementById('ghost');if(g)g.remove();
+  const D=$('#dash');D.style.clipPath='';D.style.position='';D.style.zIndex='';D.style.removeProperty('--fxd');
+}
+function prepFx(D){
+  clearFx();if(noMo())return null;
+  const g=D.cloneNode(true);g.id='ghost';g.className=D.className;
+  g.style.cssText=D.style.cssText+`;position:absolute;left:${D.offsetLeft}px;top:${D.offsetTop}px;width:${D.offsetWidth}px;height:${D.offsetHeight}px`;
+  $('#app').appendChild(g);
   const lg=document.querySelector('.lg');if(lg){lg.classList.remove('fl');void lg.offsetWidth;lg.classList.add('fl')}
-  wipeT=setTimeout(clearWipe,760);
-  return dir>0?'rR':'rL';
+  return {g};
+}
+function runFx(D,fx){
+  const app=$('#app'),NS='http://www.w3.org/2000/svg',W=D.offsetWidth,H=D.offsetHeight,L=D.offsetLeft,Tp=D.offsetTop;
+  const S=H*.9,bw=Math.max(120,W*.4),cx=W/2,cy=H/2,R=(W+H)/2+16,DUR=980,SERIF='"Hiragino Mincho ProN","Noto Serif JP","Yu Mincho",serif';
+  const mk=(z,inner)=>{const e=document.createElementNS(NS,'svg');e.setAttribute('viewBox',`0 0 ${W} ${H}`);e.style.cssText=`position:absolute;left:${L}px;top:${Tp}px;width:${W}px;height:${H}px;z-index:${z};pointer-events:none;overflow:hidden`;e.innerHTML=inner;app.appendChild(e);fxEls.push(e);return e};
+  // 下: 暗い面(背景の薄い文字)と、斜めの白い帯
+  const fs=H*.15;let rows='';[.2,.46,.72,.98].forEach((y,i)=>{rows+=`<text x="${-W*(1.05+.18*i)}" y="${(H*y).toFixed(0)}" fill="#fff" fill-opacity=".055" font-family='${SERIF}' font-weight="700" font-size="${fs}" letter-spacing="3">NEVERNESS TO EVERNESS NEVERNESS</text>`});
+  const sb=mk(3,`<g id="fxS"><polygon fill="#131113" points="${-3*W-S},0 0,0 ${S},${H} ${-3*W-S},${H}"/>${rows}<polygon fill="#f2f2f2" points="0,0 ${bw},0 ${bw+S},${H} ${S},${H}"/><polygon fill="#1d1d1d" points="${bw*.2},0 ${bw*.28},0 ${bw*.28+S},${H} ${bw*.2+S},${H}"/><polygon fill="#1d1d1d" points="${bw*.58},0 ${bw*.63},0 ${bw*.63+S},${H} ${bw*.58+S},${H}"/></g>`);
+  // 上: 斜線・回転する四角・文字の帯・菱形の枠
+  const ang=Math.atan2(H,S)*180/Math.PI;let sk='';
+  for(let i=0;i<5;i++){const x=W*(.08+.2*i);sk+=`<g class="sk"><line x1="${x}" y1="0" x2="${x+S*.55}" y2="${H*.55}" stroke="#fff" stroke-width="${i%2?1.6:2.4}" stroke-linecap="round"/><rect x="${x+S*.55-9}" y="${H*.55-4}" width="18" height="8" fill="#fff" transform="rotate(${ang} ${x+S*.55} ${H*.55})"/></g>`}
+  const sq=[1,.74,.52].map(()=>`<rect fill="none" stroke="#fff" stroke-width="1.2"/>`).join('');
+  const st=mk(5,`<g id="fxMid">${sk}${sq}<g id="fxBand" opacity="0"><line x1="0" x2="${W}" y1="${cy-H*.075}" y2="${cy-H*.075}" stroke="#fff" stroke-opacity=".5"/><line x1="0" x2="${W}" y1="${cy+H*.075}" y2="${cy+H*.075}" stroke="#fff" stroke-opacity=".5"/><text id="fxT" x="${cx}" y="${cy+H*.032}" text-anchor="middle" fill="#ececec" font-family='${SERIF}' font-weight="700" font-size="${H*.085}" letter-spacing="2">NEVERNESS TO EVERNESS</text></g></g><polygon id="dF1" fill="none" stroke="#f2f2f2" stroke-width="3.6"/><polygon id="dF2" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="1.3"/><polygon id="dF3" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="1"/>`);
+  const gS=sb.querySelector('#fxS'),mid=st.querySelector('#fxMid'),band=st.querySelector('#fxBand'),txt=st.querySelector('#fxT'),sks=[...st.querySelectorAll('.sk')],rects=[...st.querySelectorAll('rect')].filter(r=>!r.getAttribute('width')),F1=st.querySelector('#dF1'),F2=st.querySelector('#dF2'),F3=st.querySelector('#dF3');
+  D.style.position='relative';D.style.zIndex=4;D.style.clipPath='polygon(50% 50%,50% 50%,50% 50%,50% 50%)';D.style.setProperty('--fxd','.62s');
+  const ease=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2,eo=x=>1-Math.pow(1-x,3),cl=(x,a,b)=>Math.max(a,Math.min(b,x));
+  const poly=(r,a)=>[0,1,2,3].map(i=>[cx+r*Math.cos(a+i*Math.PI/2),cy+r*Math.sin(a+i*Math.PI/2)]);
+  const ps=p=>p.map(q=>q[0].toFixed(1)+','+q[1].toFixed(1)).join(' ');
+  const t0=performance.now(),m=Math.min(W,H)*.6;
+  function frame(now){
+    const u=cl((now-t0)/DUR,0,1);
+    // 斜めの帯(左→右)
+    const k=cl(u/.46,0,1),pp=-(S+bw)+(W+S+bw)*ease(k);gS.setAttribute('transform',`translate(${pp.toFixed(1)},0)`);
+    // 斜線(帯のあとを走る)
+    sks.forEach((g,i)=>{const a=.26+i*.04,s2=cl((u-a)/.36,0,1),o=Math.sin(Math.PI*s2);g.setAttribute('transform',`translate(${(S*(-.5+1.5*s2)).toFixed(1)},${(H*(-.5+1.5*s2)).toFixed(1)})`);g.setAttribute('opacity',(o*.95).toFixed(2))});
+    // 回転する四角
+    const qo=cl((u-.36)/.12,0,1)*cl((.94-u)/.1,0,1)*.8;
+    rects.forEach((r,i)=>{const sz=m*[1,.74,.52][i],an=12+i*21+u*(150+i*60)*(i%2?-1:1);r.setAttribute('x',cx-sz/2);r.setAttribute('y',cy-sz/2);r.setAttribute('width',sz);r.setAttribute('height',sz);r.setAttribute('transform',`rotate(${an.toFixed(1)} ${cx} ${cy})`);r.setAttribute('opacity',qo.toFixed(2))});
+    // 文字の帯
+    const bo=Math.sin(Math.PI*cl((u-.36)/.32,0,1));band.setAttribute('opacity',bo.toFixed(2));txt.setAttribute('x',(cx+(.5-cl((u-.36)/.32,0,1))*W*.4).toFixed(1));
+    // 菱形が回りながら開いて、新しい画面を見せる
+    const v=cl((u-.5)/.5,0,1),r=R*eo(v),a=-0.66*(1-eo(v)),pts=poly(r,a);
+    D.style.clipPath=v<=0?'polygon(50% 50%,50% 50%,50% 50%,50% 50%)':`polygon(${pts.map(q=>q[0].toFixed(1)+'px '+q[1].toFixed(1)+'px').join(',')})`;
+    const fo=v<=0?0:cl((1-v)/.14,0,1);
+    F1.setAttribute('points',ps(pts));F1.setAttribute('opacity',fo.toFixed(2));
+    F2.setAttribute('points',ps(poly(r*.88,a+.28*(1-eo(v)))));F2.setAttribute('opacity',fo.toFixed(2));
+    F3.setAttribute('points',ps(poly(r*1.1,a-.4*(1-eo(v)))));F3.setAttribute('opacity',fo.toFixed(2));
+    if(u<1)fxRaf=requestAnimationFrame(frame);else clearFx();
+  }
+  fxRaf=requestAnimationFrame(frame);
+  fxTm=setTimeout(clearFx,DUR+500);
 }
 function scrambleTo(el,txt){
   if(noMo()){el.textContent=txt;return}
@@ -611,7 +637,7 @@ function renderDash(){
   const dir=VORD[VIEW]>=VORD[lastView]?1:-1;
   lastView=VIEW;lastSigG=sg;firstDone=true;lastSizeKey=sizeKey;
   const T=$('.title'),lab={top:'ホーム',home:'残高',analysis:'分析'}[VIEW];
-  const revCls=changed&&!first?startWipe(D,dir):null;
+  const fx=changed&&!first?prepFx(D):null;
   if(T.textContent!==lab){if(first)T.textContent=lab;else scrambleTo(T,lab)}
   if(mode==='enter'){
     enterAt=performance.now();D.classList.remove('na');clearTimeout(naT);naT=setTimeout(()=>D.classList.add('na'),1700);
@@ -620,7 +646,7 @@ function renderDash(){
   if(VIEW==='analysis')renderAnalysis(mode==='enter');else if(VIEW==='top')renderTop();else renderHome();
   runCU(D,mode);runBars(D,mode);
   D.style.setProperty('--cx',changed&&!first?(dir*22)+'px':'0px');
-  if(revCls){D.classList.add(revCls)}
+  if(fx)runFx(D,fx);
 }
 
 /* ===== 汎用アニメーション(数値・バー) ===== */
