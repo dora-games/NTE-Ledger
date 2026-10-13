@@ -581,7 +581,7 @@ function prepFx(D){
   const lg=document.querySelector('.lg');if(lg){lg.classList.remove('fl');void lg.offsetWidth;lg.classList.add('fl')}
   return {g};
 }
-function runFx(D,fx){
+function runFxL(D,fx){
   const app=$('#app'),NS='http://www.w3.org/2000/svg',W=D.offsetWidth,H=D.offsetHeight,L=D.offsetLeft,Tp=D.offsetTop;
   const S=H*.9,bw=Math.max(120,W*.4),cx=W/2,cy=H/2,R=(W+H)/2+16,DUR=980,SERIF='"Hiragino Mincho ProN","Noto Serif JP","Yu Mincho",serif';
   const mk=(z,inner)=>{const e=document.createElementNS(NS,'svg');e.setAttribute('viewBox',`0 0 ${W} ${H}`);e.style.cssText=`position:absolute;left:${L}px;top:${Tp}px;width:${W}px;height:${H}px;z-index:${z};pointer-events:none;overflow:hidden`;e.innerHTML=inner;app.appendChild(e);fxEls.push(e);return e};
@@ -617,6 +617,54 @@ function runFx(D,fx){
     F1.setAttribute('points',ps(pts));F1.setAttribute('opacity',fo.toFixed(2));
     F2.setAttribute('points',ps(poly(r*.88,a+.28*(1-eo(v)))));F2.setAttribute('opacity',fo.toFixed(2));
     F3.setAttribute('points',ps(poly(r*1.1,a-.4*(1-eo(v)))));F3.setAttribute('opacity',fo.toFixed(2));
+    if(u<1)fxRaf=requestAnimationFrame(frame);else clearFx();
+  }
+  fxRaf=requestAnimationFrame(frame);
+  fxTm=setTimeout(clearFx,DUR+500);
+}
+function runFx(D,fx){if(D.offsetHeight>=D.offsetWidth*1.1)runFxP(D,fx);else runFxL(D,fx)}
+/* 縦画面向け: 下から上へ走る斜めの帯 → 回る枠と文字 → 縦長の菱形で新画面が開く */
+function runFxP(D,fx){
+  const app=$('#app'),NS='http://www.w3.org/2000/svg',W=D.offsetWidth,H=D.offsetHeight,L=D.offsetLeft,Tp=D.offsetTop;
+  const kS=.5,bh=H*.3,cx=W/2,cy=H/2,DUR=860,SERIF='"Hiragino Mincho ProN","Noto Serif JP","Yu Mincho",serif',P0=H+bh+kS*W+8;
+  const mk=(z,inner)=>{const e=document.createElementNS(NS,'svg');e.setAttribute('viewBox',`0 0 ${W} ${H}`);e.style.cssText=`position:absolute;left:${L}px;top:${Tp}px;width:${W}px;height:${H}px;z-index:${z};pointer-events:none;overflow:hidden`;e.innerHTML=inner;app.appendChild(e);fxEls.push(e);return e};
+  // 下: 暗い面+薄い大きな文字、斜めの白い帯(縞入り)
+  const fs=W*.2;let rows='';for(let i=0;i<8;i++)rows+=`<text class="tr" y="${(H*(.06+.14*i)).toFixed(0)}" fill="#fff" fill-opacity=".055" font-family='${SERIF}' font-weight="700" font-size="${fs}" letter-spacing="3">NEVERNESS TO EVERNESS NEVERNESS</text>`;
+  const band=(a,b)=>`0,${-bh*a} ${W},${-kS*W-bh*a} ${W},${-kS*W-bh*b} 0,${-bh*b}`;
+  const sb=mk(3,`<g id="fxS"><polygon fill="#131113" points="0,0 ${W},${-kS*W} ${W},${5*H} 0,${5*H}"/>${rows}<polygon fill="#f2f2f2" points="0,${-bh} ${W},${-kS*W-bh} ${W},${-kS*W} 0,0"/><polygon fill="#1d1d1d" points="${band(.27,.2)}"/><polygon fill="#1d1d1d" points="${band(.67,.6)}"/></g>`);
+  // 上: 斜線・回転する四角・2行の文字・縦長の菱形の枠
+  const ang=-Math.atan(kS)*180/Math.PI;let sk='';
+  for(let i=0;i<5;i++){const y=H*(.2+.15*i);sk+=`<g class="sk"><line x1="0" y1="${y}" x2="${W}" y2="${y-kS*W}" stroke="#fff" stroke-width="${i%2?1.6:2.4}" stroke-linecap="round"/><rect x="${W*(.18+.13*i)-9}" y="${y-kS*W*(.18+.13*i)-4}" width="18" height="8" fill="#fff" transform="rotate(${ang} ${W*(.18+.13*i)} ${y-kS*W*(.18+.13*i)})"/></g>`}
+  const sq=[1,.74,.52].map(()=>`<rect fill="none" stroke="#fff" stroke-width="1.2"/>`).join('');
+  const f2=W*.115;
+  const st=mk(5,`<g id="fxMid">${sk}${sq}<g id="fxBand" opacity="0"><line id="fxL1" x1="0" x2="${W}" y1="${cy-f2*1.25}" y2="${cy-f2*1.25}" stroke="#fff" stroke-opacity=".5"/><line x1="0" x2="${W}" y1="${cy+f2*1.75}" y2="${cy+f2*1.75}" stroke="#fff" stroke-opacity=".5"/><text id="fxT1" y="${cy-f2*.1}" text-anchor="middle" fill="#ececec" font-family='${SERIF}' font-weight="700" font-size="${f2}" letter-spacing="2">NEVERNESS</text><text id="fxT2" y="${cy+f2*1.25}" text-anchor="middle" fill="#ececec" font-family='${SERIF}' font-weight="700" font-size="${f2}" letter-spacing="2">TO EVERNESS</text></g></g><polygon id="dF1" fill="none" stroke="#f2f2f2" stroke-width="3.6"/><polygon id="dF2" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="1.3"/><polygon id="dF3" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="1"/>`);
+  const gS=sb.querySelector('#fxS'),trs=[...sb.querySelectorAll('.tr')],band2=st.querySelector('#fxBand'),t1=st.querySelector('#fxT1'),t2=st.querySelector('#fxT2'),sks=[...st.querySelectorAll('.sk')],rects=[...st.querySelectorAll('rect')].filter(r=>!r.getAttribute('width')),F1=st.querySelector('#dF1'),F2=st.querySelector('#dF2'),F3=st.querySelector('#dF3');
+  D.style.position='relative';D.style.zIndex=4;D.style.clipPath='polygon(50% 50%,50% 50%,50% 50%,50% 50%)';D.style.setProperty('--fxd','.56s');
+  const ease=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2,eo=x=>1-Math.pow(1-x,3),cl=(x,a,b)=>Math.max(a,Math.min(b,x));
+  const rhomb=(k,a)=>{const rx=W*k,ry=H*k,c=Math.cos(a),s=Math.sin(a);return [[rx,0],[0,ry],[-rx,0],[0,-ry]].map(([x,y])=>[cx+x*c-y*s,cy+x*s+y*c])};
+  const ps=p=>p.map(q=>q[0].toFixed(1)+','+q[1].toFixed(1)).join(' ');
+  const m=Math.min(W,H)*.8,t0=performance.now();let buzz=false;
+  try{navigator.vibrate&&navigator.vibrate(14)}catch(e){}
+  function frame(now){
+    const u=cl((now-t0)/DUR,0,1);
+    // 斜めの帯: 下から上へ
+    const k=cl(u/.44,0,1);gS.setAttribute('transform',`translate(0,${(P0*(1-ease(k))).toFixed(1)})`);
+    trs.forEach((e,i)=>e.setAttribute('x',(-W*.7+(i%2?-1:1)*u*70).toFixed(1)));
+    // 斜線(帯と同じ角度で、上へ流れる)
+    sks.forEach((g,i)=>{const a=.22+i*.045,s2=cl((u-a)/.38,0,1);g.setAttribute('transform',`translate(0,${(H*(.25-.75*s2)).toFixed(1)})`);g.setAttribute('opacity',(Math.sin(Math.PI*s2)*.95).toFixed(2))});
+    // 回転する四角
+    const qo=cl((u-.34)/.12,0,1)*cl((.94-u)/.1,0,1)*.8;
+    rects.forEach((r,i)=>{const sz=m*[1,.74,.52][i],an=12+i*21+u*(150+i*60)*(i%2?-1:1);r.setAttribute('x',cx-sz/2);r.setAttribute('y',cy-sz/2);r.setAttribute('width',sz);r.setAttribute('height',sz);r.setAttribute('transform',`rotate(${an.toFixed(1)} ${cx} ${cy})`);r.setAttribute('opacity',qo.toFixed(2))});
+    // 2行の文字(逆向きにスライド)
+    const bs=cl((u-.34)/.3,0,1);band2.setAttribute('opacity',Math.sin(Math.PI*bs).toFixed(2));t1.setAttribute('x',(cx+(.5-bs)*W*.5).toFixed(1));t2.setAttribute('x',(cx-(.5-bs)*W*.5).toFixed(1));
+    // 縦長の菱形が回りながら開く
+    const v=cl((u-.48)/.52,0,1),kk=1.1*eo(v),a=-.2*(1-eo(v)),pts=rhomb(kk,a);
+    if(v>0&&!buzz){buzz=true;try{navigator.vibrate&&navigator.vibrate(10)}catch(e){}}
+    D.style.clipPath=v<=0?'polygon(50% 50%,50% 50%,50% 50%,50% 50%)':`polygon(${pts.map(q=>q[0].toFixed(1)+'px '+q[1].toFixed(1)+'px').join(',')})`;
+    const fo=v<=0?0:cl((1-v)/.16,0,1);
+    F1.setAttribute('points',ps(pts));F1.setAttribute('opacity',fo.toFixed(2));
+    F2.setAttribute('points',ps(rhomb(kk*.9,a+.34*(1-eo(v)))));F2.setAttribute('opacity',fo.toFixed(2));
+    F3.setAttribute('points',ps(rhomb(kk*1.12,a-.42*(1-eo(v)))));F3.setAttribute('opacity',fo.toFixed(2));
     if(u<1)fxRaf=requestAnimationFrame(frame);else clearFx();
   }
   fxRaf=requestAnimationFrame(frame);
