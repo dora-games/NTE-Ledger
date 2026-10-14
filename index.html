@@ -157,7 +157,7 @@ html,body{overscroll-behavior:none}
 .title .sub{font-weight:500;color:var(--mu);font-size:14px;margin-left:9px;letter-spacing:.04em}
 .vs{animation:vsw .36s cubic-bezier(.2,.8,.2,1)}
 @keyframes vsw{from{opacity:0;transform:translateX(var(--dx,14px))}}
-.bu,.bd{transform-box:fill-box;animation:gw .6s cubic-bezier(.2,.8,.2,1) both}
+.bu,.bd{transform-box:fill-box;animation:gw .78s cubic-bezier(.2,1.35,.4,1) both}
 .bu{transform-origin:50% 100%}.bd{transform-origin:50% 0}
 @keyframes gw{from{transform:scaleY(0)}}
 .ach.still .bu,.ach.still .bd{animation:none}
@@ -237,10 +237,6 @@ html,body{overscroll-behavior:none}
 .cuw{display:inline-block;transform-origin:left center}
 .cuw.bump{animation:bump .65s cubic-bezier(.2,.9,.3,1.3)}
 @keyframes bump{0%{transform:scale(1)}30%{transform:scale(1.08);text-shadow:0 0 16px #ffffffaa}100%{transform:scale(1);text-shadow:0 0 0 #fff0}}
-.ch2:not(.still) .ar{animation:fadein .9s calc(var(--fxd,0s) + .25s) both}
-.ch2:not(.still) .fp{animation:fadein .7s calc(var(--fxd,0s) + 1s) both}
-.ch2:not(.still) .dt{transform-box:fill-box;transform-origin:center;animation:popdot .55s cubic-bezier(.2,1.6,.4,1) calc(var(--fxd,0s) + 1s) both}
-.ch2:not(.still) .tm{transform-box:fill-box;transform-origin:50% 100%;animation:grow2 .7s cubic-bezier(.2,.9,.3,1) var(--fxd,0s) both}
 @keyframes fadein{from{opacity:0}}@keyframes popdot{from{transform:scale(0)}}@keyframes grow2{from{transform:scaleY(0)}}
 #wm img{animation:breathe 10s ease-in-out infinite}
 @keyframes breathe{0%,100%{opacity:.12;transform:scale(1)}50%{opacity:.17;transform:scale(1.04)}}
@@ -266,6 +262,21 @@ input{transition:border-color .2s,box-shadow .25s}input:focus{box-shadow:0 0 0 4
 .vk{--kl:max(0px,calc(var(--kb,0px) - var(--sab) + 4px))}
 .vk .inp{transform:translateY(calc(-1 * var(--kl)));transition:transform .24s cubic-bezier(.2,.9,.3,1)}
 .vk #log,.vk #sheet{transition:bottom .24s cubic-bezier(.2,.9,.3,1)}
+/* ---- チャートの演出(走査・ポップ・ピング) ---- */
+.ls{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.hd{pointer-events:none;filter:drop-shadow(0 0 4px #fff)}
+.ch2.rvl .dt,.ch2.rvl .tm{visibility:hidden}
+.ch2.rvl.pop .dt{visibility:visible;transform-box:fill-box;transform-origin:center;animation:popdot .62s cubic-bezier(.2,1.6,.4,1) both}
+.ch2.rvl.pop .tm{visibility:visible;transform-box:fill-box;transform-origin:50% 100%;animation:grow2 .6s cubic-bezier(.2,.9,.3,1) both}
+.pg{opacity:0;fill:none}
+.ch2.ping .pg{transform-box:fill-box;transform-origin:center;animation:pingr .95s cubic-bezier(.2,.8,.2,1) both}
+@keyframes pingr{0%{transform:scale(.7);opacity:.9}100%{transform:scale(3.8);opacity:0}}
+#dash:not(.na) .av{animation:fadein .6s calc(var(--fxd,0s) + .3s) both}
+#dash:not(.na) .lgd span{animation:fadein .5s both;animation-delay:calc(var(--fxd,0s) + 1.3s + var(--i,0)*100ms)}
+.lgd span:nth-child(1){--i:0}.lgd span:nth-child(2){--i:1}.lgd span:nth-child(3){--i:2}
+.ach:not(.still) .bl0{transform-box:fill-box;transform-origin:left;animation:grow3 .7s cubic-bezier(.2,.9,.3,1) calc(var(--fxd,0s) + .05s) both}
+.ach:not(.still) .ax{animation:fadein .5s calc(var(--fxd,0s) + .55s) both}
+@keyframes grow3{from{transform:scaleX(0)}}
 </style>
 </head>
 <body>
@@ -335,7 +346,8 @@ function fc(c,n){const o=basis()==='obs'?obs(c):null;if(!o)return fcS(c,n);const
 function eta(c){const g=S.goals[c],b=bal(c);if(!(g>0))return '目標未設定';if(b>=g)return '達成済み';if(basis()==='obs'){const o=obs(c);if(!o||o.v<=0)return '増加傾向なし';const d=Math.ceil((g-b)/o.v);if(d>730)return '2年以内に到達しません';const dt=addD(startOf(new Date()),d);return (dt.getMonth()+1)+'/'+dt.getDate()+'頃（'+d+'日後）'}
   if(avg(c)<=0)return '定期収入が未設定';let x=b;const t=startOf(new Date());for(let i=1;i<=730;i++){x+=inc(c,addD(t,i));if(x>=g){const d=addD(t,i);return (d.getMonth()+1)+'/'+d.getDate()+'頃（'+i+'日後）'}}return '2年以内に到達しません'}
 function nextDue(s){if(s.t==='d')return '';const t=startOf(new Date());for(let i=0;i<30;i++){const d=addD(t,i);if(due(s,d))return (d.getMonth()+1)+'/'+d.getDate()+'（'+'日月火水木金土'[d.getDay()]+'）'}return ''}
-function chart(){
+let CHU=0,CHMODE='enter',chartMemo=null,chartPrevMemo=null,chartTok=0,morphTok=0;
+function chartCalc(){
   const t=startOf(new Date()),F=30;
   const first=S.log.length?startOf(new Date(S.log[0].t)):t;
   const start=first<addD(t,-13)?addD(t,-13):first,P=dnum(t)-dnum(start),N=P+F+1;
@@ -347,28 +359,67 @@ function chart(){
     let mx=Math.max(...V,g>0?g:-Infinity),mn=c==='b'?Math.min(...V):Math.min(...V,0);if(mx===mn)mx=mn+1;
     return {V,mx,mn,g};
   };
-  const W=300,H=CH,pd=8,top=14,bot=20,X=i=>pd+i*(W-pd*2)/(N-1);
   const A=mk('f'),B=mk('e'),hasB=!!(S.open.b||of('b').length),C=hasB?mk('b'):null;
-  const Y=(o,v)=>(H-bot)-(v-o.mn)/(o.mx-o.mn)*(H-bot-top);
+  return {start,P,N,A,B,C,W:300,H:CH,pd:8,top:14,bot:20};
+}
+function chartSvg(c,over,cls){
+  const {start,P,N,W,H,pd,top,bot}=c,mg=(o,k)=>over&&over[k]?Object.assign({},o,over[k]):o;
+  const A=mg(c.A,'f'),B=mg(c.B,'e'),C=c.C?mg(c.C,'b'):null,id='cpr'+(++CHU);
+  const X=i=>pd+i*(W-pd*2)/(N-1),Y=(o,v)=>(H-bot)-(v-o.mn)/(o.mx-o.mn)*(H-bot-top);
   const path=(o,i0,i1)=>{let d='';for(let i=i0;i<=i1;i++)d+=(i===i0?'M':'L')+X(i).toFixed(1)+' '+Y(o,o.V[i]).toFixed(1);return d};
-  const L=(o,gid,w,under)=>`${under?`<path d="${path(o,0,P)}" fill="none" stroke="#000" stroke-opacity=".6" stroke-width="${w+2.4}" stroke-linecap="round" stroke-linejoin="round"/>`:''}<path class="ln" pathLength="1" d="${path(o,0,P)}" stroke="url(#${gid})" style="stroke-width:${w}"/><path class="fp" d="${path(o,P,N-1)}" fill="none" stroke="url(#${gid})" stroke-width="${w}" stroke-dasharray="3 4" stroke-linecap="round" opacity=".8"/>`;
+  const L=(o,gid,w,under)=>`${under?`<path d="${path(o,0,P)}" fill="none" stroke="#000" stroke-opacity=".6" stroke-width="${w+2.4}" stroke-linecap="round" stroke-linejoin="round"/>`:''}<path class="ls" d="${path(o,0,P)}" stroke="url(#${gid})" stroke-width="${w}"/><path class="fp" d="${path(o,P,N-1)}" fill="none" stroke="url(#${gid})" stroke-width="${w}" stroke-dasharray="3 4" stroke-linecap="round" opacity=".8"/>`;
   const lab=(i,txt,an)=>{const d=addD(start,i);return `<text class="ax" x="${X(i)}" y="${H-5}" text-anchor="${an}">${txt||(d.getMonth()+1)+'/'+d.getDate()}</text>`};
   const gl=(o,col)=>o.g>0?`<line x1="0" x2="${W}" y1="${Y(o,o.g)}" y2="${Y(o,o.g)}" stroke="${col}" stroke-opacity=".35" stroke-dasharray="1 4"/>`:'';
-  const area=(o)=>`${path(o,0,N-1)}L${X(N-1)} ${H-bot}L${X(0)} ${H-bot}Z`;
-  return `<div class="cw"><svg class="ch2${ANIM?'':' still'}" viewBox="0 0 ${W} ${H}"><defs>
+  const area=o=>`${path(o,0,N-1)}L${X(N-1)} ${H-bot}L${X(0)} ${H-bot}Z`;
+  const ring=(o,col)=>`<circle class="pg" cx="${X(P)}" cy="${Y(o,o.V[P])}" r="5" stroke="${col}" stroke-width="1.6"/>`;
+  return `<svg class="ch2 ${cls}" data-xp="${X(P).toFixed(1)}" viewBox="0 0 ${W} ${H}"><defs>
   <linearGradient id="cgf" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${W}" y2="0"><stop offset="0" stop-color="#a8721a"/><stop offset=".5" stop-color="#fccc54"/><stop offset="1" stop-color="#fff0a8"/></linearGradient>
   <linearGradient id="cge" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${W}" y2="0"><stop offset="0" stop-color="#2a54b0"/><stop offset=".55" stop-color="#4aa0f0"/><stop offset="1" stop-color="#8ff0ff"/></linearGradient>
   <linearGradient id="cgb" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${W}" y2="0"><stop offset="0" stop-color="#8a4f86"/><stop offset=".55" stop-color="#d28ac4"/><stop offset="1" stop-color="#ffd3f0"/></linearGradient>
   <linearGradient id="caf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fccc54" stop-opacity=".38"/><stop offset=".55" stop-color="#6b4a10" stop-opacity=".16"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
-  <linearGradient id="cae" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4aa0f0" stop-opacity=".3"/><stop offset="1" stop-color="#0c243c" stop-opacity="0"/></linearGradient></defs>
+  <linearGradient id="cae" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4aa0f0" stop-opacity=".3"/><stop offset="1" stop-color="#0c243c" stop-opacity="0"/></linearGradient>
+  <clipPath id="${id}"><rect class="rv" x="0" y="0" width="${W}" height="${H}"/></clipPath></defs>
   <line class="tm" x1="${X(P)}" x2="${X(P)}" y1="${top-4}" y2="${H-bot}" stroke="#555" stroke-dasharray="2 3"/>
-  ${gl(A,'#fccc54')}${gl(B,'#71e7fb')}
-  <path class="ar" d="${area(B)}" fill="url(#cae)"/><path class="ar" d="${area(A)}" fill="url(#caf)"/>
-  ${C?L(C,'cgb',1.7,false):''}${L(B,'cge',2,false)}${L(A,'cgf',2.4,true)}
-  ${C?`<circle class="dt" cx="${X(P)}" cy="${Y(C,C.V[P])}" r="3" fill="#ffd3f0"/>`:''}<circle class="dt" cx="${X(P)}" cy="${Y(B,B.V[P])}" r="7" fill="#71e7fb" opacity=".2"/><circle class="dt" cx="${X(P)}" cy="${Y(B,B.V[P])}" r="3.2" fill="#8ff0ff"/>
-  <circle class="dt" cx="${X(P)}" cy="${Y(A,A.V[P])}" r="7" fill="#fccc54" opacity=".22"/><circle class="dt" cx="${X(P)}" cy="${Y(A,A.V[P])}" r="3.6" fill="#fccc54" stroke="#000" stroke-opacity=".6"/>
-  ${lab(0,'','start')}${P>3?lab(P,'今日','middle'):''}${lab(N-1,'点線＝予測 '+(addD(start,N-1).getMonth()+1)+'/'+addD(start,N-1).getDate(),'end')}</svg><div class="av"><div class="t">1日平均<em>${basis()==='obs'?'実績'+obs('f').days+'日':'定期収入'}</em></div>${[['f','ファンス','linear-gradient(90deg,#a8721a,#fccc54,#fff0a8)'],['e','円石','linear-gradient(90deg,#2a54b0,#4aa0f0,#8ff0ff)'],...(C?[['b','甲虫','linear-gradient(90deg,#8a4f86,#d28ac4,#ffd3f0)']]:[])].map(([c,n,g])=>`<div><i style="background:${g}"></i>${n}<b>${fmtA(Math.round(avgX(c)))}</b></div>`).join('')}</div></div>
+  <g clip-path="url(#${id})">${gl(A,'#fccc54')}${gl(B,'#71e7fb')}<path class="ar" d="${area(B)}" fill="url(#cae)"/><path class="ar" d="${area(A)}" fill="url(#caf)"/>${C?L(C,'cgb',1.7,false):''}${L(B,'cge',2,false)}${L(A,'cgf',2.4,true)}</g>
+  <line class="hd" x1="0" x2="0" y1="${top-4}" y2="${H-bot}" stroke="#fff" stroke-width="1.2" opacity="0"/>
+  ${C?`<circle class="dt" cx="${X(P)}" cy="${Y(C,C.V[P])}" r="3" fill="#ffd3f0"/>${ring(C,'#ffd3f0')}`:''}<circle class="dt" cx="${X(P)}" cy="${Y(B,B.V[P])}" r="7" fill="#71e7fb" opacity=".2"/><circle class="dt" cx="${X(P)}" cy="${Y(B,B.V[P])}" r="3.2" fill="#8ff0ff"/>${ring(B,'#8ff0ff')}
+  <circle class="dt" cx="${X(P)}" cy="${Y(A,A.V[P])}" r="7" fill="#fccc54" opacity=".22"/><circle class="dt" cx="${X(P)}" cy="${Y(A,A.V[P])}" r="3.6" fill="#fccc54" stroke="#000" stroke-opacity=".6"/>${ring(A,'#fccc54')}
+  ${lab(0,'','start')}${P>3?lab(P,'今日','middle'):''}${lab(N-1,'点線＝予測 '+(addD(start,N-1).getMonth()+1)+'/'+addD(start,N-1).getDate(),'end')}</svg>`;
+}
+function chart(){
+  const c=chartCalc(),A=c.A,B=c.B,C=c.C,sm=o=>o?{V:o.V,mx:o.mx,mn:o.mn,g:o.g}:null;
+  chartMemo={N:c.N,P:c.P,H:c.H,calc:c,s:{f:sm(A),e:sm(B),b:sm(C)}};
+  return `<div class="cw">${chartSvg(c,null,ANIM?'rvl':'still')}<div class="av"><div class="t">1日平均<em>${basis()==='obs'?'実績'+obs('f').days+'日':'定期収入'}</em></div>${[['f','ファンス','linear-gradient(90deg,#a8721a,#fccc54,#fff0a8)'],['e','円石','linear-gradient(90deg,#2a54b0,#4aa0f0,#8ff0ff)'],...(C?[['b','甲虫','linear-gradient(90deg,#8a4f86,#d28ac4,#ffd3f0)']]:[])].map(([c2,n,g])=>`<div><i style="background:${g}"></i>${n}<b>${fmtA(Math.round(avgX(c2)))}</b></div>`).join('')}</div></div>
   <div class="lgd"><span><i class="sw" style="background:linear-gradient(90deg,#a8721a,#fccc54,#fff0a8)"></i>ファンス 〜${nc(A.mx)}</span><span><i class="sw" style="background:linear-gradient(90deg,#2a54b0,#4aa0f0,#8ff0ff)"></i>円石 〜${nc(B.mx)}</span>${C?`<span><i class="sw" style="background:linear-gradient(90deg,#8a4f86,#d28ac4,#ffd3f0)"></i>甲虫 〜${nc(C.mx)}</span>`:''}</div>`;
+}
+/* ---- チャートの演出 ---- */
+function armChart(D){if(noMotion())return;D.querySelectorAll('svg.rvl').forEach(sv=>{const r=sv.querySelector('.rv');if(r)r.setAttribute('width','0')})}
+function playChart(D,tok){
+  if(tok!==chartTok||noMotion())return;
+  const sv=D.querySelector('svg.rvl');if(!sv)return;
+  const r=sv.querySelector('.rv'),h=sv.querySelector('.hd'),W=300,xp=+sv.dataset.xp,DUR=1500,t0=performance.now();let popped=false;
+  const ease=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+  (function f(t){
+    if(tok!==chartTok||!sv.isConnected)return;
+    const u=Math.min(1,(t-t0)/DUR),x=W*ease(u);
+    r.setAttribute('width',x.toFixed(1));h.setAttribute('x1',x.toFixed(1));h.setAttribute('x2',x.toFixed(1));h.setAttribute('opacity',(u<.9?.85:Math.max(0,(1-u)/.1)*.85).toFixed(2));
+    if(!popped&&x>=xp-1){popped=true;sv.classList.add('pop')}
+    if(u<1)requestAnimationFrame(f);else{r.setAttribute('width',W);h.setAttribute('opacity','0');sv.classList.add('pop')}
+  })(t0);
+}
+function morphChart(D){
+  const pm=chartPrevMemo,cm=chartMemo;
+  if(!pm||!cm||pm.N!==cm.N||pm.P!==cm.P||noMotion()||!D.querySelector('svg.ch2'))return;
+  const tok=++morphTok,keys=['f','e','b'].filter(k=>pm.s[k]&&cm.s[k]),t0=performance.now(),DUR=560;
+  (function f(t){
+    if(tok!==morphTok)return;
+    const u=Math.min(1,(t-t0)/DUR),e=1-Math.pow(1-u,3),over={};
+    keys.forEach(k=>{const a=pm.s[k],b=cm.s[k];over[k]={V:b.V.map((v,i)=>a.V[i]+(v-a.V[i])*e),mx:a.mx+(b.mx-a.mx)*e,mn:a.mn+(b.mn-a.mn)*e,g:b.g}});
+    const cur=D.querySelector('svg.ch2');if(!cur)return;
+    const tmp=document.createElement('div');tmp.innerHTML=chartSvg(cm.calc,over,u>=1?'still ping':'still');
+    cur.replaceWith(tmp.firstElementChild);
+    if(u<1)requestAnimationFrame(f);
+  })(t0);
 }
 function card(){
   const D={};['f','e','b'].forEach(c=>{const td=of(c).filter(isToday);D[c]={net:td.reduce((x,y)=>x+y.a,0),b:bal(c),g:S.goals[c]}});
@@ -419,7 +470,7 @@ $('#sheet').addEventListener('change',e=>{const t=e.target,v=Math.max(0,Math.rou
   save();renderDash()});
 function renderHome(){
   const D=$('#dash'),st=D.scrollTop;let drop=0;
-  {const sg=sigNow();ANIM=sg!==lastSig;lastSig=sg}
+  ANIM=CHMODE==='enter'&&!noMotion();
   const build=()=>{D.innerHTML=card()+fcCard()+(drop?'':histPanel())};
   D.style.overflowY=S.all?'auto':'hidden';
   build();
@@ -503,7 +554,7 @@ function anaChart(D){
   const lab=(i,an)=>`<text class="ax" x="${(pd+(i+.5)*GW).toFixed(1)}" y="${H-4}" text-anchor="${an}">${md(addD(start,i).getTime())}</text>`;
   const defs=cols.map(c=>`<linearGradient id="ab${c}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${G[c][0]}"/><stop offset="1" stop-color="${G[c][1]}"/></linearGradient>`).join('');
   const lg=cols.map(c=>`<div><span class="lgt"><i style="background:${SWG[c]}"></i>${nmS(c)}</span></div>`).join('');
-  return `<div class="cw"><svg class="ch2 ach${animA?'':' still'}" viewBox="0 0 ${W} ${H}"><defs>${defs}</defs><line x1="0" x2="${W}" y1="${y0.toFixed(1)}" y2="${y0.toFixed(1)}" stroke="#555"/>${bars}${lab(0,'start')}${N>4?lab(Math.floor((N-1)/2),'middle'):''}${lab(N-1,'end')}</svg><div class="av2">DAILY　上＝入手　下＝消費　高さは通貨ごとの最大値が基準</div></div><div class="lg3" style="--n:${k}">${lg}</div>`;
+  return `<div class="cw"><svg class="ch2 ach${animA?'':' still'}" viewBox="0 0 ${W} ${H}"><defs>${defs}</defs><line class="bl0" x1="0" x2="${W}" y1="${y0.toFixed(1)}" y2="${y0.toFixed(1)}" stroke="#555"/>${bars}${lab(0,'start')}${N>4?lab(Math.floor((N-1)/2),'middle'):''}${lab(N-1,'end')}</svg><div class="av2">DAILY　上＝入手　下＝消費　高さは通貨ごとの最大値が基準</div></div><div class="lg3" style="--n:${k}">${lg}</div>`;
 }
 function anaChartCard(D){return `<section class="card" style="padding-top:8px;padding-bottom:8px">${anaChart(D)}</section>`}
 function anaInsights(D){
@@ -520,7 +571,7 @@ function anaInsights(D){
 }
 function renderAnalysis(changed){
   const D=$('#dash'),st=D.scrollTop,data=anaData();
-  const sg=sigNow();animA=changed||sg!==lastSigA;lastSigA=sg;
+  const sg=sigNow();animA=changed;lastSigA=sg;
   const build=()=>{D.innerHTML=data?anaSummary(data)+anaChartCard(data)+anaInsights(data):'<section class="card"><div class="empty">記録がまだありません。<br>記録がたまると、ここに分析が出ます。</div></section>'};
   D.style.overflowY='hidden';build();
   if(data){for(let i=0;i<8;i++){
@@ -582,6 +633,7 @@ function prepFx(D){
   clearFx();if(noMo())return null;
   const g=D.cloneNode(true);g.id='ghost';g.className=D.className;
   g.style.cssText=D.style.cssText+`;position:absolute;left:${D.offsetLeft}px;top:${D.offsetTop}px;width:${D.offsetWidth}px;height:${D.offsetHeight}px`;
+  g.querySelectorAll('.rv').forEach(r=>r.setAttribute('width',300));g.querySelectorAll('svg.rvl').forEach(v=>v.classList.add('pop'));g.querySelectorAll('.hd').forEach(h=>h.setAttribute('opacity','0'));
   $('#app').appendChild(g);
   const lg=document.querySelector('.lg');if(lg){lg.classList.remove('fl');void lg.offsetWidth;lg.classList.add('fl')}
   return {g};
@@ -696,8 +748,9 @@ function renderDash(){
     enterAt=performance.now();D.classList.remove('na');clearTimeout(naT);naT=setTimeout(()=>D.classList.add('na'),1700);
     if(VIEW==='home'){shown.f=shown.e=shown.b=0;barPrev.f=barPrev.e=0;lastSig=''}
   }else{clearTimeout(naT);D.classList.add('na')}
-  FXD=fx?420:0;
+  FXD=fx?420:0;CHMODE=mode;chartPrevMemo=chartMemo;
   if(VIEW==='analysis')renderAnalysis(mode==='enter');else if(VIEW==='top')renderTop();else renderHome();
+  armChart(D);{const tok=++chartTok;morphTok++;if(mode==='data')morphChart(D);else if(mode==='enter')setTimeout(()=>playChart(D,tok),fx?FXD+80:260)}
   if(fx)setTimeout(()=>{runCU(D,mode);runBars(D,mode)},FXD);else{runCU(D,mode);runBars(D,mode)}
   D.style.setProperty('--cx',changed&&!first?(dir*22)+'px':'0px');
   if(fx)runFx(D,fx);
