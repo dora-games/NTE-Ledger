@@ -277,6 +277,36 @@ input{transition:border-color .2s,box-shadow .25s}input:focus{box-shadow:0 0 0 4
 .ach:not(.still) .bl0{transform-box:fill-box;transform-origin:left;animation:grow3 .7s cubic-bezier(.2,.9,.3,1) calc(var(--fxd,0s) + .05s) both}
 .ach:not(.still) .ax{animation:fadein .5s calc(var(--fxd,0s) + .55s) both}
 @keyframes grow3{from{transform:scaleX(0)}}
+/* ---- カード詳細 ---- */
+[data-d]{cursor:pointer;transition:transform .16s cubic-bezier(.2,.9,.3,1),background .2s}
+[data-d]:active{transform:scale(.972)}
+.tl2{position:relative}
+.tl2[data-d]::after{content:"›";position:absolute;right:11px;top:7px;color:#6a6a6a;font-size:17px;line-height:1}
+.dh{padding:2px 0 4px}.dnum{font-size:32px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.2}
+.ds{font-size:12px;color:var(--mu);font-variant-numeric:tabular-nums}
+.dc{margin:4px -2px 6px}.dc svg.ch2{margin:0}
+.dg{display:grid;grid-template-columns:1fr 1fr;gap:0 16px;margin-bottom:6px}
+.dg>div{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:12px;color:var(--mu);border-bottom:1px solid #ffffff0d;padding:6px 0}
+.dg b{color:var(--tx);font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.dg small{color:var(--mu);font-weight:400;font-size:10px;margin-left:5px}
+.dl2{margin-top:4px}
+.dg>div.w{grid-column:1/-1}.dg span{white-space:nowrap}
+.d2{padding:6px 0;border-bottom:1px solid #ffffff0d}.d2 b{font-size:12.5px}.d2 small{margin-left:8px;color:var(--mu);font-size:10.5px}.d2 .mu{font-size:11.5px;color:#cfcfcf;margin-top:1px;font-variant-numeric:tabular-nums}
+/* ---- シート(ポップアップ)の表示・非表示 ---- */
+#shw{opacity:1;visibility:hidden;pointer-events:none;transition:visibility 0s linear .38s}
+#shw.open{visibility:visible;pointer-events:auto;transition-delay:0s}
+#shbd{opacity:0;backdrop-filter:blur(0px);-webkit-backdrop-filter:blur(0px);transition:opacity .3s ease,backdrop-filter .3s ease,-webkit-backdrop-filter .3s ease}
+#shw.open #shbd{opacity:1;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transition-duration:.4s}
+#sheet,.vk #sheet{transform-origin:50% 100%;transform:translateY(72px) scale(.9);opacity:0;will-change:transform,opacity;transition:transform .34s cubic-bezier(.55,0,.85,.4),opacity .24s ease-in,bottom .24s cubic-bezier(.2,.9,.3,1)}
+#shw.open #sheet,.vk #shw.open #sheet{transform:none;opacity:1;transition:transform .66s cubic-bezier(.2,1.5,.36,1),opacity .26s ease-out,bottom .24s cubic-bezier(.2,.9,.3,1)}
+#sheet::before{content:none!important}
+.grab{height:22px;margin:-8px -16px 0;position:relative;touch-action:none;cursor:grab}
+.grab::before{content:"";position:absolute;left:50%;top:9px;width:38px;height:4px;margin-left:-19px;border-radius:2px;background:#5a5a5a;transition:background .2s,width .2s}
+.grab:active::before{background:#9a9a9a;width:46px;margin-left:-23px}
+.sh-h{touch-action:none}
+/* ---- 吹き出しの消え方 ---- */
+.m.out{animation:out .4s cubic-bezier(.5,0,.8,.4) forwards}
+@keyframes out{to{opacity:0;transform:translateY(-12px) scale(.92);filter:blur(3px)}}
 </style>
 </head>
 <body>
@@ -346,6 +376,7 @@ function fc(c,n){const o=basis()==='obs'?obs(c):null;if(!o)return fcS(c,n);const
 function eta(c){const g=S.goals[c],b=bal(c);if(!(g>0))return '目標未設定';if(b>=g)return '達成済み';if(basis()==='obs'){const o=obs(c);if(!o||o.v<=0)return '増加傾向なし';const d=Math.ceil((g-b)/o.v);if(d>730)return '2年以内に到達しません';const dt=addD(startOf(new Date()),d);return (dt.getMonth()+1)+'/'+dt.getDate()+'頃（'+d+'日後）'}
   if(avg(c)<=0)return '定期収入が未設定';let x=b;const t=startOf(new Date());for(let i=1;i<=730;i++){x+=inc(c,addD(t,i));if(x>=g){const d=addD(t,i);return (d.getMonth()+1)+'/'+d.getDate()+'頃（'+i+'日後）'}}return '2年以内に到達しません'}
 function nextDue(s){if(s.t==='d')return '';const t=startOf(new Date());for(let i=0;i<30;i++){const d=addD(t,i);if(due(s,d))return (d.getMonth()+1)+'/'+d.getDate()+'（'+'日月火水木金土'[d.getDay()]+'）'}return ''}
+const CHREF={t:0},SHREF={t:0};
 let CHU=0,CHMODE='enter',chartMemo=null,chartPrevMemo=null,chartTok=0,morphTok=0;
 function chartCalc(){
   const t=startOf(new Date()),F=30;
@@ -394,13 +425,13 @@ function chart(){
 }
 /* ---- チャートの演出 ---- */
 function armChart(D){if(noMotion())return;D.querySelectorAll('svg.rvl').forEach(sv=>{const r=sv.querySelector('.rv');if(r)r.setAttribute('width','0')})}
-function playChart(D,tok){
-  if(tok!==chartTok||noMotion())return;
+function playChart(D,tok,ref){
+  ref=ref||CHREF;if(tok!==ref.t||noMotion())return;
   const sv=D.querySelector('svg.rvl');if(!sv)return;
   const r=sv.querySelector('.rv'),h=sv.querySelector('.hd'),W=300,xp=+sv.dataset.xp,DUR=1500,t0=performance.now();let popped=false;
   const ease=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
   (function f(t){
-    if(tok!==chartTok||!sv.isConnected)return;
+    if(tok!==ref.t||!sv.isConnected)return;
     const u=Math.min(1,(t-t0)/DUR),x=W*ease(u);
     r.setAttribute('width',x.toFixed(1));h.setAttribute('x1',x.toFixed(1));h.setAttribute('x2',x.toFixed(1));h.setAttribute('opacity',(u<.9?.85:Math.max(0,(1-u)/.1)*.85).toFixed(2));
     if(!popped&&x>=xp-1){popped=true;sv.classList.add('pop')}
@@ -458,9 +489,33 @@ function sheetHTML(){
   <div class="src"><div class="sn"><b>目標</b></div><div class="sf">${inp('data-g="f"','ファンス',S.goals.f)}${inp('data-g="e"','円石',S.goals.e)}</div></div>`+
   S.src.map(s=>{const nx=nextDue(s);return `<div class="src"><div class="sn"><b>${s.n}</b><small>${s.lb}${nx?'・次回 '+nx:''}</small></div><div class="sf">${inp(`data-s="${s.id}" data-k="f"`,'ファンス',s.f)}${inp(`data-s="${s.id}" data-k="e"`,'円石',s.e)}${inp(`data-s="${s.id}" data-k="b"`,'甲虫コイン',s.b)}${s.t==='b'?`<label>基準日（受取の月曜）<input type="date" data-s="${s.id}" data-k="anchor" value="${s.anchor}"></label>`:''}</div></div>`}).join('');
 }
-function renderSheet(){const sh=$('#sheet'),st=sh.scrollTop;sh.innerHTML=sheetMode==='inbox'?inboxHTML():sheetMode==='hist'?histHTML():sheetHTML();[...sh.children].forEach((c,i)=>c.style.setProperty('--r',Math.min(i,12)));sh.scrollTop=st}
-function openSheet(o){const was=sheetOpen;sheetOpen=o;if(o)renderSheet();$('#shw').classList.toggle('open',o);if(o&&!was){const sh=$('#sheet');sh.classList.remove('enter');void sh.offsetWidth;sh.classList.add('enter');setTimeout(()=>sh.classList.remove('enter'),1200)}}
+function renderSheet(){const sh=$('#sheet'),st=sh.scrollTop;const anim=detailFirst&&sheetMode==='detail';if(sheetMode==='detail')detailFirst=false;
+  sh.innerHTML='<div class="grab"></div>'+(sheetMode==='inbox'?inboxHTML():sheetMode==='hist'?histHTML():sheetMode==='detail'?detailHTML(detailKey,anim):sheetHTML());[...sh.children].forEach((c,i)=>c.style.setProperty('--r',Math.min(i,12)));sh.scrollTop=st;
+  if(anim){armChart(sh);const tk=++SHREF.t;setTimeout(()=>playChart(sh,tk,SHREF),380);runCU(sh,'enter')}}
+function openSheet(o){const was=sheetOpen;sheetOpen=o;if(o){const q=$('#sheet');q.style.transition=q.style.transform=q.style.opacity='';$('#shbd').style.opacity='';renderSheet()}$('#shw').classList.toggle('open',o);if(o&&!was){const sh=$('#sheet');sh.classList.remove('enter');void sh.offsetWidth;sh.classList.add('enter');setTimeout(()=>sh.classList.remove('enter'),1200)}}
 $('#shbd').onclick=()=>openSheet(false);
+(function(){
+  const sh=$('#sheet'),bd=$('#shbd');let dr=null;
+  sh.addEventListener('pointerdown',e=>{if(!sheetOpen||e.target.id==='shx'||!e.target.closest('.grab,.sh-h'))return;dr={y:e.clientY,t:performance.now(),dy:0,id:e.pointerId,moved:false}});
+  addEventListener('pointermove',e=>{
+    if(!dr||e.pointerId!==dr.id)return;const dy=e.clientY-dr.y;
+    if(!dr.moved){if(Math.abs(dy)<6)return;dr.moved=true;try{sh.setPointerCapture(e.pointerId)}catch(x){}sh.style.transition='none';bd.style.transition='none'}
+    dr.dy=dy>0?dy:dy*.25;sh.style.transform=`translateY(${dr.dy.toFixed(1)}px) scale(${(1-Math.min(Math.max(dr.dy,0),320)/3200).toFixed(3)})`;bd.style.opacity=String(1-Math.min(Math.max(dr.dy,0)/340,.85));
+  });
+  const end=e=>{
+    if(!dr||e.pointerId!==dr.id)return;const d=dr;dr=null;if(!d.moved)return;
+    const v=d.dy/Math.max(1,performance.now()-d.t);sh.style.transition='';bd.style.transition='';
+    if(d.dy>90||v>.6){
+      sh.style.transition='transform .3s cubic-bezier(.55,0,.85,.4),opacity .24s ease-in';sh.style.transform='translateY(110%) scale(.92)';sh.style.opacity='0';bd.style.opacity='';
+      openSheet(false);setTimeout(()=>{if(!sheetOpen)sh.style.transition=sh.style.transform=sh.style.opacity=''},420);
+      try{navigator.vibrate&&navigator.vibrate(8)}catch(x){}
+    }else{
+      sh.style.transition='transform .5s cubic-bezier(.2,1.4,.4,1)';sh.style.transform='none';bd.style.opacity='';
+      setTimeout(()=>{if(sheetOpen)sh.style.transition=sh.style.transform=''},540);
+    }
+  };
+  addEventListener('pointerup',end);addEventListener('pointercancel',end);
+})();
 $('#sheet').addEventListener('click',e=>{if(e.target.id==='shx')openSheet(false)});
 $('#sheet').addEventListener('change',e=>{const t=e.target,v=Math.max(0,Math.round(+t.value||0));
   if(t.dataset.p){S.pull=v>0?v:160}
@@ -596,22 +651,23 @@ function topHTML(lv=0){
   const hm=t=>{const d=new Date(t);return p2(d.getHours())+':'+p2(d.getMinutes())};
   const dl=v=>v?fmtA(v):'±0';
   const wkL=c=>{const w=lv<2&&wkNet(c);return w?'<br>先週比 '+fmtPct(w.pct)+(w.partial?'※':''):''};
-  const status=`<section class="card"><div class="stc"><i class="sd${upd?' ok':''}"></i><div><b>${upd?'今日は更新済み':'今日はまだ更新がありません'}</b><small>${upd?`最終 ${hm(lastT)}・今日の記録 ${S.log.filter(isTodayE).length}件`:'「スクショ」か記録で更新できます'}</small></div></div></section>`;
+  const status=`<section class="card" data-d="hist"><div class="stc"><i class="sd${upd?' ok':''}"></i><div><b>${upd?'今日は更新済み':'今日はまだ更新がありません'}</b><small>${upd?`最終 ${hm(lastT)}・今日の記録 ${S.log.filter(isTodayE).length}件`:'「スクショ」か記録で更新できます'}</small></div></div></section>`;
   const gF=S.goals.f>0&&bal('f')<S.goals.f?`<div class="bar"><i data-bk="t-goal-f" data-w="${Math.max(0,Math.min(100,Math.round(bal('f')/S.goals.f*100)))}"></i></div><div class="tl2s">目標まで あと ${nf(S.goals.f-bal('f'))}</div>`:'';
-  const tile=(cls,head,v,sub,extra)=>`<div class="tl2 ${cls}"><div class="tl2h">${head}</div><div class="tl2v">${cu('t-'+head.replace(/<[^>]*>/g,''),v)}</div><div class="tl2s">${sub}</div>${extra||''}</div>`;
+  const dkey=h=>({'ファンス':'cur:f','円石':'cur:e','甲虫コイン':'cur:b','財力値':'wealth'})[h.replace(/<[^>]*>/g,'')]||'';
+  const tile=(cls,head,v,sub,extra)=>`<div class="tl2 ${cls}" data-d="${dkey(head)}"><div class="tl2h">${head}</div><div class="tl2v">${cu('t-'+head.replace(/<[^>]*>/g,''),v)}</div><div class="tl2s">${sub}</div>${extra||''}</div>`;
   const tiles=`<div class="tg">`+
     tile('',`${ico('f')}ファンス`,bal('f'),`今日 ${dl(td('f'))}${wkL('f')}`,gF)+
     tile('',`${ico('e')}円石`,bal('e'),`今日 ${dl(td('e'))}・ガチャ ${pulls(bal('e'))}回分${wkL('e')}`)+
     (hb?tile('',`${ico('b')}甲虫コイン`,bal('b'),`今日 ${dl(td('b'))}${wkL('b')}`):'')+
     tile(hb?'':'w2',`財力値`,wealth(),`今日 ${dl(of('f').filter(e=>isTodayE(e)&&e.a>0).reduce((x,e)=>x+e.a,0))}${(()=>{const w=lv<2&&wkInc('f');return w?'<br>先週比 '+fmtPct(w.pct)+'（入手）':''})()}`)+`</div>`;
   const nx=S.src.filter(x=>x.t!=='d').map(s=>{const n=nextDueD(s);if(!n)return '';const L=s.t==='w'?7:14,pct=Math.round((L-n.i)/L*100);
-    return `<div class="nx2"><div class="nx2h"><b>${s.n}</b><span>${fmtMD(n.d)}<em>${n.i===0?'今日':n.i===1?'明日':'あと'+n.i+'日'}</em></span></div><div class="bar"><i data-bk="nx-${s.id}" data-w="${pct}"></i></div>${lv>=1?'':`<small>${ntfDetail(s)||'金額は「設定」で入力'}</small>`}</div>`}).join('');
+    return `<div class="nx2" data-d="src:${s.id}"><div class="nx2h"><b>${s.n}</b><span>${fmtMD(n.d)}<em>${n.i===0?'今日':n.i===1?'明日':'あと'+n.i+'日'}</em></span></div><div class="bar"><i data-bk="nx-${s.id}" data-w="${pct}"></i></div>${lv>=1?'':`<small>${ntfDetail(s)||'金額は「設定」で入力'}</small>`}</div>`}).join('');
   const t0=startOf(new Date()),evs=S.src.filter(x=>x.t!=='d');
   const cells=Array.from({length:lv>=2?7:14},(_,i)=>{const d=addD(t0,i),es=evs.filter(s=>due(s,d));
-    return `<div class="cc${es.length?' ev':''}${i===0?' td':''}" style="--i:${i}"><small>${WD[d.getDay()]}</small><b>${d.getDate()}</b><span>${es.map(s=>s.t==='w'?'●':'◆').join('')}</span></div>`}).join('');
+    return `<div class="cc${es.length?' ev':''}${i===0?' td':''}" data-d="day:${i}" style="--i:${i}"><small>${WD[d.getDay()]}</small><b>${d.getDate()}</b><span>${es.map(s=>s.t==='w'?'●':'◆').join('')}</span></div>`}).join('');
   return status+tiles+
     `<section class="card"><div class="ch"><span>NEXT UPDATE</span><span>定期収入の更新日</span></div>${nx}</section>`+
-    `<section class="card"><div class="ch"><span>CALENDAR</span><span>今後${lv>=2?7:14}日　● スタミナ　◆ ミリオン</span></div><div class="cal">${cells}</div></section>`+(lv>=1?'':`<div class="hn">「残高」グラフ・「分析」レポート・「スクショ」読み取り・「ヘルプ」一覧</div>`);
+    `<section class="card"><div class="ch"><span>CALENDAR</span><span>今後${lv>=2?7:14}日　● スタミナ　◆ ミリオン</span></div><div class="cal">${cells}</div></section>`+(lv>=1?'':`<div class="hn">カードをタップで詳細・「残高」グラフ・「分析」レポート・「ヘルプ」一覧</div>`);
 }
 function renderTop(){
   const D=$('#dash'),st=D.scrollTop;
@@ -750,7 +806,7 @@ function renderDash(){
   }else{clearTimeout(naT);D.classList.add('na')}
   FXD=fx?420:0;CHMODE=mode;chartPrevMemo=chartMemo;
   if(VIEW==='analysis')renderAnalysis(mode==='enter');else if(VIEW==='top')renderTop();else renderHome();
-  armChart(D);{const tok=++chartTok;morphTok++;if(mode==='data')morphChart(D);else if(mode==='enter')setTimeout(()=>playChart(D,tok),fx?FXD+80:260)}
+  armChart(D);{const tok=++CHREF.t;morphTok++;if(mode==='data')morphChart(D);else if(mode==='enter')setTimeout(()=>playChart(D,tok),fx?FXD+80:260)}
   if(fx)setTimeout(()=>{runCU(D,mode);runBars(D,mode)},FXD);else{runCU(D,mode);runBars(D,mode)}
   D.style.setProperty('--cx',changed&&!first?(dir*22)+'px':'0px');
   if(fx)runFx(D,fx);
@@ -822,6 +878,80 @@ function drawBanner(list){
   if(!nbFirst)renderDash();nbFirst=false;
 }
 $('#nb').addEventListener('click',e=>{const k=e.target.dataset&&e.target.dataset.k;if(!k)return;const el=e.target.closest('.nt');if(el)el.classList.add('nout');setTimeout(()=>{S.ntf.dis[k]=1;save();ntfCheck()},el?210:0)});
+/* ===== ホームのカードの詳細 ===== */
+let detailKey='',detailFirst=false;
+const THEME={f:{c:['#a8721a','#fccc54','#fff0a8'],a:'#fccc54',dot:'#fccc54'},e:{c:['#2a54b0','#4aa0f0','#8ff0ff'],a:'#4aa0f0',dot:'#8ff0ff'},b:{c:['#8a4f86','#d28ac4','#ffd3f0'],a:'#d28ac4',dot:'#ffd3f0'},w:{c:['#8d8d8d','#d8d8d8','#ffffff'],a:'#e6e6e6',dot:'#ffffff'}};
+function serie(c,pastN,futN,kind){
+  const t=startOf(new Date()),first=S.log.length?startOf(new Date(S.log[0].t)):t,start=first<addD(t,-(pastN-1))?addD(t,-(pastN-1)):first,P=dnum(t)-dnum(start);
+  const sel=kind==='w'?(e=>(e.c||'f')==='f'&&e.a>0?e.a:0):(e=>(e.c||'f')===c?e.a:0);
+  let pre=kind==='w'?(S.open.w||0):(S.open[c]||0);const net={};
+  S.log.forEach(e=>{const v=sel(e);if(!v)return;const d=startOf(new Date(e.t));if(d<start)pre+=v;else{const k=ymd(d);net[k]=(net[k]||0)+v}});
+  const past=[];let b=pre;for(let i=0;i<=P;i++){b+=net[ymd(addD(start,i))]||0;past.push(b)}
+  let fut;
+  if(kind==='w'){
+    let rate=avg('f');const o=obs('f');
+    if(basis()==='obs'&&o){const t0=Math.max(startOf(new Date(S.log[0].t)).getTime(),startOf(addD(new Date(),-29)).getTime()),days=(Date.now()-t0)/864e5;rate=S.log.filter(e=>(e.c||'f')==='f'&&e.a>0&&e.t>=t0).reduce((x,e)=>x+e.a,0)/days}
+    fut=Array.from({length:futN},(_,i)=>Math.round(past[P]+rate*(i+1)));
+  }else fut=fc(c,futN);
+  return {V:past.concat(fut),P,N:P+futN+1,start};
+}
+function miniSvg(sr,th,goal,cls){
+  const W=300,H=150,pd=8,top=12,bot=18,N=sr.N,P=sr.P,V=sr.V,u=++CHU,id='cpm'+u,gs='mgs'+u,ga='mga'+u;
+  let mx=Math.max(...V,goal>0?goal:-Infinity),mn=Math.min(...V);const span=(mx-mn)||Math.max(1,Math.abs(mx)*.02),pad=span*.14;mx+=pad;mn-=pad;if(Math.min(...V)>=0&&mn<0)mn=0;
+  const X=i=>pd+i*(W-pd*2)/(N-1),Y=v=>(H-bot)-(v-mn)/(mx-mn)*(H-bot-top);
+  const path=(i0,i1)=>{let d='';for(let i=i0;i<=i1;i++)d+=(i===i0?'M':'L')+X(i).toFixed(1)+' '+Y(V[i]).toFixed(1);return d};
+  const lab=(i,t,an)=>{const d=addD(sr.start,i);return `<text class="ax" x="${X(i)}" y="${H-5}" text-anchor="${an}">${t||(d.getMonth()+1)+'/'+d.getDate()}</text>`};
+  return `<svg class="ch2 ${cls}" data-xp="${X(P).toFixed(1)}" viewBox="0 0 ${W} ${H}"><defs><linearGradient id="${gs}" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${W}" y2="0"><stop offset="0" stop-color="${th.c[0]}"/><stop offset=".55" stop-color="${th.c[1]}"/><stop offset="1" stop-color="${th.c[2]}"/></linearGradient><linearGradient id="${ga}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${th.a}" stop-opacity=".34"/><stop offset="1" stop-color="${th.a}" stop-opacity="0"/></linearGradient><clipPath id="${id}"><rect class="rv" x="0" y="0" width="${W}" height="${H}"/></clipPath></defs>
+  <line class="tm" x1="${X(P)}" x2="${X(P)}" y1="${top-4}" y2="${H-bot}" stroke="#555" stroke-dasharray="2 3"/>
+  <g clip-path="url(#${id})">${goal>0?`<line x1="0" x2="${W}" y1="${Y(goal)}" y2="${Y(goal)}" stroke="${th.a}" stroke-opacity=".4" stroke-dasharray="1 4"/>`:''}<path class="ar" d="${path(0,N-1)}L${X(N-1)} ${H-bot}L${X(0)} ${H-bot}Z" fill="url(#${ga})"/><path class="ls" d="${path(0,P)}" stroke="url(#${gs})" stroke-width="2.4"/><path class="fp" d="${path(P,N-1)}" fill="none" stroke="url(#${gs})" stroke-width="2.4" stroke-dasharray="3 4" stroke-linecap="round" opacity=".8"/></g>
+  <line class="hd" x1="0" x2="0" y1="${top-4}" y2="${H-bot}" stroke="#fff" stroke-width="1.2" opacity="0"/>
+  <circle class="dt" cx="${X(P)}" cy="${Y(V[P])}" r="7" fill="${th.dot}" opacity=".22"/><circle class="dt" cx="${X(P)}" cy="${Y(V[P])}" r="3.6" fill="${th.dot}" stroke="#000" stroke-opacity=".6"/>
+  ${lab(0,'','start')}${P>3?lab(P,'今日','middle'):''}${lab(N-1,'点線＝予測','end')}</svg>`;
+}
+const dRow=(l,v,w)=>`<div${w?' class="w"':''}><span>${l}</span><b>${v}</b></div>`;
+const dHead=(t,sub)=>`<div class="sh-h"><b>${t}</b><span class="mu">${sub||''}</span><span id="shx">✕</span></div>`;
+const tmH=t=>{const d=new Date(t);return (d.getMonth()+1)+'/'+d.getDate()+' '+p2(d.getHours())+':'+p2(d.getMinutes())};
+const dRecent=(a,t)=>{const L=a.slice(-5).reverse();return `<div class="dl2"><div class="bt"><span>${t||'直近の記録'}</span></div>`+(L.length?L.map(e=>`<div class="h"><span><small>${tmH(e.t)}</small>${esc(e.n||'メモなし')}</span><em class="${e.a>0?'up':'dn'}">${sg(e.a)}</em></div>`).join(''):'<div class="empty" style="padding:8px 0">記録はまだありません</div>')+'</div>'};
+function memoTop(a,n){const m={};a.forEach(e=>{const k=(e.n||'その他').trim()||'その他';m[k]=(m[k]||0)+Math.abs(e.a)});const L=Object.entries(m).sort((x,y)=>y[1]-x[1]),tot=L.reduce((x,y)=>x+y[1],0);return {L:L.slice(0,n),tot}}
+function detCur(c){
+  const nm=CUR[c],b=bal(c),td=of(c).filter(isTodayE).reduce((x,e)=>x+e.a,0),w=wkNet(c),D=anaData(),st=D&&D.st[c],f30=fc(c,30),g=S.goals[c]||0;
+  const rows=[dRow('1日平均',fmtA(Math.round(avgX(c)))+`<small>${basis()==='obs'?'実績':'定期'}</small>`),dRow('先週比',w?fmtPct(w.pct)+(w.partial?'※':''):'—')];
+  if(st)rows.push(dRow('入手（直近）',nf(st.inc)),dRow('消費（直近）',nf(st.out)));
+  rows.push(dRow('7日後',nf(f30[6])),dRow('30日後',nf(f30[29])));
+  if(c==='e'){const pc=S.pull||160;rows.push(dRow('ガチャ',pulls(b)+'回分'),dRow('次の1回まで','あと '+nf(pc-b%pc)),dRow('30日後のガチャ',pulls(f30[29])+'回分'))}
+  if(g>0)rows.push(dRow('目標',nf(g)),dRow(b>=g?'達成':'あと',b>=g?'✓':nf(g-b)+'<small>'+eta(c).replace(/（.*）/,'')+'</small>'));
+  return {nm,b,td,w,g,rows,sr:serie(c,30,30,'bal'),th:THEME[c],recent:dRecent(of(c))};
+}
+function detailHTML(key,anim){
+  const [kind,arg]=key.split(':'),cls=anim?'rvl':'still';
+  if(kind==='cur'){const d=detCur(arg);
+    return dHead(`${ico(arg)}${d.nm}`,'詳細')+`<div class="dh"><div class="dnum">${cu('d-'+arg,d.b)}</div><div class="ds">今日 ${d.td?fmtA(d.td):'±0'}${d.w?'・先週比 '+fmtPct(d.w.pct):''}</div></div><div class="dc">${miniSvg(d.sr,d.th,d.g,cls)}</div><div class="dg">${d.rows.join('')}</div>${d.recent}`}
+  if(kind==='wealth'){
+    const w7=wkInc('f'),sr=serie('f',30,30,'w'),D=anaData(),inc=D?D.st.f.inc:0,days=D?D.days:1,top=memoTop(of('f').filter(e=>e.a>0),3);
+    const rows=[dRow('7日の増加',w7?'+'+nf(Math.round(w7.cur)):'—'),dRow('先週比',w7?fmtPct(w7.pct)+(w7.partial?'※':''):'—'),dRow('入手合計',nf(inc)),dRow('日平均入手','+'+nf(Math.round(inc/days))),dRow('7日後',nf(sr.V[sr.P+7])),dRow('30日後',nf(sr.V[sr.P+30])),dRow('初期値',nf(S.open.w||0))];
+    const src=top.tot?`<div class="dl2"><div class="bt"><span>入手元（ファンス）</span></div>${top.L.map(([k,v])=>`<div class="br" style="--p:${Math.round(v/top.tot*100)}%"><span>${esc(k)} ${Math.round(v/top.tot*100)}%</span><b>${nf(v)}</b></div>`).join('')}</div>`:'';
+    return dHead('財力値','これまでに稼いだファンスの合計')+`<div class="dh"><div class="dnum">${cu('d-w',wealth())}</div><div class="ds">今日 +${nf(of('f').filter(e=>isTodayE(e)&&e.a>0).reduce((x,e)=>x+e.a,0))}</div></div><div class="dc">${miniSvg(sr,THEME.w,0,cls)}</div><div class="dg">${rows.join('')}</div>${src}`}
+  if(kind==='src'){
+    const s=S.src.find(x=>x.id===arg);if(!s)return dHead('更新日','');
+    const t=startOf(new Date()),next=[];for(let i=0;i<70&&next.length<3;i++){const d=addD(t,i);if(due(s,d))next.push({d,i})}
+    const by={};S.log.filter(e=>e.n===s.n).forEach(e=>{const k=ymd(startOf(new Date(e.t)));(by[k]=by[k]||{t:e.t,f:0,e:0,b:0})[e.c||'f']+=e.a});
+    const rec=Object.values(by).sort((a,b)=>b.t-a.t),pc=['f','e','b'].find(c=>s[c]>0)||'f',L=s.t==='w'?7:14;
+    const amt=o=>['f','e','b'].filter(c=>o[c]>0).map(c=>`${nmS(c)} +${nf(o[c])}`).join('／')||'—';
+    let bars='';
+    if(rec.length>=2){const R=rec.slice(0,8).reverse(),mxv=Math.max(...R.map(r=>r[pc]),1),bw=Math.min(24,260/R.length-6);
+      bars=`<svg class="ch2 still" viewBox="0 0 300 90"><line x1="0" x2="300" y1="70" y2="70" stroke="#555"/>${R.map((r,i)=>{const h=Math.max(2,r[pc]/mxv*52),x=20+i*(260/R.length)+(260/R.length-bw)/2;return `<rect class="bu" x="${x.toFixed(1)}" y="${(70-h).toFixed(1)}" width="${bw}" height="${h.toFixed(1)}" rx="2" fill="${THEME[pc].a}" style="animation-delay:${i*45}ms"/><text class="ax" x="${(x+bw/2).toFixed(1)}" y="84" text-anchor="middle">${md(r.t)}</text>`}).join('')}</svg>`}
+    const n0=next[0];
+    return dHead(s.n,'更新日の詳細')+`<div class="dh"><div class="dnum" style="font-size:24px">${n0?fmtMD(n0.d):'—'}</div><div class="ds">${n0?(n0.i===0?'今日':n0.i===1?'明日':'あと'+n0.i+'日'):''}・${s.lb}</div></div>${bars?`<div class="dc">${bars}</div>`:''}<div class="dg">${dRow('受取予定',amt(s),1)}${dRow('周期',L+'日')}${dRow('次回',next.slice(0,3).map(x=>x.d.getMonth()+1+'/'+x.d.getDate()).join('・'),1)}${dRow('受取の記録',rec.length+'回')}${rec.length?dRow('前回',md(rec[0].t)):''}${rec.length>=2?dRow('平均',nf(Math.round(rec.reduce((x,r)=>x+r[pc],0)/rec.length))+'<small>'+nmS(pc)+'</small>'):''}</div><div class="dl2"><div class="bt"><span>受取の記録</span></div>${rec.length?rec.slice(0,5).map(r=>`<div class="h"><span><small>${md(r.t)}</small>${amt(r)}</span></div>`).join(''):`<div class="empty" style="padding:8px 0">「${s.n} 受取」で記録すると履歴が出ます</div>`}</div>`}
+  if(kind==='day'){
+    const i=+arg,d=addD(startOf(new Date()),i),dueS=S.src.filter(x=>due(x,d)),tot={f:0,e:0,b:0};
+    dueS.forEach(x=>['f','e','b'].forEach(c=>tot[c]+=+x[c]||0));
+    const amt=o=>['f','e','b'].filter(c=>o[c]>0).map(c=>`${nmS(c)} +${nf(o[c])}`).join('／')||'金額未設定';
+    const recs=i===0?S.log.filter(isTodayE).reverse():[];
+    return dHead(fmtMD(d),i===0?'今日':'あと'+i+'日')+`<div class="dh"><div class="dnum" style="font-size:19px;letter-spacing:0">${amt(tot)}</div><div class="ds">この日の定期収入の合計（見込み）</div></div><div class="dl2"><div class="bt"><span>この日の更新・受取</span></div>${dueS.map(x=>`<div class="d2"><div><b>${esc(x.n)}</b><small>${x.lb}</small></div><div class="mu">${amt(x)}</div></div>`).join('')}</div>${i===0?`<div class="dl2"><div class="bt"><span>今日の記録</span></div>${recs.length?recs.map(e=>`<div class="h"><span><small>${tmH(e.t).split(' ')[1]}</small><u>${CUR[e.c||'f']}</u>${esc(e.n||'メモなし')}</span><em class="${e.a>0?'up':'dn'}">${sg(e.a)}</em></div>`).join(''):'<div class="empty" style="padding:8px 0">まだ記録がありません</div>'}</div>`:''}`}
+  return '';
+}
+function openDetail(key){detailKey=key;detailFirst=true;sheetMode='detail';openSheet(true)}
+$('#dash').addEventListener('click',e=>{if(VIEW!=='top')return;const el=e.target.closest('[data-d]');if(!el||!el.dataset.d)return;const k=el.dataset.d;if(k==='hist'){sheetMode='hist';openSheet(true)}else openDetail(k)});
 function histHTML(){
   const L=S.log.slice(-60).reverse(),tm=t=>{const d=new Date(t);return (d.getMonth()+1)+'/'+d.getDate()+' '+p2(d.getHours())+':'+p2(d.getMinutes())};
   return `<div class="sh-h"><b>履歴</b><span class="mu">${L.length?'直近'+L.length+'件':''}</span><span id="shx">✕</span></div>`+
