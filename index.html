@@ -327,6 +327,43 @@ input{transition:border-color .2s,box-shadow .25s}input:focus{box-shadow:0 0 0 4
 .chero{display:flex;gap:14px;align-items:center;margin:2px 0 10px}.cn2{font-size:20px;font-weight:700}
 .sf label.w{flex-basis:100%}
 .cdel{text-align:center;color:var(--mu);font-size:12px;padding:14px 0 8px;margin-top:6px;border-top:1px solid #ffffff0d;cursor:pointer}
+/* ---- キャラリスト(保持・お気に入り・メモ) ---- */
+.cgrid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:7px!important}
+.ct{padding:9px 3px 7px!important;position:relative}
+.cav{width:40px!important;height:40px!important;font-size:17px!important;margin:0 auto 5px!important}
+.cav.lg{width:58px!important;height:58px!important;font-size:25px!important;margin:0!important}
+.cn{font-size:11px!important}.cl{font-size:9.5px!important}
+.ct:not(.own):not(.up){opacity:.5}
+.ct.own .cav{border-color:#f2f2f2;box-shadow:0 0 12px #ffffff3d}
+.ct:not(.own) .cav{border-color:#4a4a4a;box-shadow:none}
+.ct.up{border-style:dashed}
+.cu{font-size:9px;color:var(--mu);margin-top:2px;letter-spacing:.02em}
+.bd{position:absolute;top:4px;width:21px;height:21px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:12px;line-height:1}
+.bd::after{content:"";position:absolute;inset:-7px}
+.bo{left:4px;border:1.5px solid #666;color:transparent;transition:background .2s,border-color .2s,color .2s}
+.ct.own .bo{background:#f2f2f2;border-color:#f2f2f2;color:#1d1d1d;font-weight:900}
+.bf{right:4px;color:#6a6a6a;font-size:14px;transition:color .2s,text-shadow .2s}
+.bf.on{color:#fff;text-shadow:0 0 8px #fff}
+.bd.pop{animation:popdot .5s cubic-bezier(.2,1.7,.4,1)}
+.cst{grid-template-columns:repeat(4,1fr)!important;gap:4px!important;margin-top:8px}
+.cs2{cursor:pointer;border-radius:12px;padding:4px 0;transition:background .2s}.cs2.on{background:#ffffff1c}.cs2.noh{cursor:default}
+.cs2 b{display:block;font-size:18px;font-variant-numeric:tabular-nums}.cs2 em{font-style:normal;font-size:11px;color:var(--mu);font-weight:500}
+.cbar{height:3px;border-radius:2px;background:var(--line);margin-top:6px;overflow:hidden}.cbar i{display:block;height:100%;background:#fff;border-radius:2px;transition:width .7s cubic-bezier(.2,.8,.2,1)}
+.epl{display:flex;gap:6px;overflow-x:auto;padding:1px 0;scrollbar-width:none;min-height:34px;align-items:center}.epl::-webkit-scrollbar{display:none}
+.ep{flex:none;padding:6px 12px;border-radius:15px;border:1px solid var(--line);font-size:11.5px;color:var(--mu);cursor:pointer;white-space:nowrap;transition:background .2s,color .2s}
+.ep em{font-style:normal;font-size:10px;margin-left:5px;opacity:.7}
+.ep.on{background:#f2f2f2;color:#1d1d1d;border-color:#f2f2f2;font-weight:700}
+.cmeta{font-size:12px;color:var(--mu);margin-top:3px;display:flex;align-items:center;gap:6px}
+.rb{display:inline-block;min-width:20px;text-align:center;padding:1px 6px;border-radius:6px;font-size:11px;font-weight:800;border:1px solid #777;color:#ddd}.rb.S{background:#f2f2f2;color:#1d1d1d;border-color:#f2f2f2}
+.rw2{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #ffffff0d}.rw2 b{font-size:13px}.rw2 small{display:block;color:var(--mu);font-size:10.5px;font-weight:400;margin-top:1px}
+.tg2{flex:none;width:48px;height:27px;border-radius:14px;background:#3a3a3a;position:relative;cursor:pointer;transition:background .25s}
+.tg2 i{position:absolute;left:3px;top:3px;width:21px;height:21px;border-radius:50%;background:#bdbdbd;transition:transform .34s cubic-bezier(.2,1.5,.4,1),background .25s}
+.tg2.on{background:#f2f2f2}.tg2.on i{transform:translateX(21px);background:#1d1d1d}.tg2.dis{opacity:.35;pointer-events:none}
+.mm2{display:block;font-size:10px;color:var(--mu);letter-spacing:.05em;margin-top:10px}
+.mm2 textarea{display:block;width:100%;margin-top:3px;padding:9px 12px;border-radius:12px;background:var(--p2);border:1px solid #333;color:var(--tx);font:13px/1.5 inherit;resize:none;min-height:70px}
+.mm2 textarea:focus{outline:0;border-color:#666;box-shadow:0 0 0 3px #ffffff1c}
+.bt2{flex:1;min-width:88px;padding:10px 8px;border-radius:12px;background:var(--p2);border:1px solid #3a3a3a;color:var(--tx);font:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:transform .16s,background .2s}
+.bt2:active{transform:scale(.95);background:#333}
 </style>
 </head>
 <body>
@@ -336,6 +373,7 @@ input{transition:border-color .2s,box-shadow .25s}input:focus{box-shadow:0 0 0 4
   <div id="nb"></div>
   <div id="dash"></div>
   <input type="file" accept="image/*" id="shot" hidden>
+  <input type="file" accept="application/json,.json,text/plain" id="impf" hidden>
   <div id="shw"><div id="shbd"></div><div id="sheet"></div></div>
   <div id="log"></div>
   <div class="inp"><input id="q" enterkeyhint="send" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="メッセージ"><button id="send" aria-label="送信"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div>
@@ -362,10 +400,11 @@ const SRC=()=>[
  {id:'coffee',n:'壱のコーヒー',k:['コーヒー','壱'],f:0,e:0,b:0,t:'d',lb:'毎日'},
  {id:'stamina',n:'シティスタミナ',k:['スタミナ'],f:0,e:0,b:0,t:'w',lb:'毎週月曜'},
  {id:'million',n:'プロジェクトミリオン',k:['ミリオン'],f:0,e:0,b:0,t:'b',lb:'14日ごと(月曜)',anchor:nextMon()}];
-let S={v:5,log:[],goals:{f:0,e:0},all:false,src:SRC(),rcv:{},open:{f:0,e:0,b:0,w:0,set:false},pull:160,fcMode:'auto',chars:[],cSort:'star',ntf:{on:true,seen:{},dis:{},inbox:[],upd:0,wsync:0,gt:null,gr:null,edge:[]}};
-try{const r=JSON.parse(localStorage.getItem('nte_fans')||'null');if(r){S.log=r.log||[];S.goals=r.goals||{f:r.goal||0,e:0};S.rcv=r.rcv||{};if(r.open)S.open=Object.assign(S.open,r.open);if(r.pull>0)S.pull=r.pull;if(r.fcMode)S.fcMode=r.fcMode;if(Array.isArray(r.chars))S.chars=r.chars;if(r.cSort)S.cSort=r.cSort;if(r.ntf)S.ntf=Object.assign(S.ntf,r.ntf);if(!r.mig)S._m=1;(r.src||[]).forEach(o=>{const s=S.src.find(x=>x.id===o.id);if(s){s.f=+o.f||0;s.b=+o.b||0;s.e=+o.e||0;if(o.anchor)s.anchor=o.anchor}})}}catch(e){}
+let S={v:5,log:[],goals:{f:0,e:0},all:false,src:SRC(),rcv:{},open:{f:0,e:0,b:0,w:0,set:false},pull:160,fcMode:'auto',cs:{},cSort:'rel',cF:{},ntf:{on:true,seen:{},dis:{},inbox:[],upd:0,wsync:0,gt:null,gr:null,edge:[]}};
+try{const r=JSON.parse(localStorage.getItem('nte_fans')||'null');if(r){S.log=r.log||[];S.goals=r.goals||{f:r.goal||0,e:0};S.rcv=r.rcv||{};if(r.open)S.open=Object.assign(S.open,r.open);if(r.pull>0)S.pull=r.pull;if(r.fcMode)S.fcMode=r.fcMode;if(r.cs&&typeof r.cs==='object'&&!Array.isArray(r.cs))S.cs=r.cs;if(r.cSort)S.cSort=r.cSort;if(r.cF&&typeof r.cF==='object')S.cF=r.cF;if(r.ntf)S.ntf=Object.assign(S.ntf,r.ntf);if(!r.mig)S._m=1;(r.src||[]).forEach(o=>{const s=S.src.find(x=>x.id===o.id);if(s){s.f=+o.f||0;s.b=+o.b||0;s.e=+o.e||0;if(o.anchor)s.anchor=o.anchor}})}}catch(e){}
 if(S._m){const d=S.src.find(x=>x.id==='daily');if(d&&!d.b)d.b=20000}
-const save=()=>{try{localStorage.setItem('nte_fans',JSON.stringify({v:5,mig:1,fcMode:S.fcMode,chars:S.chars,cSort:S.cSort,ntf:S.ntf,log:S.log,goals:S.goals,open:S.open,pull:S.pull,rcv:S.rcv,src:S.src.map(s=>({id:s.id,f:s.f,e:s.e,b:s.b,anchor:s.anchor}))}))}catch(e){}};
+const snapshot=()=>({v:5,mig:1,fcMode:S.fcMode,cs:S.cs,cSort:S.cSort,cF:S.cF,ntf:S.ntf,log:S.log,goals:S.goals,open:S.open,pull:S.pull,rcv:S.rcv,src:S.src.map(s=>({id:s.id,f:s.f,e:s.e,b:s.b,anchor:s.anchor}))});
+const save=()=>{try{localStorage.setItem('nte_fans',JSON.stringify(snapshot()))}catch(e){}};
 const of=c=>S.log.filter(e=>(e.c||'f')===c);
 const nc=n=>n>=1e8?(n/1e8).toFixed(1).replace(/\.0$/,'')+'億':n>=1e5?Math.round(n/1e4)+'万':n>=1e4?(n/1e4).toFixed(1).replace(/\.0$/,'')+'万':nf(n);
 const hasBeetle=()=>!!(S.open.b||of('b').length||S.src.some(x=>x.b>0));
@@ -533,13 +572,14 @@ function sheetHTML(){
   return `<div class="sh-h"><b>設定</b><span class="mu">量はレベルに合わせて入力</span><span id="shx">✕</span></div>
   <div class="src"><div class="sn"><b>使い始めの量</b><small>このサイトを使い始めた時点</small></div><div class="sf">${inp('data-o="f"','ファンス',S.open.f)}${inp('data-o="e"','円石',S.open.e)}${inp('data-o="b"','甲虫コイン',S.open.b)}${inp('data-o="w"','財力値',S.open.w)}</div></div>
   <div class="src"><div class="sn"><b>ガチャ</b><small>1回に必要な円石</small></div><div class="sf">${inp('data-p="1"','円石',S.pull)}</div></div>
+  <div class="src"><div class="sn"><b>データ</b><small>バックアップ・機種変更用（jsonファイル）</small></div><div class="sf"><button class="bt2" data-act="exp">書き出し</button><button class="bt2" data-act="imp">読み込み</button><button class="bt2" data-act="cp">コピー</button></div></div>
   <div class="src"><div class="sn"><b>目標</b></div><div class="sf">${inp('data-g="f"','ファンス',S.goals.f)}${inp('data-g="e"','円石',S.goals.e)}</div></div>`+
   S.src.map(s=>{const nx=nextDue(s);return `<div class="src"><div class="sn"><b>${s.n}</b><small>${s.lb}${nx?'・次回 '+nx:''}</small></div><div class="sf">${inp(`data-s="${s.id}" data-k="f"`,'ファンス',s.f)}${inp(`data-s="${s.id}" data-k="e"`,'円石',s.e)}${inp(`data-s="${s.id}" data-k="b"`,'甲虫コイン',s.b)}${s.t==='b'?`<label>基準日（受取の月曜）<input type="date" data-s="${s.id}" data-k="anchor" value="${s.anchor}"></label>`:''}</div></div>`}).join('');
 }
 function renderSheet(){const sh=$('#sheet'),st=sh.scrollTop;const anim=detailFirst&&sheetMode==='detail';if(sheetMode==='detail')detailFirst=false;
   sh.innerHTML='<div class="grab"></div>'+(sheetMode==='inbox'?inboxHTML():sheetMode==='hist'?histHTML():sheetMode==='detail'?detailHTML(detailKey,anim):sheetMode==='char'?charHTML(charEditId):sheetHTML());[...sh.children].forEach((c,i)=>c.style.setProperty('--r',Math.min(i,12)));sh.scrollTop=st;sh.classList.toggle('ns',sh.scrollHeight<=sh.clientHeight+1);
   if(anim){armChart(sh);const tk=++SHREF.t;setTimeout(()=>playChart(sh,tk,SHREF),380);runCU(sh,'enter')}}
-function openSheet(o){const was=sheetOpen;sheetOpen=o;if(!o&&was&&sheetMode==='char')closeChar();if(o){const q=$('#sheet');q.style.transition=q.style.transform=q.style.opacity='';$('#shbd').style.opacity='';renderSheet()}$('#shw').classList.toggle('open',o);if(o&&!was){const sh=$('#sheet');sh.classList.remove('enter');void sh.offsetWidth;sh.classList.add('enter');setTimeout(()=>sh.classList.remove('enter'),1200)}}
+function openSheet(o){const was=sheetOpen;sheetOpen=o;if(o){const q=$('#sheet');q.style.transition=q.style.transform=q.style.opacity='';$('#shbd').style.opacity='';renderSheet()}$('#shw').classList.toggle('open',o);if(o&&!was){const sh=$('#sheet');sh.classList.remove('enter');void sh.offsetWidth;sh.classList.add('enter');setTimeout(()=>sh.classList.remove('enter'),1200)}}
 $('#shbd').onclick=()=>openSheet(false);
 (function(){
   const sh=$('#sheet'),bd=$('#shbd');let dr=null,lastDrag=0;
@@ -585,6 +625,7 @@ $('#shbd').onclick=()=>openSheet(false);
   sh.addEventListener('click',e=>{if(performance.now()-lastDrag<320){e.stopPropagation();e.preventDefault()}},true);
 })();
 $('#sheet').addEventListener('click',e=>{if(e.target.id==='shx')openSheet(false)});
+$('#sheet').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;if(a==='exp')doExport();else if(a==='cp')doCopy();else if(a==='imp')$('#impf').click()});
 $('#sheet').addEventListener('change',e=>{const t=e.target,v=Math.max(0,Math.round(+t.value||0));
   if(t.dataset.ch){charChange(t);return}
   if(t.dataset.p){S.pull=v>0?v:160}
@@ -948,64 +989,85 @@ function drawBanner(list){
   if(!nbFirst)renderDash();nbFirst=false;
 }
 $('#nb').addEventListener('click',e=>{const k=e.target.dataset&&e.target.dataset.k;if(!k)return;const el=e.target.closest('.nt');if(el)el.classList.add('nout');setTimeout(()=>{S.ntf.dis[k]=1;save();ntfCheck()},el?210:0)});
-/* ===== キャラリスト ===== */
-const STAR='★',SORTN={star:'★順',lv:'Lv順',rk:'凸順',name:'名前順',add:'追加順'};
-let charEditId=0;
-const cNum=(v,a,b,d)=>{v=Math.round(+v);return isNaN(v)?d:Math.max(a,Math.min(b,v))};
-function sortedChars(){
-  const m=S.cSort||'star',jp=(x,y)=>x.n.localeCompare(y.n,'ja');
-  const f={star:(x,y)=>y.r-x.r||y.lv-x.lv||jp(x,y),lv:(x,y)=>y.lv-x.lv||y.r-x.r||jp(x,y),rk:(x,y)=>y.rk-x.rk||y.lv-x.lv||jp(x,y),name:jp,add:(x,y)=>x.id-y.id}[m]||((x,y)=>y.r-x.r);
-  return [...S.chars].sort(f);
+/* ===== キャラリスト(一覧はユーザー提供のデータ) ===== */
+const CHARS=[
+ ['c1','異能者・零','S','2026-04-29','1.0 初期','光','ダメージ出力'],['c2','白蔵','S','2026-04-29','1.0 初期','呪','ダメージ出力'],['c3','ちぃちゃん','S','2026-04-29','1.0 初期','光','ダメージ出力'],['c4','ダフォディル','S','2026-04-29','1.0 初期','闇','ダメージ出力'],
+ ['c5','ファルディーヤ','S','2026-04-29','1.0 初期','魂','生存'],['c6','ハトホル','S','2026-04-29','1.0 初期','相','バフ'],['c7','九原','S','2026-04-29','1.0 初期','霊','ダメージ出力'],['c8','早霧','S','2026-04-29','1.0 初期','呪','バフ'],
+ ['c9','アドレー','A','2026-04-29','1.0 初期','呪','生存'],['c10','海月','A','2026-04-29','1.0 初期','魂','ダメージ出力'],['c11','エドガー','A','2026-04-29','1.0 初期','光','生存'],['c12','ハニア','A','2026-04-29','1.0 初期','魂','バフ'],
+ ['c13','ミント','A','2026-04-29','1.0 初期','霊','ダメージ出力'],['c14','翳','A','2026-04-29','1.0 初期','相','ダメージ出力'],['c15','ナナリ','S','2026-04-29','1.0 前半','霊','ダメージ出力'],['c16','潯','S','2026-05-13','1.0 後半','光','バフ'],
+ ['c17','レクイエム','S','2026-06-03','1.1 前半','闇','ダメージ出力'],['c18','カオス','S','2026-06-24','1.1 後半','相','ダメージ出力'],['c19','真紅','S','2026-07-08','1.2 前半','光','ダメージ出力'],['c20','イロヒ','S','2026-07-29','1.2 後半','霊','生存'],
+ ['c21','残虹','S','2026-08-19','1.3 前半','呪','ダメージ出力'],['c22','リンコ','S','2026-09-09','1.3 後半','霊','ダメージ出力'],['c23','クロバネ','S','2026-09-30','1.4 前半','魂','ダメージ出力'],['c24','明音凛','S','2026-10-21','1.4 後半','相','ダメージ出力'],
+ ['c25','イェルム','S','','1.5','',''],['c26','Exe','S','','1.5','','']
+].map(([id,n,r,d,v,e,ro])=>({id,n,r,d,v,e,ro}));
+const ELS=['光','呪','闇','魂','相','霊'],ROLE_S={'ダメージ出力':'出力','生存':'生存','バフ':'バフ'};
+const SORTN={rel:'実装順',new:'新しい順',name:'名前順',rar:'レア順',fav:'お気に入り順'};
+let charEditId='';
+const cst=id=>S.cs[id]||{};
+const cset=(id,k,v)=>{const o=S.cs[id]||(S.cs[id]={});if(v===''||v===false||v==null)delete o[k];else o[k]=v;if(!Object.keys(o).length)delete S.cs[id];save()};
+const cini=c=>[...(c.n.split('・').pop())][0]||'?';
+const fmtD=d=>d.replace(/-/g,'/');
+function relState(c){
+  if(!c.d)return {k:'tbd',label:'実装予定',days:null};
+  const days=dnum(new Date(c.d+'T00:00:00'))-dnum(startOf(new Date()));
+  return days>0?{k:'up',label:days===1?'明日実装':'あと'+days+'日',days}:{k:'rel',label:'実装済み',days};
+}
+function visChars(){
+  const f=S.cF||{};let L=CHARS.slice();
+  if(f.el)L=L.filter(c=>c.e===f.el);
+  if(f.st==='own')L=L.filter(c=>cst(c.id).o);
+  else if(f.st==='not')L=L.filter(c=>relState(c).k==='rel'&&!cst(c.id).o);
+  else if(f.st==='fav')L=L.filter(c=>cst(c.id).f);
+  else if(f.st==='up')L=L.filter(c=>relState(c).k!=='rel');
+  const m=S.cSort||'rel',idx=c=>CHARS.indexOf(c);
+  const key={rel:(x,y)=>idx(x)-idx(y),new:(x,y)=>(y.d||'9999')<(x.d||'9999')?-1:(y.d||'9999')>(x.d||'9999')?1:idx(y)-idx(x),name:(x,y)=>x.n.localeCompare(y.n,'ja'),rar:(x,y)=>(x.r===y.r?0:x.r==='S'?-1:1)||idx(x)-idx(y),fav:(x,y)=>(!!cst(y.id).f-!!cst(x.id).f)||idx(x)-idx(y)}[m]||((x,y)=>idx(x)-idx(y));
+  return L.sort(key);
 }
 function charsHTML(){
-  const L=sortedChars(),n=L.length,s5=L.filter(c=>c.r>=5).length,avgLv=n?Math.round(L.reduce((x,c)=>x+c.lv,0)/n):0,rk=L.reduce((x,c)=>x+c.rk,0);
-  const st=(l,v)=>`<div><b>${v}</b><small>${l}</small></div>`;
-  const tile=(c,i)=>`<div class="ct r${c.r>=5?5:4}${S._newc===c.id?' new':''}" data-c="${c.id}" style="--i:${i}"><div class="cav"><span>${esc([...c.n][0]||'?')}</span></div><div class="cn">${esc(c.n)||'—'}</div><div class="cs">${STAR.repeat(c.r)}</div><div class="cl">Lv${c.lv}${c.e?'・'+esc(c.e):''}</div><div class="cp">${[0,1,2,3,4,5].map(k=>`<i class="${k<c.rk?'on':''}"></i>`).join('')}</div></div>`;
-  return `<section class="card"><div class="ch"><span>ROSTER</span><span>並び：${SORTN[S.cSort||'star']}</span></div><div class="cst">${st('所持',n+'体')}${st('★5',s5+'体')}${st('平均Lv',avgLv||'—')}${st('凸の合計',rk)}</div></section>`+
-    `<div class="cgrid">${L.map(tile).join('')}<div class="ct add" data-c="new" style="--i:${n}"><div class="cav"><span>＋</span></div><div class="cn">追加</div></div></div>`+
-    (n?'':'<div class="hn">「キャラ追加 名前 ★5 Lv60 凸2」でも登録できます</div>');
+  const f=S.cF||{},rel=CHARS.filter(c=>relState(c).k==='rel'),own=rel.filter(c=>cst(c.id).o),sRel=rel.filter(c=>c.r==='S'),sOwn=own.filter(c=>c.r==='S'),favN=CHARS.filter(c=>cst(c.id).f).length,upN=CHARS.length-rel.length;
+  const pct=rel.length?Math.round(own.length/rel.length*100):0;
+  const stat=(k,l,v,sub)=>`<div class="cs2${f.st===k?' on':''}" data-f="st:${k}"><b>${v}</b><small>${l}</small></div>`;
+  const L=visChars(),lab=[f.st&&({own:'保持のみ',not:'未保持のみ',fav:'お気に入りのみ',up:'未実装のみ'})[f.st],f.el].filter(Boolean).join('・');
+  const tile=(c,i)=>{const s=cst(c.id),st=relState(c),role=ROLE_S[c.ro]||'';
+    return `<div class="ct ${c.r==='S'?'r5':'r4'}${s.o?' own':''}${st.k!=='rel'?' up':''}" data-c="${c.id}" style="--i:${i}">${st.k==='rel'?`<i class="bd bo" data-b="o:${c.id}">✓</i>`:''}<i class="bd bf${s.f?' on':''}" data-b="f:${c.id}">${s.f?'♥':'♡'}</i><div class="cav"><span>${esc(cini(c))}</span></div><div class="cn">${esc(c.n)}</div><div class="cl">${c.e?esc(c.e)+(role?'・'+role:''):'—'}</div>${st.k!=='rel'?`<div class="cu">${st.label}</div>`:s.m?'<div class="cu">✎メモ</div>':''}</div>`};
+  return `<section class="card"><div class="ch"><span>ROSTER</span><span>${lab?esc(lab)+'・':''}${SORTN[S.cSort]||'実装順'}</span></div>
+  <div class="cst">${stat('own','保持',own.length+'<em>/'+rel.length+'</em>')}<div class="cs2 noh"><b>${sOwn.length}<em>/${sRel.length}</em></b><small>うちS</small></div>${stat('fav','お気に入り',favN)}${stat('up','未実装',upN)}</div>
+  <div class="cbar"><i style="width:${pct}%"></i></div></section>
+  <div class="epl"><span class="ep${!f.el?' on':''}" data-f="el:">全属性</span>${ELS.map(e=>`<span class="ep${f.el===e?' on':''}" data-f="el:${e}">${e}<em>${CHARS.filter(c=>c.e===e).length}</em></span>`).join('')}</div>
+  <div class="cgrid">${L.map(tile).join('')}</div>`+(L.length?'':'<div class="empty" style="padding:26px 0">条件に合うキャラがいません<br><span class="mu">「キャラ 全員」で絞り込みを解除</span></div>');
 }
-function renderChars(){
+function renderChars(popKey){
   const D=$('#dash'),st=D.scrollTop;D.innerHTML=charsHTML();
-  D.style.overflowY=D.scrollHeight>D.clientHeight+1?'auto':'hidden';D.scrollTop=st;S._newc=null;
+  D.style.overflowY=D.scrollHeight>D.clientHeight+1?'auto':'hidden';D.scrollTop=st;
+  if(popKey){const el=D.querySelector(`[data-b="${popKey}"]`);if(el){el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop')}}
 }
 function charHTML(id){
-  const c=S.chars.find(x=>x.id===id);if(!c)return dHead('キャラ','');
-  const inp=(k,l,v,type,x)=>`<label${x==='w'?' class="w"':''}>${l}<input type="${type}" ${type==='number'?'inputmode="numeric"':''} data-ch="${k}" value="${esc(v)}"${k==='r'?' min="1" max="5"':k==='rk'?' min="0" max="6"':k==='lv'?' min="1"':''}></label>`;
-  return dHead(esc(c.n)||'新しいキャラ','キャラの編集')+
-    `<div class="chero"><div class="cav lg"><span>${esc([...c.n][0]||'?')}</span></div><div><div class="cn2">${esc(c.n)||'名前を入力'}</div><div class="cs">${STAR.repeat(c.r)}</div></div></div>`+
-    `<div class="src"><div class="sf">${inp('n','名前',c.n,'text','w')}</div><div class="sf">${inp('r','★（1〜5）',c.r,'number')}${inp('lv','レベル',c.lv,'number')}${inp('rk','凸（0〜6）',c.rk,'number')}</div><div class="sf">${inp('e','属性など',c.e||'','text','w')}</div><div class="sf">${inp('memo','メモ',c.memo||'','text','w')}</div></div>`+
-    `<div class="cdel">このキャラを削除</div>`;
+  const c=CHARS.find(x=>x.id===id);if(!c)return dHead('キャラ','');
+  const s=cst(id),st=relState(c),rel=st.k==='rel',row=(l,v)=>`<div><span>${l}</span><b>${v}</b></div>`;
+  return dHead(esc(c.n),'キャラ詳細')+
+   `<div class="chero"><div class="cav lg"><span>${esc(cini(c))}</span></div><div><div class="cn2">${esc(c.n)}</div><div class="cmeta"><span class="rb ${c.r}">${c.r}</span>${c.e?esc(c.e):'属性未定'}${c.ro?'・'+esc(c.ro):''}</div></div></div>`+
+   `<div class="dg">${row('実装日',c.d?fmtD(c.d):'未定')}${row('バージョン','Ver.'+c.v)}${row('状態',st.label)}${row('属性・役割',(c.e||'—')+(c.ro?' / '+ROLE_S[c.ro]:''))}</div>`+
+   `<div class="rw2"><div><b>保持している</b><small>${rel?'手に入れたらオン':'実装前なのでまだ選べません'}</small></div><div class="tg2${s.o?' on':''}${rel?'':' dis'}" data-t="o"><i></i></div></div>`+
+   `<div class="rw2"><div><b>お気に入り</b><small>ホームの一覧で♥が付きます</small></div><div class="tg2${s.f?' on':''}" data-t="f"><i></i></div></div>`+
+   `<label class="mm2">メモ<textarea data-ch="m" rows="3" placeholder="凸の状況、育成メモなど">${esc(s.m||'')}</textarea></label>`;
 }
-function charChange(t){
-  const c=S.chars.find(x=>x.id===charEditId);if(!c)return;const k=t.dataset.ch;
-  if(k==='n'||k==='e'||k==='memo')c[k]=t.value.trim();
-  else if(k==='r'){c.r=cNum(t.value,1,5,5);t.value=c.r}else if(k==='lv'){c.lv=cNum(t.value,1,999,1);t.value=c.lv}else if(k==='rk'){c.rk=cNum(t.value,0,6,0);t.value=c.rk}
-  save();const sh=$('#sheet'),q=x=>sh.querySelector(x);
-  if(q('.cn2'))q('.cn2').textContent=c.n||'名前を入力';if(q('.chero .cs'))q('.chero .cs').textContent=STAR.repeat(c.r);if(q('.chero .cav span'))q('.chero .cav span').textContent=[...c.n][0]||'?';
-  if(VIEW==='chars')renderChars();
-}
-function closeChar(){const c=S.chars.find(x=>x.id===charEditId);if(c&&!c.n.trim()){S.chars=S.chars.filter(x=>x!==c);save()}if(VIEW==='chars')renderChars()}
-function parseChar(rest){
-  const o={},free=[];
-  rest.split(/\s+/).filter(Boolean).forEach(tk=>{let m;
-    if((m=tk.match(/^[★☆星]\s*([1-5])$/))||(m=tk.match(/^([1-5])[★星]$/)))o.r=+m[1];
-    else if((m=tk.match(/^(?:Lv|lv|LV|レベル)\s*(\d{1,3})$/))||(m=tk.match(/^(\d{1,3})(?:Lv|lv|LV|レベル)$/)))o.lv=Math.max(1,+m[1]);
-    else if((m=tk.match(/^凸\s*(\d)$/))||(m=tk.match(/^(\d)凸$/)))o.rk=Math.min(6,+m[1]);
-    else if((m=tk.match(/^属性[:：]?(.+)$/)))o.e=m[1];
-    else free.push(tk)});
-  return {o,free};
-}
+function charChange(t){const id=charEditId;if(!id||t.dataset.ch!=='m')return;cset(id,'m',t.value.trim());if(VIEW==='chars')renderChars()}
+function findChars(tok){tok=(tok||'').trim();if(!tok)return [];const ex=CHARS.filter(c=>c.n===tok);if(ex.length)return ex;const sw=CHARS.filter(c=>c.n.startsWith(tok)||c.n.split('・').pop()===tok);if(sw.length)return sw;return CHARS.filter(c=>c.n.includes(tok))}
 $('#dash').addEventListener('click',e=>{
-  if(VIEW!=='chars')return;const el=e.target.closest('[data-c]');if(!el)return;const k=el.dataset.c;
-  if(k==='new'){const c={id:Date.now(),n:'',r:5,lv:1,rk:0,e:'',memo:''};S.chars.push(c);save();charEditId=c.id}else charEditId=+k;
-  sheetMode='char';openSheet(true);
+  if(VIEW!=='chars')return;
+  const b=e.target.closest('[data-b]');
+  if(b){e.stopPropagation();const [k,id]=b.dataset.b.split(':'),c=CHARS.find(x=>x.id===id);if(!c)return;
+    if(k==='o'&&relState(c).k!=='rel')return;
+    cset(id,k,!cst(id)[k]);renderChars(b.dataset.b);try{navigator.vibrate&&navigator.vibrate(7)}catch(x){}return}
+  const fl=e.target.closest('[data-f]');
+  if(fl){const [k,v]=fl.dataset.f.split(':');S.cF=S.cF||{};S.cF[k]=S.cF[k]===v?'':v;save();renderChars();return}
+  const el=e.target.closest('[data-c]');if(!el)return;charEditId=el.dataset.c;sheetMode='char';openSheet(true);
 });
 $('#sheet').addEventListener('click',e=>{
-  const d=e.target.closest('.cdel');if(!d)return;
-  if(!d.dataset.arm){d.dataset.arm='1';d.textContent='もう一度押すと削除します';setTimeout(()=>{if(d.isConnected){delete d.dataset.arm;d.textContent='このキャラを削除'}},2600)}
-  else{S.chars=S.chars.filter(x=>x.id!==charEditId);save();openSheet(false);if(VIEW==='chars')renderChars()}
+  const t=e.target.closest('.tg2');if(!t||t.classList.contains('dis')||sheetMode!=='char')return;
+  const k=t.dataset.t,id=charEditId,v=!cst(id)[k];cset(id,k,v);t.classList.toggle('on',v);
+  try{navigator.vibrate&&navigator.vibrate(7)}catch(x){}if(VIEW==='chars')renderChars();
 });
+$('#sheet').addEventListener('input',e=>{const t=e.target;if(sheetMode==='char'&&t.dataset&&t.dataset.ch==='m')cset(charEditId,'m',t.value.trim())});
 /* ===== ホームのカードの詳細 ===== */
 let detailKey='',detailFirst=false;
 const THEME={f:{c:['#a8721a','#fccc54','#fff0a8'],a:'#fccc54',dot:'#fccc54'},e:{c:['#2a54b0','#4aa0f0','#8ff0ff'],a:'#4aa0f0',dot:'#8ff0ff'},b:{c:['#8a4f86','#d28ac4','#ffd3f0'],a:'#d28ac4',dot:'#ffd3f0'},w:{c:['#8d8d8d','#d8d8d8','#ffffff'],a:'#e6e6e6',dot:'#ffffff'}};
@@ -1108,7 +1170,7 @@ function bot(h,o={}){
   const d=bubble('a','<span class="dots"><i></i><i></i><i></i></span>');
   setTimeout(()=>{d.innerHTML=h;if(!o.keep)fadeT=setTimeout(fadeAll,o.ms||2400)},420);
 }
-const help=()=>`<div class="hp"><b>記録</b>+5000 ボス報酬／-3000 ガチャ<br><b></b>円石 +300／甲虫 +1000／1.2万 売却<br><b>修正</b>取り消し／履歴<br><b>設定</b>目標 100000／セット ファンス 50000／設定<br><b>画面</b>ホーム／残高／分析／キャラ／予測／お知らせ<br><b>読取</b>スクショ（バッグ画面・ランキング）</div>`;
+const help=()=>`<div class="hp"><b>記録</b>+5000 ボス報酬／-3000 ガチャ<br><b></b>円石 +300／甲虫 +1000／1.2万 売却<br><b>修正</b>取り消し／履歴<br><b>設定</b>目標 100000／セット ファンス 50000／設定<br><b>画面</b>ホーム／残高／分析／キャラ／予測／お知らせ<br><b>読取</b>スクショ（バッグ画面・ランキング）<br><b>データ</b>書き出し／コピー／読み込み／インポート取り消し</div>`;
 
 const norm=s=>s.replace(/[！-～]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0)).replace(/(^|\s)[−ー‐–](?=\s*\d)/g,'$1-').replace(/＋/g,'+').replace(/　/g,' ').trim();
 const curOf=t=>/円石|えんせき/.test(t)?'e':/甲虫|ビートル/.test(t)?'b':'f';
@@ -1136,7 +1198,7 @@ function handle(raw){
     if(p.type==='sign'){
       if(/入手|獲得|増|プラス|^\+/.test(t)){pending=null;return record(p.c,p.v,p.note)}
       if(/消費|使|減|マイナス|^-/.test(t)){pending=null;return record(p.c,-p.v,p.note)}
-    }else if(p.type==='shot'){pending=null;if(/^(はい|うん|ok|yes|y|反映)/i.test(t))return applyShot(p);return bot('キャンセルしました。')}else if(p.type==='reset'){
+    }else if(p.type==='imp'){pending=null;if(/^(はい|うん|ok|yes|y|反映|置き換え)/i.test(t))return applyImport(p.obj);return bot('キャンセルしました。')}else if(p.type==='shot'){pending=null;if(/^(はい|うん|ok|yes|y|反映)/i.test(t))return applyShot(p);return bot('キャンセルしました。')}else if(p.type==='reset'){
       pending=null;
       if(/^(はい|うん|ok|yes|消す|y)/i.test(t)){S.log=[];S.goals={f:0,e:0};S.open={f:0,e:0,b:0,w:0,set:false};save();shown.f=shown.e=shown.b=0;render();return bot('リセットしました。')}
       return bot('キャンセルしました。');
@@ -1151,34 +1213,44 @@ function handle(raw){
     if(!('Notification' in window))return bot('このブラウザはシステム通知に対応していません。アプリを開いている間は、画面上のお知らせで通知します。',{ms:5200});
     try{Notification.requestPermission().then(r=>bot(r==='granted'?'システム通知を許可しました（アプリを開いたまま別の画面にいる間に届きます）。':'許可されませんでした。アプリを開いている間は画面上のお知らせで通知します。',{ms:4800}))}catch(x){bot('許可を求められませんでした。',{ms:3000})}
     return}
+  if(/^(インポート|読み込み|読込|バックアップ)\s*(取り消し|取消|元に戻す|復元)$/.test(t))return undoImport();
+  if(/^(エクスポート|書き出し|書出し|バックアップ)\s*(コピー|テキスト)$/.test(t))return doCopy();
+  if(/^(エクスポート|書き出し|書出し|バックアップ|export)$/i.test(t))return doExport();
+  if(/^(インポート|読み込み|読込|復元|リストア|import)$/i.test(t)){$('#impf').click();return bot('書き出したjsonファイルを選んでください。<div class="mu">書き出しの内容を貼り付け（Ctrl+V）しても読み込めます</div>',{ms:3600})}
   const cmd=t.match(/^キャラ(?:リスト|一覧)?\s*(.*)$/);
   if(cmd){
-    const rest=(cmd[1]||'').trim();
-    if(!rest){VIEW='chars';render();return bot('キャラリストを開きました。<div class="mu">「キャラ追加 名前 ★5 Lv60 凸2」で登録／「キャラ並び Lv」で並べ替え</div>',{ms:3600})}
-    const sub=rest.match(/^(追加|登録|削除|並び|並べ替え|ソート)\s*(.*)$/);
+    const rest=cmd[1].trim(),open=()=>{VIEW='chars';render()};
+    if(!rest){open();return bot('キャラリストを開きました。<div class="mu">「キャラ 保持 白蔵」「キャラ お気に入り 零」「キャラ メモ 白蔵 …」「キャラ 光」で絞り込み</div>',{ms:4200})}
+    const sub=rest.match(/^(未保持|持ってない|保持|持ってる|お気に入り|メモ|並び|並べ替え|絞り込み|全員|クリア)\s*(.*)$/);
     if(sub){
-      const k=sub[1],arg=sub[2].trim();
-      if(/追加|登録/.test(k)){
-        const {o,free}=parseChar(arg);
-        if(!free.length)return bot('名前を付けてください。<div class="mu">例：キャラ追加 ナナリー ★5 Lv60 凸2</div>',{ms:4200});
-        const n=free[0];if(S.chars.some(c=>c.n===n))return bot(`「${esc(n)}」はすでに登録されています。`,{ms:3000});
-        const c={id:Date.now(),n,r:o.r||5,lv:o.lv||1,rk:o.rk||0,e:o.e||free[1]||'',memo:free.slice(2).join(' ')};
-        S.chars.push(c);S._newc=c.id;save();VIEW='chars';render();
-        return bot(`<b>${esc(n)}</b> を登録しました<div class="mu">${STAR.repeat(c.r)}　Lv${c.lv}　凸${c.rk}${c.e?'　'+esc(c.e):''}</div>`,{ms:3200});
+      const k=sub[1],arg=sub[2].trim(),names=arg.split(/[\s、,]+/).filter(Boolean);
+      if(k==='全員'||k==='クリア'){S.cF={};save();open();return bot('絞り込みを解除しました。',{ms:2000})}
+      if(/^(保持|持ってる|未保持|持ってない)$/.test(k)){
+        if(!names.length){S.cF={st:/未|ない/.test(k)?'not':'own'};save();open();return bot(`${/未|ない/.test(k)?'未保持':'保持'}のキャラだけを表示します。`,{ms:2400})}
+        const on=!/未|ない/.test(k),hit=[],ng=[];
+        names.forEach(n=>{const L=findChars(n);if(!L.length){ng.push(n);return}L.forEach(c=>{if(relState(c).k!=='rel'){ng.push(c.n+'（未実装）');return}cset(c.id,'o',on);hit.push(c.n)})});
+        open();return bot(`${hit.length?`<b>${esc(hit.join('、'))}</b> を${on?'保持':'未保持'}にしました`:'変更できませんでした'}${ng.length?`<div class="mu">見つからない／変更不可：${esc(ng.join('、'))}</div>`:''}`,{ms:3600});
       }
-      if(/削除/.test(k)){
-        const c=S.chars.find(x=>x.n===arg)||S.chars.find(x=>arg&&x.n.startsWith(arg));
-        if(!c)return bot(`「${esc(arg)}」は見つかりません。`,{ms:3000});
-        S.chars=S.chars.filter(x=>x!==c);save();render();return bot(`${esc(c.n)} を削除しました。`,{ms:2600});
+      if(k==='お気に入り'){
+        if(!names.length){S.cF={st:'fav'};save();open();return bot('お気に入りのキャラだけを表示します。',{ms:2400})}
+        const hit=[],ng=[];names.forEach(n=>{const L=findChars(n);if(!L.length){ng.push(n);return}L.forEach(c=>{const v=!cst(c.id).f;cset(c.id,'f',v);hit.push(c.n+(v?'♥':'♡'))})});
+        open();return bot(`${hit.length?`お気に入り：<b>${esc(hit.join('、'))}</b>`:'見つかりません'}${ng.length?`<div class="mu">見つからない：${esc(ng.join('、'))}</div>`:''}`,{ms:3200});
       }
-      const key=/★|星/.test(arg)?'star':/Lv|レベル|lv/i.test(arg)?'lv':/凸/.test(arg)?'rk':/名前|あいう/.test(arg)?'name':/追加|登録/.test(arg)?'add':null;
-      if(!key)return bot('並び順：★・Lv・凸・名前・追加 から選べます。<div class="mu">例：キャラ並び Lv</div>',{ms:4200});
-      S.cSort=key;save();VIEW='chars';render();return bot(`並び順を ${SORTN[key]} にしました。`,{ms:2200});
+      if(k==='メモ'){
+        const m=arg.match(/^(\S+)\s*(.*)$/),L=m?findChars(m[1]):[];
+        if(!L.length)return bot('「キャラ メモ 白蔵 凸2まで」のように、名前に続けて内容を書いてください。',{ms:4200});
+        cset(L[0].id,'m',m[2].trim());open();return bot(`<b>${esc(L[0].n)}</b> のメモを${m[2].trim()?'更新':'消去'}しました。`,{ms:2600});
+      }
+      if(/並/.test(k)){
+        const key=/新/.test(arg)?'new':/実装/.test(arg)?'rel':/名前|あいう/.test(arg)?'name':/レア|S|星/.test(arg)?'rar':/お気に入り|♥/.test(arg)?'fav':null;
+        if(!key)return bot('並び順：実装順・新しい順・名前・レア・お気に入り から選べます。<div class="mu">例：キャラ並び 新しい順</div>',{ms:4200});
+        S.cSort=key;save();open();return bot(`並び順を ${SORTN[key]} にしました。`,{ms:2200});
+      }
+      if(k==='絞り込み'){const r2=arg;S.cF={};if(ELS.includes(r2))S.cF.el=r2;else if(/未保持/.test(r2))S.cF.st='not';else if(/保持/.test(r2))S.cF.st='own';else if(/お気に入り/.test(r2))S.cF.st='fav';else if(/未実装/.test(r2))S.cF.st='up';save();open();return bot('絞り込みました。',{ms:1800})}
     }
-    const {o,free}=parseChar(rest),n=free[0],c=n&&(S.chars.find(x=>x.n===n)||S.chars.find(x=>x.n.startsWith(n)));
-    if(c){Object.assign(c,o);if(free[1])c.e=free[1];save();VIEW='chars';render();
-      return bot(`<b>${esc(c.n)}</b> を更新しました<div class="mu">${STAR.repeat(c.r)}　Lv${c.lv}　凸${c.rk}${c.e?'　'+esc(c.e):''}</div>`,{ms:3200})}
-    if(n&&Object.keys(o).length)return bot(`「${esc(n)}」は未登録です。<div class="mu">「キャラ追加 ${esc(n)}」で登録できます</div>`,{ms:3600});
+    if(ELS.includes(rest)){S.cF={el:rest};save();open();return bot(`属性「${rest}」だけを表示します。`,{ms:2400})}
+    const L=findChars(rest.split(/\s+/)[0]);
+    if(L.length&&!/^[+\-]/.test(rest)){open();charEditId=L[0].id;sheetMode='char';openSheet(true);return bot(`<b>${esc(L[0].n)}</b> の詳細を開きました。`,{ms:2000})}
   }
   const am=t.match(/^(分析|分析レポート|レポート)\s*(ファンス|円石|甲虫コイン|甲虫)?$/);
   if(am){VIEW='analysis';render();return bot('分析レポートを開きました。<div class="mu">「ホーム」で戻ります</div>',{ms:2400})}
@@ -1370,6 +1442,73 @@ function applyShot(p){
 }
 $('#shot').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)readShot(f)};
 document.addEventListener('paste',e=>{const it=[...((e.clipboardData&&e.clipboardData.items)||[])].find(i=>i.type.indexOf('image/')===0);if(it){e.preventDefault();readShot(it.getAsFile())}});
+/* ===== データの書き出し・読み込み ===== */
+const EXP_APP='nte-ledger';
+const stampNow=()=>{const d=new Date();return d.getFullYear()+p2(d.getMonth()+1)+p2(d.getDate())+'-'+p2(d.getHours())+p2(d.getMinutes())};
+const exportJSON=()=>JSON.stringify({app:EXP_APP,ver:5,exported:new Date().toISOString(),data:snapshot()},null,1);
+function doExport(){
+  const txt=exportJSON(),name='nte-ledger-'+stampNow()+'.json';
+  try{
+    const f=new File([txt],name,{type:'application/json'});
+    if(/iPhone|iPad|Android/i.test(navigator.userAgent)&&navigator.canShare&&navigator.canShare({files:[f]})){
+      navigator.share({files:[f],title:name}).catch(()=>{});
+      return bot(`書き出しの共有画面を開きました。「ファイルに保存」などで保存してください。<div class="mu">記録 ${S.log.length}件</div>`,{ms:4600});
+    }
+  }catch(e){}
+  try{
+    const u=URL.createObjectURL(new Blob([txt],{type:'application/json'})),a=document.createElement('a');
+    a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);
+    bot(`<b>${name}</b> を書き出しました。<div class="mu">記録 ${S.log.length}件・「読み込み」で復元できます</div>`,{ms:4200});
+  }catch(e){bot('書き出せませんでした。「書き出し コピー」でテキストをコピーできます。',{ms:4200})}
+}
+function doCopy(){
+  const txt=exportJSON();
+  const ok=()=>bot('データをクリップボードにコピーしました。<div class="mu">別の端末で貼り付け（Ctrl+V）すると読み込めます</div>',{ms:4200});
+  const ng=()=>bot('コピーできませんでした。「書き出し」でファイルとして保存してください。',{ms:4200});
+  try{if(navigator.clipboard&&navigator.clipboard.writeText)return navigator.clipboard.writeText(txt).then(ok).catch(ng)}catch(e){}
+  ng();
+}
+function parseImport(txt){
+  let o;try{o=JSON.parse(String(txt).replace(/^﻿/,''))}catch(e){return {err:'JSONとして読み取れませんでした。'}}
+  const d=o&&o.app===EXP_APP&&o.data&&typeof o.data==='object'?o.data:(o&&Array.isArray(o.log)?o:null);
+  if(!d)return {err:'NTE Ledgerの書き出しファイルではありません。'};
+  const isObj=x=>x&&typeof x==='object'&&!Array.isArray(x),nn=x=>{x=Math.round(+x);return Number.isFinite(x)?x:0},CS=['f','e','b'];
+  const log=(Array.isArray(d.log)?d.log:[]).filter(e=>e&&Number.isFinite(+e.a)&&Number.isFinite(+e.t)).map(e=>({id:+e.id||+e.t,c:CS.includes(e.c)?e.c:'f',a:Math.round(+e.a),n:String(e.n||'').slice(0,60),t:+e.t})).sort((x,y)=>x.t-y.t);
+  const op=isObj(d.open)?d.open:{},open={f:nn(op.f),e:nn(op.e),b:nn(op.b),w:nn(op.w),set:!!op.set||log.length>0};
+  const gl=isObj(d.goals)?d.goals:{},goals={f:Math.max(0,nn(gl.f)),e:Math.max(0,nn(gl.e))};
+  const ids=S.src.map(x=>x.id),src=(Array.isArray(d.src)?d.src:[]).filter(x=>x&&ids.includes(x.id)).map(x=>({id:x.id,f:Math.max(0,nn(x.f)),e:Math.max(0,nn(x.e)),b:Math.max(0,nn(x.b)),anchor:/^\d{4}-\d{2}-\d{2}$/.test(x.anchor||'')?x.anchor:undefined}));
+  const out={v:5,mig:1,fcMode:['auto','obs','sched','blend'].includes(d.fcMode)?d.fcMode:'auto',cs:isObj(d.cs)?d.cs:{},cSort:typeof d.cSort==='string'?d.cSort:'rel',cF:isObj(d.cF)?d.cF:{},ntf:isObj(d.ntf)?d.ntf:undefined,log,goals,open,pull:nn(d.pull)>0?nn(d.pull):160,rcv:isObj(d.rcv)?d.rcv:{},src};
+  return {out,exported:o.exported};
+}
+function askImport(txt){
+  const r=parseImport(txt);
+  if(r.err)return bot(r.err+'<div class="mu">「書き出し」で保存したjsonファイルを選んでください。</div>',{ms:4800});
+  const o=r.out,b=c=>(o.open[c]||0)+o.log.filter(e=>e.c===c).reduce((x,e)=>x+e.a,0),w=(o.open.w||0)+o.log.filter(e=>e.c==='f'&&e.a>0).reduce((x,e)=>x+e.a,0);
+  const range=o.log.length?`${md(o.log[0].t)}〜${md(o.log[o.log.length-1].t)}`:'記録なし';
+  pending={type:'imp',obj:o};openSheet(false);clearTimeout(fadeT);fadeAll();
+  bot(`読み込み内容：記録 ${o.log.length}件（${range}）<div class="mu">ファンス ${nf(b('f'))}／円石 ${nf(b('e'))}${b('b')?`／甲虫コイン ${nf(b('b'))}`:''}／財力値 ${nf(w)}</div>今のデータをすべて置き換えます。よろしければ「はい」と送ってください。<div class="mu">あとから「インポート取り消し」で戻せます</div>`,{keep:true});
+}
+function applyImport(o){
+  try{
+    localStorage.setItem('nte_fans_bak',JSON.stringify(snapshot()));
+    localStorage.setItem('nte_fans',JSON.stringify(o));
+    sessionStorage.setItem('nte_imp','1');
+  }catch(e){return bot('保存できませんでした（ブラウザの保存容量を確認してください）。',{ms:4800})}
+  bot('読み込んでいます…',{ms:900});setTimeout(()=>location.reload(),500);
+}
+function undoImport(){
+  const b=localStorage.getItem('nte_fans_bak');
+  if(!b)return bot('戻せるバックアップがありません。',{ms:2800});
+  try{localStorage.setItem('nte_fans',b);localStorage.removeItem('nte_fans_bak');sessionStorage.setItem('nte_imp','undo')}catch(e){return bot('戻せませんでした。',{ms:2800})}
+  bot('元に戻しています…',{ms:900});setTimeout(()=>location.reload(),500);
+}
+function readImport(file){
+  clearTimeout(fadeT);fadeAll();
+  (file.text?file.text():new Promise((ok,ng)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=ng;r.readAsText(file)})).then(askImport).catch(()=>bot('ファイルを読み込めませんでした。'));
+}
+$('#impf').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)readImport(f)};
+document.addEventListener('paste',e=>{const t=(e.clipboardData&&e.clipboardData.getData('text'))||'';if(t.trim()[0]==='{'&&t.indexOf('"nte-ledger"')>0){e.preventDefault();askImport(t)}});
+try{const f=sessionStorage.getItem('nte_imp');if(f){sessionStorage.removeItem('nte_imp');setTimeout(()=>bot(f==='undo'?'インポート前の状態に戻しました。':'読み込みました。<div class="mu">「インポート取り消し」で元に戻せます</div>',{ms:4600}),700)}}catch(e){}
 if(navigator.virtualKeyboard){try{const vk=navigator.virtualKeyboard;vk.overlaysContent=true;document.documentElement.classList.add('vk');const upKb=()=>document.documentElement.style.setProperty('--kb',Math.round(vk.boundingRect.height)+'px');vk.addEventListener('geometrychange',upKb);upKb()}catch(e){}}
 let rzT,pendRefit=false;const refit=()=>{if(document.activeElement&&document.activeElement.id==='q'){pendRefit=true;return}clearTimeout(rzT);rzT=setTimeout(renderDash,160)};$('#q').addEventListener('blur',()=>{if(pendRefit){pendRefit=false;refit()}});addEventListener('resize',refit);addEventListener('orientationchange',refit);if(window.visualViewport)visualViewport.addEventListener('resize',refit);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(refit);
 </script>
