@@ -373,7 +373,7 @@ input{transition:border-color .2s,box-shadow .25s}input:focus{box-shadow:0 0 0 4
   <div id="nb"></div>
   <div id="dash"></div>
   <input type="file" accept="image/*" id="shot" hidden>
-  <input type="file" accept="application/json,.json,text/plain" id="impf" hidden>
+  <input type="file" id="impf" hidden>
   <div id="shw"><div id="shbd"></div><div id="sheet"></div></div>
   <div id="log"></div>
   <div class="inp"><input id="q" enterkeyhint="send" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="メッセージ"><button id="send" aria-label="送信"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div>
@@ -1191,6 +1191,7 @@ function record(c,v,note){
 const INC=/入手|獲得|もらっ|貰|収入|入金|稼|報酬|ドロップ|売却|売っ|増/,EXP=/使[っい]|消費|購入|買|ガチャ|支出|出金|課金|払|減/;
 let pending=null;
 function handle(raw){
+  if(/^\s*\{/.test(raw)&&raw.indexOf('nte-ledger')>0){clearTimeout(fadeT);fadeAll();return askImport(raw)}
   const t=norm(raw);if(!t)return;
   clearTimeout(fadeT);fadeAll();user(raw);
   if(pending){
@@ -1469,7 +1470,7 @@ function doCopy(){
   ng();
 }
 function parseImport(txt){
-  let o;try{o=JSON.parse(String(txt).replace(/^﻿/,''))}catch(e){return {err:'JSONとして読み取れませんでした。'}}
+  let o;txt=String(txt).replace(/[\u200B-\u200D\uFEFF]/g,'').trim();const i=txt.indexOf('{'),j=txt.lastIndexOf('}');if(i>0&&j>i)txt=txt.slice(i,j+1);try{o=JSON.parse(txt)}catch(e){return {err:'JSONとして読み取れませんでした。コピーが途中で切れている可能性があります。'}}
   const d=o&&o.app===EXP_APP&&o.data&&typeof o.data==='object'?o.data:(o&&Array.isArray(o.log)?o:null);
   if(!d)return {err:'NTE Ledgerの書き出しファイルではありません。'};
   const isObj=x=>x&&typeof x==='object'&&!Array.isArray(x),nn=x=>{x=Math.round(+x);return Number.isFinite(x)?x:0},CS=['f','e','b'];
@@ -1507,7 +1508,7 @@ function readImport(file){
   (file.text?file.text():new Promise((ok,ng)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=ng;r.readAsText(file)})).then(askImport).catch(()=>bot('ファイルを読み込めませんでした。'));
 }
 $('#impf').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)readImport(f)};
-document.addEventListener('paste',e=>{const t=(e.clipboardData&&e.clipboardData.getData('text'))||'';if(t.trim()[0]==='{'&&t.indexOf('"nte-ledger"')>0){e.preventDefault();askImport(t)}});
+document.addEventListener('paste',e=>{const cd=e.clipboardData;if(!cd)return;const f=[...(cd.files||[])].find(x=>/json|text/.test(x.type)||/\.json$/i.test(x.name));if(f){e.preventDefault();return readImport(f)}const t=cd.getData('text')||'';if(t.indexOf('nte-ledger')>=0&&t.indexOf('{')>=0){e.preventDefault();askImport(t)}});
 try{const f=sessionStorage.getItem('nte_imp');if(f){sessionStorage.removeItem('nte_imp');setTimeout(()=>bot(f==='undo'?'インポート前の状態に戻しました。':'読み込みました。<div class="mu">「インポート取り消し」で元に戻せます</div>',{ms:4600}),700)}}catch(e){}
 if(navigator.virtualKeyboard){try{const vk=navigator.virtualKeyboard;vk.overlaysContent=true;document.documentElement.classList.add('vk');const upKb=()=>document.documentElement.style.setProperty('--kb',Math.round(vk.boundingRect.height)+'px');vk.addEventListener('geometrychange',upKb);upKb()}catch(e){}}
 let rzT,pendRefit=false;const refit=()=>{if(document.activeElement&&document.activeElement.id==='q'){pendRefit=true;return}clearTimeout(rzT);rzT=setTimeout(renderDash,160)};$('#q').addEventListener('blur',()=>{if(pendRefit){pendRefit=false;refit()}});addEventListener('resize',refit);addEventListener('orientationchange',refit);if(window.visualViewport)visualViewport.addEventListener('resize',refit);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(refit);
