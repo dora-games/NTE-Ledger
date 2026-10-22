@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-visual">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#1D1D1D">
 <title>NTE Ledger</title>
@@ -364,6 +364,29 @@ input{transition:border-color .2s,box-shadow .25s}input:focus{box-shadow:0 0 0 4
 .mm2 textarea:focus{outline:0;border-color:#666;box-shadow:0 0 0 3px #ffffff1c}
 .bt2{flex:1;min-width:88px;padding:10px 8px;border-radius:12px;background:var(--p2);border:1px solid #3a3a3a;color:var(--tx);font:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:transform .16s,background .2s}
 .bt2:active{transform:scale(.95);background:#333}
+
+/* ===== UI改善 v2 ===== */
+:root{--kb:0px;--vvt:0px;--kdur:.34s;--kease:cubic-bezier(.22,.82,.28,1)}
+html{touch-action:manipulation}
+/* iOSは16px未満の入力欄にフォーカスすると画面が勝手にズームして動く → 防止 */
+#q{font-size:16px;line-height:1.3}
+.mm2 textarea{font-family:inherit;line-height:1.5}
+@supports (-webkit-touch-callout:none){.sf input,.mm2 textarea{font-size:16px}}
+/* キーボード: Chromium以外(iOS等)でも同じ動きにする */
+.kbf{--kl:max(0px,calc(var(--kb,0px) - var(--sab) + 4px))}
+.kbf #app,.kbf #wm{translate:0 var(--vvt)}
+.kbf .inp,.vk .inp{transform:translateY(calc(-1 * var(--kl)));transition:transform var(--kdur) var(--kease)}
+.kbf #log,.vk #log{transition:bottom var(--kdur) var(--kease)}
+#log{z-index:10}
+/* 入力欄: すりガラス + キーボード表示中だけ下地を敷く */
+#q{background:#2c2c2cd1;-webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3);border:1px solid #ffffff1f;box-shadow:0 6px 20px #0006,inset 0 1px 0 #ffffff0d;transition:border-color .2s,box-shadow .25s}
+#q:focus{border-color:#ffffff4d;box-shadow:0 0 0 4px #ffffff1a,0 6px 20px #0006}
+.inp::before{content:"";position:absolute;left:0;right:0;top:-12px;bottom:-1px;z-index:-1;pointer-events:none;background:linear-gradient(to top,#1d1d1d 0,#1d1d1df0 42%,#1d1d1d00 100%);opacity:0;transition:opacity var(--kdur) var(--kease)}
+html.kbo .inp::before{opacity:1}
+/* グラフ解像度: 保持されたtransformレイヤー/will-changeによる低解像度ラスタを避ける */
+svg.ch2,svg.ch2 text{shape-rendering:geometricPrecision;text-rendering:geometricPrecision}
+#sheet,.vk #sheet{will-change:auto}
+#dash .card,#dash .ct,.bu,.bd{animation-fill-mode:backwards}
 </style>
 </head>
 <body>
@@ -1510,8 +1533,18 @@ function readImport(file){
 $('#impf').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)readImport(f)};
 document.addEventListener('paste',e=>{const cd=e.clipboardData;if(!cd)return;const f=[...(cd.files||[])].find(x=>/json|text/.test(x.type)||/\.json$/i.test(x.name));if(f){e.preventDefault();return readImport(f)}const t=cd.getData('text')||'';if(t.indexOf('nte-ledger')>=0&&t.indexOf('{')>=0){e.preventDefault();askImport(t)}});
 try{const f=sessionStorage.getItem('nte_imp');if(f){sessionStorage.removeItem('nte_imp');setTimeout(()=>bot(f==='undo'?'インポート前の状態に戻しました。':'読み込みました。<div class="mu">「インポート取り消し」で元に戻せます</div>',{ms:4600}),700)}}catch(e){}
-if(navigator.virtualKeyboard){try{const vk=navigator.virtualKeyboard;vk.overlaysContent=true;document.documentElement.classList.add('vk');const upKb=()=>document.documentElement.style.setProperty('--kb',Math.round(vk.boundingRect.height)+'px');vk.addEventListener('geometrychange',upKb);upKb()}catch(e){}}
+if(navigator.virtualKeyboard){try{const vk=navigator.virtualKeyboard;vk.overlaysContent=true;document.documentElement.classList.add('vk');const upKb=()=>{const h=Math.round(vk.boundingRect.height);document.documentElement.style.setProperty('--kb',h+'px');document.documentElement.classList.toggle('kbo',h>80)};vk.addEventListener('geometrychange',upKb);upKb()}catch(e){}}
 let rzT,pendRefit=false;const refit=()=>{if(document.activeElement&&document.activeElement.id==='q'){pendRefit=true;return}clearTimeout(rzT);rzT=setTimeout(renderDash,160)};$('#q').addEventListener('blur',()=>{if(pendRefit){pendRefit=false;refit()}});addEventListener('resize',refit);addEventListener('orientationchange',refit);if(window.visualViewport)visualViewport.addEventListener('resize',refit);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(refit);
+
+/* ---- キーボード追従(visualViewport) / DPR変化でグラフ再描画 ---- */
+(()=>{const R=document.documentElement,vv=window.visualViewport;
+if(vv&&!navigator.virtualKeyboard){R.classList.add('kbf');let raf=0,last='';
+const upd=()=>{raf=0;const z=vv.scale>1.01;const d=Math.round(innerHeight-vv.height);const kb=(!z&&d>80)?d:0,t=(!z&&kb)?Math.round(vv.offsetTop):0,k=kb+'|'+t;if(k===last)return;last=k;
+R.style.setProperty('--kb',kb+'px');R.style.setProperty('--vvt',t+'px');R.classList.toggle('kbo',kb>0)};
+const sch=()=>{if(!raf)raf=requestAnimationFrame(upd)};
+vv.addEventListener('resize',sch);vv.addEventListener('scroll',sch);addEventListener('focusin',sch);addEventListener('focusout',()=>setTimeout(sch,60));upd()}
+if(window.matchMedia){let mq;const on=()=>{w();refit()},w=()=>{if(mq)mq.removeEventListener('change',on);mq=matchMedia('(resolution:'+devicePixelRatio+'dppx)');mq.addEventListener('change',on)};try{w()}catch(e){}}
+})();
 </script>
 </body>
 </html>
